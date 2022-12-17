@@ -3,12 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:get/get.dart';
+import 'admin_main_page.dart';
 import 'enter_sms_page.dart';
+import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
 
 class EnterPhonePage extends StatefulWidget {
-  const EnterPhonePage({super.key});
+  final bool loginAsWorker;
+
+  const EnterPhonePage({super.key, required this.loginAsWorker});
 
   @override
   State<EnterPhonePage> createState() => _EnterPhonePageState();
@@ -19,13 +24,6 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
   final _adminPhoneController = TextEditingController();
   final _workerPhoneController = TextEditingController();
   Widget _buttonLabel = const Text('Отправить код');
-  late final _loginAsWorker;
-
-  @override
-  void initState() {
-    super.initState();
-    _loginAsWorker = Get.arguments[0] == 'worker';
-  }
 
   void sendTelNumbers() {
     // Send data to backend and wait for SMS
@@ -34,7 +32,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       print(_workerPhoneController.text);
       setState(() {
         _buttonLabel = const SpinKitThreeBounce(
-          color: Colors.white,
+          color: Colors.black,
           size: 25.0,
         );
       });
@@ -44,15 +42,18 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(content: Text('Processing Data')),
       // );
-      Get.to(const EnterSMSPage());
+      widget.loginAsWorker;
+      Get.to(EnterSMSPage(
+          nextPage: widget.loginAsWorker
+              ? const WorkersMainPage()
+              : const AdminsMainPage()));
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      appBar: getAppBar("Заполнить"),
+      backgroundColor: brownColor,
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
@@ -60,31 +61,47 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 10.h),
+              SizedBox(height: 40.h),
+              Text(
+                "Заполнить",
+                style: TextStyle(
+                  color: Theme.of(context).primaryColorDark,
+                  fontSize: 40.h,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              SizedBox(height: 20.h),
               Form(
                 key: _formKey,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     getTelNumberInputField(
-                        'Номер телефона администратора', _adminPhoneController),
+                        'Телефонный номер админа', _adminPhoneController),
+                    SizedBox(height: 4.h),
                     // Если юзер нажал на кнопку "войти как работник" тогда показываем
-                    _loginAsWorker
-                        ? getTelNumberInputField(
-                            'Номер телефона работника', _workerPhoneController)
+                    widget.loginAsWorker
+                        ? getTelNumberInputField('Телефонный номер работника',
+                            _workerPhoneController)
                         : const SizedBox(height: 0),
                   ],
                 ),
               ),
-              SizedBox(height: 4.h),
+              SizedBox(height: 20.h),
               FloatingActionButton.extended(
                 onPressed: sendTelNumbers,
-                elevation: 0,
-                backgroundColor: Theme.of(context).primaryColorDark,
-                heroTag: "1",
                 label: _buttonLabel,
-                icon: const Icon(Icons.send_rounded),
+                foregroundColor: Theme.of(context).primaryColorDark,
+                heroTag: "1",
+                elevation: 0,
+                backgroundColor: Theme.of(context).primaryColorLight,
+                shape: const BeveledRectangleBorder(
+                    borderRadius: BorderRadius.zero),
               ),
-              SizedBox(height: 10.h),
+              SizedBox(
+                height: 40.h,
+              )
             ],
           ),
         ),
@@ -94,8 +111,12 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
 
   Widget getTelNumberInputField(
       String label, TextEditingController controller) {
-    return Padding(
-      padding: EdgeInsets.all(5.w),
+    return Container(
+      margin: EdgeInsets.only(left: 50.w, right: 50.w),
+      padding: const EdgeInsets.only(left: 20, top: 5, right: 20, bottom: 5),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+      ),
       child: TextFormField(
         controller: controller,
         validator: (String? value) {
@@ -111,11 +132,14 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
         },
         onChanged: (value) {
           _formKey.currentState!.validate();
+          if (value.length == 14) {
+            FocusScope.of(context).nextFocus();
+          }
         },
         decoration: InputDecoration(
           labelText: label,
         ),
-        cursorColor: Theme.of(context).primaryColorDark,
+        cursorColor: Theme.of(context).primaryColorLight,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,

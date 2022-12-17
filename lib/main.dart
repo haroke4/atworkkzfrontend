@@ -5,7 +5,13 @@ import 'package:get/get.dart';
 import 'pages/login_page.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.landscapeRight,
+    DeviceOrientation.landscapeLeft,
+  ]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky, overlays: []);
 }
 
 class MyApp extends StatelessWidget {
@@ -21,33 +27,21 @@ class MyApp extends StatelessWidget {
       builder: (context , child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
-          title: 'Fi  rst Method',
+          title: 'AppName',
           // You can use the library anywhere in the app even in theme
           theme: ThemeData(
             primarySwatch: Colors.blue,
             textTheme: Typography.englishLike2018.apply(fontSizeFactor: 1.sp),
-            backgroundColor: const Color.fromRGBO(246, 246, 246, 1.0),
+            backgroundColor: const Color.fromRGBO(230, 230, 230, 1),
+            primaryColorLight: const Color.fromRGBO(246, 246, 246, 1),
             primaryColorDark: const Color.fromRGBO(21, 21, 21, 1.0),
-            errorColor: const Color.fromRGBO(244, 113, 116, 1.0),
 
             inputDecorationTheme: const InputDecorationTheme(
-              enabledBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color.fromRGBO(21, 21, 21, 1.0)),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color.fromRGBO(21, 21, 21, 1.0)),
-              ),
-              errorBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Color.fromRGBO(244, 113, 116, 1.0)),
+              border: InputBorder.none,
+              labelStyle: TextStyle(
+                color: Color.fromRGBO(131, 131, 131, 1.0),
               ),
 
-              border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Color.fromRGBO(21, 21, 21, 1.0)),
-              ),
-              fillColor: Color.fromRGBO(21, 21, 21, 1.0),
-              labelStyle: TextStyle(
-                color: Color.fromRGBO(21, 21, 21, 1.0),
-              ),
             ),
 
             appBarTheme: const AppBarTheme(

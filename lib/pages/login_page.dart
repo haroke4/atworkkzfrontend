@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'enter_phone_page.dart';
+import '../prefabs/colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -16,38 +16,46 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     print("Login page");
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.landscapeRight,
-      DeviceOrientation.landscapeLeft,
-    ]);
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.bottom]);
   }
 
   void loginAsAdministrator() {
-    Get.to(const EnterPhonePage(), arguments: ['admin']);
+    Get.to(const EnterPhonePage(loginAsWorker: false));
   }
 
   void loginAsUser() {
-    Get.to(const EnterPhonePage(), arguments: ['worker']);
+    Get.to(const EnterPhonePage(loginAsWorker: true));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Theme.of(context).backgroundColor,
-      body: Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            getLoginAsButtons(
-                Icons.person_outline, "Войти как работник", loginAsUser),
-            SizedBox(
-              width: 50.h,
-            ),
-            getLoginAsButtons(Icons.admin_panel_settings_outlined,
-                "Войти как администратор", loginAsAdministrator),
-          ],
+      backgroundColor: brownColor,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+          "Вход как...",
+          style: TextStyle(
+            color: Theme.of(context).primaryColorDark,
+            fontSize: 40.h,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+          SizedBox(height: 20.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              getLoginAsButtons(Icons.admin_panel_settings_outlined,
+                  "Админ", loginAsAdministrator),
+              SizedBox(
+                width: 50.w,
+              ),
+              getLoginAsButtons(
+                  Icons.person_outline, "Работник", loginAsUser),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -67,9 +75,7 @@ class _LoginPageState extends State<LoginPage> {
 
       child: Material(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
         child: InkWell(
-          borderRadius: BorderRadius.circular(20),
           splashColor: Colors.black26,
           onTap: _onPressed,
           child: Padding(
