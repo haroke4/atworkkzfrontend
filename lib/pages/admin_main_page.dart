@@ -4,11 +4,13 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freelance_order/pages/admin_general_page.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../prefabs/admin_tools.dart';
+import 'admin_add_worker_page.dart';
 import 'worker_main_page.dart';
 import 'admin_about_worker_page.dart';
 
@@ -21,7 +23,11 @@ class AdminsMainPage extends StatefulWidget {
 
 class _AdminsMainPageState extends State<AdminsMainPage> {
   void _onWorkerNamePressed(String name) {
-    Get.to(() => AdminAboutWorkerPage(name: name));
+    if (name == "") {
+      Get.to(() => AdminAddWorkerPage());
+    } else {
+      Get.to(() => AdminAboutWorkerPage(name: name));
+    }
   }
 
   @override
@@ -70,7 +76,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
                 align: TextAlign.center)),
         getText("Установки", align: TextAlign.center, onPressed: () {}),
         getText("Общие", align: TextAlign.center, onPressed: () {
-          print("NUIGGER");
+          Get.to(() => (AdminGeneralPage()));
         }),
         getText("Qaz / Rus / Eng", align: TextAlign.center),
       ],
@@ -123,7 +129,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       "Ахметжанов",
       "Майоров",
       "Майоров",
-      "Майоров",
+      "",
     ];
     for (final e in rabotniki) {
       a.add(getWorkerLineWidget(e));
@@ -132,45 +138,42 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return a;
   }
 
-  Widget getWorkerLineWidget(String name, {current = false}) {
-    return Material(
-      color: current ? pickedLineColor : bgColor,
-      child: Row(
-        children: [
-          SizedBox(
-            width: 80.w,
-            child: getText(name, onPressed: () => _onWorkerNamePressed(name)),
+  Widget getWorkerLineWidget(String name) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 80.w,
+          child: getText(name, onPressed: () => _onWorkerNamePressed(name)),
+        ),
+        getRect(name != "" ? begOffColor : noAssignmentColor),
+        getRect(name != "" ? onTimeColor : noAssignmentColor),
+        getRect(name != "" ? validReasonColor : noAssignmentColor),
+        getRect(name != "" ? lateColor : noAssignmentColor),
+        getRect(name != "" ? workingDayColor : noAssignmentColor),
+        SizedBox(
+          width: 48.h + 12.w,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              getRect(onTimeColor, confirmation: true),
+              getRect(workingDayColor),
+            ],
           ),
-          getRect(getOffColor),
-          getRect(onTimeColor),
-          getRect(validReasonColor),
-          getRect(lateColor),
-          getRect(workingDayColor),
-          SizedBox(
-            width: 48.h + 12.w,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                getRect(onTimeColor, confirmation: true),
-                getRect(workingDayColor),
-              ],
-            ),
-          ),
-          getRect(getOffColor),
-          getRect(onTimeColor),
-          getRect(validReasonColor),
-          getRect(lateColor),
-          getRect(workingDayColor),
-          SizedBox(
-            width: 7.w,
-          ),
-          getRect(workingDayColor, text: "24", fontColor: Colors.white),
-          getRect(truancyColor, text: "2", fontColor: Colors.white),
-          Expanded(
-            child: getRect(lateColor, text: "1205"),
-          )
-        ],
-      ),
+        ),
+        getRect(name != "" ? begOffColor : noAssignmentColor),
+        getRect(name != "" ? onTimeColor : noAssignmentColor),
+        getRect(name != "" ? validReasonColor : noAssignmentColor),
+        getRect(name != "" ? lateColor : noAssignmentColor),
+        getRect(name != "" ? workingDayColor : noAssignmentColor),
+        SizedBox(
+          width: 7.w,
+        ),
+        getRect(workingDayColor, text: "24", fontColor: Colors.white),
+        getRect(truancyColor, text: "2", fontColor: Colors.white),
+        Expanded(
+          child: getRect(lateColor, text: "1205"),
+        )
+      ],
     );
   }
 
@@ -179,8 +182,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       children: [
         getButton(() {}, Icons.arrow_upward_rounded, Icons.man_outlined),
         const Expanded(child: SizedBox()),
-
-        getMainMenuButton(),
+        getMainMenuButton(enabled: false),
         SizedBox(width: 4.w),
         getGoBackButton(),
         const Expanded(child: SizedBox()),

@@ -4,13 +4,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'colors.dart';
 
-Widget __getOnlyText(text, fontColor, overflow, align, weight) {
+Widget __getOnlyText(
+    text, fontColor, overflow, align, weight, fontSize, minWidth) {
   return Container(
+    constraints: BoxConstraints(minWidth: minWidth),
     padding: EdgeInsets.all(4.w),
     child: Text(text,
         style: TextStyle(
           color: fontColor,
-          fontSize: 14.h,
+          fontSize: fontSize,
           fontWeight: weight,
         ),
         textAlign: align,
@@ -18,13 +20,18 @@ Widget __getOnlyText(text, fontColor, overflow, align, weight) {
   );
 }
 
-Widget getText(String text,
-    {Color bgColor = Colors.white,
-    Color fontColor = Colors.black,
-    TextOverflow overflow = TextOverflow.ellipsis,
-    TextAlign align = TextAlign.left,
-    FontWeight fontWeight = FontWeight.normal,
-    Function? onPressed}) {
+Widget getText(
+  String text, {
+  Color bgColor = Colors.white,
+  Color fontColor = Colors.black,
+  TextOverflow overflow = TextOverflow.ellipsis,
+  TextAlign align = TextAlign.left,
+  FontWeight fontWeight = FontWeight.normal,
+  double minWidth = 0,
+  double? fontSize,
+  Function? onPressed,
+}) {
+  fontSize = fontSize ?? 14.h;
   var textW;
   if (onPressed != null) {
     textW = InkWell(
@@ -32,9 +39,25 @@ Widget getText(String text,
         onTap: () {
           onPressed();
         },
-        child: __getOnlyText(text, fontColor, overflow, align, fontWeight));
+        child: __getOnlyText(
+          text,
+          fontColor,
+          overflow,
+          align,
+          fontWeight,
+          fontSize,
+          minWidth,
+        ));
   } else {
-    textW = __getOnlyText(text, fontColor, overflow, align, fontWeight);
+    textW = __getOnlyText(
+      text,
+      fontColor,
+      overflow,
+      align,
+      fontWeight,
+      fontSize,
+      minWidth,
+    );
   }
 
   return Container(
@@ -92,11 +115,19 @@ Widget getPhoto({text = "", Function? onTap}) {
               ),
             ),
           );
-        }
-        // else if(imageRight != null){
-        //   return Image.file(imageRight!);
-        // }
-        else {
+        } else if (onTap != null && text == "") {
+          return Ink.image(
+            fit: BoxFit.cover,
+            image: AssetImage('assets/Untitled.png'),
+            child: InkWell(
+              splashColor: Colors.black12,
+              highlightColor: Colors.black12,
+              onTap: () {
+                onTap();
+              },
+            ),
+          );
+        } else {
           return Image.asset(
             'assets/Untitled.png',
             fit: BoxFit.cover,
@@ -157,6 +188,20 @@ Widget getTwoTextOneLine(firstText, secondText,
   );
 }
 
+Widget getTwoTextSeperated(
+  firstText,
+  secondText, {
+  firstTextBgColor: Colors.white,
+  secondTextBgColor: Colors.white,
+}) {
+  return Row(
+    children: [
+      getText(firstText, bgColor: firstTextBgColor),
+      getText(secondText, bgColor: secondTextBgColor),
+    ],
+  );
+}
+
 Widget getArrowButton(Icon icon, String heroTag) {
   return Container(
     margin: EdgeInsets.only(left: 2.w, right: 2.w),
@@ -174,19 +219,30 @@ Widget getArrowButton(Icon icon, String heroTag) {
 Widget getRect(Color color,
     {String text = "",
     bool confirmation = false,
-    Color fontColor = Colors.black}) {
+    Color fontColor = Colors.black,
+    Function? onTap}) {
   return Container(
     width: 22.h,
     height: 22.h,
     margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
-    decoration: BoxDecoration(color: color),
-    child: Center(
-      child: (text == "" && confirmation)
-          ? Image.asset(
-        "assets/confirmation.png",
-        height: 13.h,
-      )
-          : Text(text, style: TextStyle(color: fontColor)),
+    child: Material(
+      color: color,
+      child: onTap == null
+          ? Center(
+              child: (text == "" && confirmation)
+                  ? Image.asset(
+                      "assets/confirmation.png",
+                      height: 13.h,
+                    )
+                  : Text(text, style: TextStyle(color: fontColor)),
+            )
+          : InkWell(
+              splashColor: Colors.black12,
+              highlightColor: Colors.black12,
+              onTap: () {
+                onTap();
+              },
+            ),
     ),
   );
 }

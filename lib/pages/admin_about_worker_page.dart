@@ -9,11 +9,12 @@ import 'package:image_picker/image_picker.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
+import 'admin_worker_photo_page.dart';
 
 class AdminAboutWorkerPage extends StatefulWidget {
   final name;
 
-  const AdminAboutWorkerPage({super.key, @required this.name});
+  const AdminAboutWorkerPage({super.key, required this.name});
 
   @override
   State<AdminAboutWorkerPage> createState() => _AdminAboutWorkerPageState();
@@ -93,7 +94,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             children: [
               getText("Отдел"),
               SizedBox(height: 4.h),
-              getText(_name, bgColor: brownColor, fontColor: Colors.white),
+              getText(widget.name,
+                  bgColor: brownColor, fontColor: Colors.white),
             ],
           ),
         ),
@@ -113,7 +115,11 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           width: width,
           child: Column(
             children: [
-              getPhoto(),
+              getPhoto(onTap: () {
+                Get.to(() => (AdminWorkerPhotoPage(
+                      name: widget.name,
+                    )));
+              }),
               SizedBox(height: 4.h),
               getTextWithTime("Явка", "8:30/9:10"),
               SizedBox(height: 4.h),
@@ -172,7 +178,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         ),
         Row(
           children: [
-            getRect(getOffColor),
+            getRect(begOffColor),
             getRect(onTimeColor),
             getRect(validReasonColor),
             getRect(lateColor),
@@ -187,7 +193,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 ],
               ),
             ),
-            getRect(getOffColor),
+            getRect(begOffColor),
             getRect(onTimeColor),
             getRect(validReasonColor),
             getRect(lateColor),
@@ -209,13 +215,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             Text("Уважительная причина")
           ]),
           SizedBox(height: 4.h),
-          Row(children: [
-            getRect(nonWorkingDayColor),
-            Text("Нерабочий день")
-          ]),
+          Row(children: [getRect(nonWorkingDayColor), Text("Нерабочий день")]),
           SizedBox(height: 4.h),
-          Row(children: [getRect(getOffColor), Text("Отпросился")]),
-
+          Row(children: [getRect(begOffColor), Text("Отпросился")]),
         ],
       );
     }
@@ -225,17 +227,14 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         children: [
           Row(
             children: [
-              getText(
-                "6 мин * 15 = 90 ед",
-                bgColor: lateColor,
-                fontColor: Colors.black,
-              ),
+              getTwoTextSeperated("6 мин * 15", " 90 ",
+                  secondTextBgColor: lateColor),
               const Expanded(child: SizedBox()),
-              getText("_ мин * 15 = _ ед", align: TextAlign.right),
+              getTwoTextSeperated("_ мин * 15", "...", secondTextBgColor: Colors.black12),
             ],
           ),
           SizedBox(height: 4.h),
-          getTwoTextOneLine("Сумма месяц", "1205"),
+          getTwoTextOneLine("Сумма месяц", "1205", bgColor: lateColor),
           SizedBox(height: 20.h),
           Row(
             children: [

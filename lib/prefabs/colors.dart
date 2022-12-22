@@ -14,6 +14,6 @@ Color onTimeColor = const Color.fromRGBO(25, 182, 63, 1);
 Color lateColor = const Color.fromRGBO(249, 133, 60, 1);
 Color truancyColor = const Color.fromRGBO(49, 49, 49, 1.0);
 Color validReasonColor = const Color.fromRGBO(122, 149, 209, 1);
-Color getOffColor = const Color.fromRGBO(181, 71, 175, 1);
+Color begOffColor = const Color.fromRGBO(181, 71, 175, 1);
 Color confirmationColor = const Color.fromRGBO(245, 246, 247, 1);
 Color pickedLineColor = const Color.fromRGBO(220, 216, 216, 1.0);

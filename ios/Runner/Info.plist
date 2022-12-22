@@ -48,8 +48,11 @@
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>NSPhotoLibraryUsageDescription</key>
-    <string>Upload images to the server</string>
+    <string>This app requires permission to work properly</string>
     <key>NSCameraUsageDescription</key>
-    <string>Upload image from camera to the server</string>
+    <string>This app requires permission to work properly</string>
+    <key>NSContactsUsageDescription</key>
+    <string>This app requires permission to work properly</string>
+
 </dict>
 </plist>

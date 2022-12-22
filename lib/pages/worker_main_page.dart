@@ -160,7 +160,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         ),
         Row(
           children: [
-            getRect(getOffColor),
+            getRect(begOffColor),
             getRect(onTimeColor),
             getRect(validReasonColor),
             getRect(lateColor),
@@ -175,7 +175,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                 ],
               ),
             ),
-            getRect(getOffColor),
+            getRect(begOffColor),
             getRect(onTimeColor),
             getRect(validReasonColor),
             getRect(lateColor),
@@ -253,7 +253,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                 Text("Уважительная причина")
               ]),
               SizedBox(height: 4.h),
-              Row(children: [getRect(getOffColor), Text("Отпросился")]),
+              Row(children: [getRect(begOffColor), Text("Отпросился")]),
               SizedBox(height: 4.h),
               Row(children: [
                 getRect(confirmationColor, confirmation: true),
