@@ -5,12 +5,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_general_page.dart';
+import 'package:freelance_order/pages/enter_sms_page.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../prefabs/admin_tools.dart';
 import 'admin_add_worker_page.dart';
+import 'enter_code_page.dart';
 import 'worker_main_page.dart';
 import 'admin_about_worker_page.dart';
 
@@ -22,9 +24,15 @@ class AdminsMainPage extends StatefulWidget {
 }
 
 class _AdminsMainPageState extends State<AdminsMainPage> {
-  void _onWorkerNamePressed(String name) {
+  bool _doingAdjustments = false;
+
+  void _onWorkerNamePressed(String name) async {
     if (name == "") {
-      Get.to(() => AdminAddWorkerPage());
+      Get.to(() => const AdminAddWorkerPage());
+    } else if (_doingAdjustments) {
+      Get.to(() => AdminAddWorkerPage(
+            displayName: name + " +7 777 777 7777",
+          ));
     } else {
       Get.to(() => AdminAboutWorkerPage(name: name));
     }
@@ -74,9 +82,20 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
                 bgColor: todayColor,
                 fontColor: Colors.white,
                 align: TextAlign.center)),
-        getText("Установки", align: TextAlign.center, onPressed: () {}),
+        getText(
+          "Установки",
+          align: TextAlign.center,
+          bgColor: _doingAdjustments ? brownColor : Colors.white,
+          onPressed: () {
+            setState(() {
+              _doingAdjustments = !_doingAdjustments;
+            });
+          },
+        ),
         getText("Общие", align: TextAlign.center, onPressed: () {
-          Get.to(() => (AdminGeneralPage()));
+          Get.to(
+            () => (const EnterCodePage(nextPage: AdminGeneralPage())),
+          );
         }),
         getText("Qaz / Rus / Eng", align: TextAlign.center),
       ],

@@ -1,27 +1,39 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
+import 'package:freelance_order/prefabs/admin_tools.dart';
 import 'package:get/get.dart';
+import 'package:local_auth/local_auth.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
 
-class EnterSMSPage extends StatefulWidget {
+class EnterCodePage extends StatefulWidget {
   final nextPage;
-  const EnterSMSPage({super.key, required this.nextPage});
+
+  const EnterCodePage({super.key, required this.nextPage});
 
   @override
-  State<EnterSMSPage> createState() => _EnterSMSPageState();
+  State<EnterCodePage> createState() => _EnterCodePageState();
 }
 
-class _EnterSMSPageState extends State<EnterSMSPage> {
+class _EnterCodePageState extends State<EnterCodePage> {
+  final LocalAuthentication _auth = LocalAuthentication();
   String _errorMessage = '';
   final _smsController = TextEditingController();
 
-  void sendAndCheckSMS({fromOnChanged = false}) {
+  @override
+  void initState(){
+    super.initState();
+    _onFingerprintPressed();
+  }
+
+  void _checkCode({fromOnChanged = false}) {
     if (_smsController.text.length < 4) {
       if (!fromOnChanged) {
         setState(() {
@@ -32,18 +44,37 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
       // send data to server
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Успешно'), duration: Duration(seconds: 1),),
+        const SnackBar(
+          content: Text('Успешно'),
+          duration: Duration(seconds: 1),
+        ),
       );
 
-      Get.offAll(widget.nextPage);
+      Get.off(widget.nextPage);
     }
     // Check data
   }
 
-  void onNumberButtonPressed(String value) {
+  void _onNumberButtonPressed(String value) {
     _smsController.text += value;
-    if (_smsController.text.length >= 4){
-      sendAndCheckSMS();
+    if (_smsController.text.length >= 4) {
+      _checkCode();
+    }
+
+  }
+
+  void _onFingerprintPressed() async {
+    final List<BiometricType> availableBiometrics = await _auth.getAvailableBiometrics();
+    if (availableBiometrics.isNotEmpty) {
+      try {
+        final bool didAuthenticate = await _auth.authenticate(
+          localizedReason: 'Пожалуйста авторизуйтесь',
+          options: const AuthenticationOptions(biometricOnly: true),
+        );
+        if (didAuthenticate) {
+          Get.off(widget.nextPage);
+        }
+      } on PlatformException {}
     }
   }
 
@@ -60,10 +91,10 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
             children: [
               SizedBox(height: 40.h),
               Text(
-                "Введите присланный код с SMS",
+                "Введите код доступа",
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
-                  fontSize: 40.h,
+                  fontSize: 20.h,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -85,7 +116,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
                         FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
                   ),
                   onChanged: (value) {
-                    sendAndCheckSMS(fromOnChanged: true);
+                    _checkCode(fromOnChanged: true);
                   },
                 ),
               ),
@@ -97,8 +128,35 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
                     )
                   : const SizedBox(),
               SizedBox(height: 10.h),
-              getNumbersWidget(),
+              Row(
+                children: [
+                  SizedBox(width: 10.w),
+                  getFingerprintButton(),
+                  const Expanded(child: SizedBox()),
+                  getNumbersWidget(),
+                  const Expanded(child: SizedBox()),
+                  getGoBackButton(padding: 2.w, height: 44.h),
+                  SizedBox(width: 10.w),
+                ],
+              ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget getFingerprintButton() {
+    return Material(
+      color: Colors.white,
+      child: InkWell(
+        splashColor: Colors.black26,
+        onTap: _onFingerprintPressed,
+        child: Padding(
+          padding: EdgeInsets.all(2.h),
+          child: Icon(
+            Icons.fingerprint,
+            size: 20.w,
           ),
         ),
       ),
@@ -110,7 +168,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
     List<Widget> secondLine = [];
     for (int i = 1; i < 6; i++) {
       firstLine.add(CircleButton(
-          onTap: () => onNumberButtonPressed(i.toString()),
+          onTap: () => _onNumberButtonPressed(i.toString()),
           text: i.toString()));
       if (i != 5) {
         firstLine.add(SizedBox(width: 15.w));
@@ -118,12 +176,12 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
     }
     for (int i = 6; i < 10; i++) {
       secondLine.add(CircleButton(
-          onTap: () => onNumberButtonPressed(i.toString()),
+          onTap: () => _onNumberButtonPressed(i.toString()),
           text: i.toString()));
       secondLine.add(SizedBox(width: 15.w));
     }
     secondLine.add(
-      CircleButton(onTap: () => onNumberButtonPressed("0"), text: "0"),
+      CircleButton(onTap: () => _onNumberButtonPressed("0"), text: "0"),
     );
 
     return Column(

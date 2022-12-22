@@ -13,7 +13,8 @@ import '../prefabs/colors.dart';
 import 'package:http/http.dart';
 
 class AdminAddWorkerPage extends StatefulWidget {
-  const AdminAddWorkerPage({super.key});
+  final String? displayName;
+  const AdminAddWorkerPage({super.key, this.displayName});
 
   @override
   State<AdminAddWorkerPage> createState() => _AdminAddWorkerPageState();
@@ -22,12 +23,19 @@ class AdminAddWorkerPage extends StatefulWidget {
 class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
   String _workerInfo = "";
 
+  @override
+  void initState(){
+    super.initState();
+    _workerInfo = widget.displayName ?? "";
+  }
+
   void _addContactPressed() async {
     var status = await Permission.contacts.status;
     if (status.isGranted) {
       final contact = await FlutterContacts.openExternalPick();
+
       setState(() {
-        _workerInfo = "${contact!.displayName}   ${contact.phones[0].number}";
+        _workerInfo = "${contact!.displayName} ${contact.phones[0].number}";
       });
     } else {
       await Permission.contacts.request();

@@ -144,7 +144,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                   onPressed: _onSavePressed,
                   align: TextAlign.center,
                 ),
-                getGoBackButton(padding: 1.w),
+                getGoBackButton(padding: 1.w, color: Colors.white),
               ],
             )
           ],
