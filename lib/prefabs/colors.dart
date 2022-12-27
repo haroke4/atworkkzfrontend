@@ -16,4 +16,31 @@ Color truancyColor = const Color.fromRGBO(49, 49, 49, 1.0);
 Color validReasonColor = const Color.fromRGBO(122, 149, 209, 1);
 Color begOffColor = const Color.fromRGBO(181, 71, 175, 1);
 Color confirmationColor = const Color.fromRGBO(245, 246, 247, 1);
+
 Color pickedLineColor = const Color.fromRGBO(220, 216, 216, 1.0);
+
+
+Color getColorByStatus(String? status) {
+  if (status == "working_day") {
+    return workingDayColor;
+  }
+  else if (status == "non_working_day"){
+    return nonWorkingDayColor;
+  }
+  else if (status == "late") {
+    return lateColor;
+  }
+  else if(status == "truancy"){
+    return truancyColor;
+  }
+  else if(status == "on_time"){
+    return onTimeColor;
+  }
+  else if(status == "beg_off"){
+    return begOffColor;
+  }
+  else if(status == "valid_reason"){
+    return validReasonColor;
+  }
+  return noAssignmentColor;
+}

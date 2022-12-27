@@ -1,8 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
+import '../utils/BackendAPI.dart';
 import 'colors.dart';
+
+Future<String> getServerTime() async {
+  String time = await BackendAPI.getServerTime();
+  final splitted = time.split(":");
+  int hour = int.parse(splitted[0]);
+  return "$hour:${splitted[1]}";
+}
 
 Widget __getOnlyText(
     text, fontColor, overflow, align, weight, fontSize, minWidth) {
@@ -35,19 +44,20 @@ Widget getText(
   var textW;
   if (onPressed != null) {
     textW = InkWell(
-        splashColor: Colors.black26,
-        onTap: () {
-          onPressed();
-        },
-        child: __getOnlyText(
-          text,
-          fontColor,
-          overflow,
-          align,
-          fontWeight,
-          fontSize,
-          minWidth,
-        ));
+      splashColor: Colors.black26,
+      onTap: () {
+        onPressed();
+      },
+      child: __getOnlyText(
+        text,
+        fontColor,
+        overflow,
+        align,
+        fontWeight,
+        fontSize,
+        minWidth,
+      ),
+    );
   } else {
     textW = __getOnlyText(
       text,
@@ -83,18 +93,18 @@ Widget getTextSmaller(String text,
         color: fontColor,
         fontSize: 12.h,
       ),
-      overflow: TextOverflow.ellipsis,
+      overflow: TextOverflow.visible,
     ),
   );
 }
 
-Widget getPhoto({text = "", Function? onTap}) {
+Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
   return Container(
     margin: EdgeInsets.only(left: 3.w, right: 3.w),
     child: AspectRatio(
       aspectRatio: 1 / 1,
       child: () {
-        if (text != "") {
+        if (imagePath != null) {
           return Material(
             color: const Color.fromRGBO(223, 223, 223, 1),
             child: InkWell(
@@ -105,33 +115,19 @@ Widget getPhoto({text = "", Function? onTap}) {
               child: Column(
                 children: [
                   SizedBox(height: 20.h),
-                  Image.asset(
-                    'assets/icon.png',
+                  Image.network(
+                    headers: headers,
+                    AdminBackendAPI.getImageUrl(imagePath),
+                    height: 140.h,
                     fit: BoxFit.cover,
-                    height: 105.h,
                   ),
                   Text(text),
                 ],
               ),
             ),
           );
-        } else if (onTap != null && text == "") {
-          return Ink.image(
-            fit: BoxFit.cover,
-            image: AssetImage('assets/Untitled.png'),
-            child: InkWell(
-              splashColor: Colors.black12,
-              highlightColor: Colors.black12,
-              onTap: () {
-                onTap();
-              },
-            ),
-          );
         } else {
-          return Image.asset(
-            'assets/Untitled.png',
-            fit: BoxFit.cover,
-          );
+          return Image.asset('assets/icon.png', fit: BoxFit.cover);
         }
       }(),
     ),
@@ -191,22 +187,25 @@ Widget getTwoTextOneLine(firstText, secondText,
 Widget getTwoTextSeperated(
   firstText,
   secondText, {
-  firstTextBgColor: Colors.white,
-  secondTextBgColor: Colors.white,
+  firstExpanded = false,
+  firstTextBgColor = Colors.white,
+  secondTextBgColor = Colors.white,
 }) {
   return Row(
     children: [
-      getText(firstText, bgColor: firstTextBgColor),
+      firstExpanded
+          ? Expanded(child: getText(firstText, bgColor: firstTextBgColor))
+          : getText(firstText, bgColor: firstTextBgColor),
       getText(secondText, bgColor: secondTextBgColor),
     ],
   );
 }
 
-Widget getArrowButton(Icon icon, String heroTag) {
+Widget getArrowButton(Icon icon, String heroTag, onPressed) {
   return Container(
     margin: EdgeInsets.only(left: 2.w, right: 2.w),
     child: FloatingActionButton.extended(
-      onPressed: () {},
+      onPressed: onPressed,
       heroTag: heroTag,
       label: icon,
       foregroundColor: Colors.black,

@@ -88,11 +88,11 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             ],
           ),
         ),
-        getArrowButton(const Icon(Icons.arrow_back), "back"),
+        getArrowButton(const Icon(Icons.arrow_back), "back", (){}),
         const Expanded(child: SizedBox()),
         getDatesWidgets(),
         const Expanded(child: SizedBox()),
-        getArrowButton(const Icon(Icons.arrow_forward), "forward"),
+        getArrowButton(const Icon(Icons.arrow_forward), "forward", (){}),
       ],
     );
   }

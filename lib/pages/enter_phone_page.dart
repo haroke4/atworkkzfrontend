@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/worker_main_page.dart';
+import 'package:freelance_order/utils/BackendAPI.dart';
+import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
 import 'admin_main_page.dart';
 import 'enter_sms_page.dart';
@@ -25,7 +27,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
   final _workerPhoneController = TextEditingController();
   Widget _buttonLabel = const Text('Отправить код');
 
-  void sendTelNumbers() {
+  void sendTelNumbers() async {
     // Send data to backend and wait for SMS
     if (_formKey.currentState!.validate()) {
       print(_adminPhoneController.text);
@@ -37,16 +39,30 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
         );
       });
 
-      //Send data to backend
-
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(content: Text('Processing Data')),
       // );
+      var adminUsername = _adminPhoneController.text.replaceAll(" ", "");
+      var workerUsername = _workerPhoneController.text.replaceAll(" ", "");
+      if (widget.loginAsWorker) {
+        await BackendAPI.sendSms(workerUsername);
+      } else {
+        try {
+          await BackendAPI.registerAsAdmin(adminUsername);
+        } on Exception {}
+
+        await BackendAPI.sendSms(adminUsername);
+      }
       widget.loginAsWorker;
-      Get.to(EnterSMSPage(
+      Get.to(
+        () => EnterSMSPage(
           nextPage: widget.loginAsWorker
               ? const WorkersMainPage()
-              : const AdminsMainPage()));
+              : const AdminsMainPage(),
+          adminUsername: adminUsername,
+          workerUsername: workerUsername,
+        ),
+      );
     }
   }
 

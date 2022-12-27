@@ -5,7 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/prefabs/admin_tools.dart';
+import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/prefabs/tools.dart';
+import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'worker_main_page.dart';
@@ -25,45 +27,34 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _enteringNewPassword = false;
   final _textController = TextEditingController();
 
-  void _sendAndCheckSMS() {
-    if (_textController.text.length < 4) {
-      setState(() {});
-      _errorMessage = 'Введите код';
-    } else {
-      // send data to server
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Успешно'),
-          duration: Duration(seconds: 1),
-        ),
-      );
-
-      Get.back();
-    }
-    // Check data
-  }
-
-  void _onNextPressed() {
+  void _onNextPressed() async {
     //Check if password valid
     if (_enteringNewPassword) {
-      // send new pass to server
+      AdminBackendAPI.changePinCode(_textController.text);
+      showScaffoldMessage(context, "Успешно");
       Get.back();
     } else {
-      setState(() {
-        if (_textController.text == "0000") {
+      if (await AdminBackendAPI.checkPinCode(_textController.text)) {
+        setState(() {
           _enteringNewPassword = true;
+          _errorMessage = "";
           _textController.text = "";
           _buttonLabel = "Сменить пароль";
-        } else {
+        });
+      } else {
+        setState(() {
           _errorMessage = "Неправильный пароль";
-        }
-      });
+          _textController.text = "";
+        });
+      }
     }
   }
 
   void _onNumberButtonPressed(String value) {
     _textController.text += value;
+    if (_textController.text.length >= 4) {
+      _onNextPressed();
+    }
   }
 
   @override
@@ -90,19 +81,25 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               ),
               Padding(
                 padding: EdgeInsets.fromLTRB(110.w, 5.w, 110.w, 5.w),
-                child: TextField(
+                child: PinInputTextField(
                   controller: _textController,
-                  style: TextStyle(fontSize: 20.h, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                  cursorColor: Colors.black,
-                  cursorWidth: 1.w,
-                  decoration: InputDecoration(
-                    enabledBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red, width: 5.h)),
-                    focusedBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(color: Colors.red, width: 5.h)),
+                  pinLength: 4,
+                  keyboardType: TextInputType.number,
+                  cursor: Cursor(
+                    width: 3,
+                    height: 20.h,
+                    color: Theme.of(context).primaryColorDark,
+                    enabled: true,
                   ),
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  decoration: const UnderlineDecoration(
+                    colorBuilder:
+                        FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
+                  ),
+                  onChanged: (value) {
+                    if (_textController.text.length == 4) {
+                      _onNextPressed();
+                    }
+                  },
                 ),
               ),
               SizedBox(height: 3.h),
@@ -118,7 +115,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getGoBackButton(padding: 2.w, height: 36.h, color: Colors.white),
+                  getGoBackButton(
+                      padding: 2.w, height: 36.h, color: Colors.white),
                   SizedBox(width: 5.w),
                   getText(_buttonLabel, onPressed: _onNextPressed),
                 ],

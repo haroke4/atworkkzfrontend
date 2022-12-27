@@ -1,0 +1,45 @@
+import 'dart:convert';
+import 'package:http/http.dart';
+import '';
+
+const host = "http://10.0.2.2:8000"; //localhost http://10.0.2.2
+String token = '';
+var headers = {"Content-type": "application/json"};
+
+Future<dynamic> _post(String url, String body) async {
+  return await post(Uri.parse('$host/api$url'), body: body, headers: headers);
+}
+
+
+Future<Response> _get(String url) async {
+  return await get(Uri.parse('$host/api$url'), headers: headers);
+}
+
+class BackendAPI {
+  static Future<dynamic> registerAsAdmin(String username) async {
+    final json = {'username': username};
+    final response = await _post('/signup', jsonEncode(json));
+    return jsonDecode(response.body);
+  }
+
+  static Future<void> sendSms(String username) async {
+    final json = {'username': username};
+    final response = await _post('/send_sms_code', jsonEncode(json));
+    return jsonDecode(response.body);
+  }
+
+  static Future<dynamic> getImage(String imagePath) async {
+    final response = await _get('/get_image$imagePath');
+    return response.body;
+  }
+
+  static String getImageUrl(String imagePath) {
+    return '$host/api/get_image$imagePath'; //TEST THIS SHIT
+  }
+
+  static Future<dynamic> getServerTime() async {
+    final response = await _get('/get_time');
+    return jsonDecode(response.body)['message']['time'];
+  }
+}
+

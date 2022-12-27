@@ -19,7 +19,12 @@ Widget getMainMenuButton({enabled = true}) {
   );
 }
 
-Widget getGoBackButton({double? padding, double? height, Function? onTap, Color? color}) {
+Widget getGoBackButton(
+    {double? padding,
+    double? height,
+    Function? onTap,
+    Color? color,
+    String? result}) {
   return Material(
     color: color ?? bgColor,
     child: SizedBox(
@@ -28,7 +33,11 @@ Widget getGoBackButton({double? padding, double? height, Function? onTap, Color?
         splashColor: Colors.black26,
         onTap: onTap == null
             ? () {
-                Get.back();
+                if (result == null || result == '') {
+                  Get.back();
+                } else {
+                  Get.back(result: result);
+                }
               }
             : () {
                 onTap();

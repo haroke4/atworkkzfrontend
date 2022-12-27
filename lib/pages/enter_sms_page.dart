@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:freelance_order/pages/admin_general_page.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
+import 'package:freelance_order/utils/AdminBackendAPI.dart';
+import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'worker_main_page.dart';
@@ -11,7 +16,14 @@ import '../prefabs/appbar_prefab.dart';
 
 class EnterSMSPage extends StatefulWidget {
   final nextPage;
-  const EnterSMSPage({super.key, required this.nextPage});
+  final adminUsername;
+  final workerUsername;
+
+  const EnterSMSPage(
+      {super.key,
+      required this.nextPage,
+      required this.adminUsername,
+      required this.workerUsername});
 
   @override
   State<EnterSMSPage> createState() => _EnterSMSPageState();
@@ -20,8 +32,9 @@ class EnterSMSPage extends StatefulWidget {
 class _EnterSMSPageState extends State<EnterSMSPage> {
   String _errorMessage = '';
   final _smsController = TextEditingController();
+  late var _nextPage = widget.nextPage;
 
-  void sendAndCheckSMS({fromOnChanged = false}) {
+  void sendAndCheckSMS({fromOnChanged = false}) async {
     if (_smsController.text.length < 4) {
       if (!fromOnChanged) {
         setState(() {
@@ -30,19 +43,52 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
       }
     } else {
       // send data to server
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Processing'),
+        duration: Duration(seconds: 1),
+      ));
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Успешно'), duration: Duration(seconds: 1),),
-      );
-
-      Get.offAll(widget.nextPage);
+      var response;
+      if (widget.workerUsername != "") {
+        response = await WorkersBackendAPI.login(
+          widget.adminUsername,
+          widget.workerUsername,
+          _smsController.text,
+        );
+      } else {
+        // logging in as admin
+        response = await AdminBackendAPI.login(
+          widget.adminUsername,
+          _smsController.text,
+        );
+      }
+      var json = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Загрузка...'),
+          duration: Duration(seconds: 1),
+        ));
+        if (widget.workerUsername == "") {
+          var response = await AdminBackendAPI.getWorkers();
+          if (response.statusCode != 200) {
+            _nextPage = AdminGeneralPage();
+          }
+        }
+        Get.offAll(_nextPage);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Ошибка: $json'),
+          duration: const Duration(seconds: 1),
+        ));
+        _smsController.text = "";
+      }
     }
     // Check data
   }
 
   void onNumberButtonPressed(String value) {
     _smsController.text += value;
-    if (_smsController.text.length >= 4){
+    if (_smsController.text.length >= 4) {
       sendAndCheckSMS();
     }
   }

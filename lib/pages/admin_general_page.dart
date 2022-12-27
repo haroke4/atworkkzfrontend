@@ -1,14 +1,19 @@
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/pages/tariffs_page.dart';
+import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
+import '../prefabs/scaffold_messages.dart';
 import '../prefabs/tools.dart';
 import 'assign_data_page.dart';
 import 'change_password_page.dart';
@@ -21,27 +26,92 @@ class AdminGeneralPage extends StatefulWidget {
 }
 
 class _AdminGeneralPageState extends State<AdminGeneralPage> {
-  var _data = {};
+  late Widget _saveButtonLabel = getSaveText();
+  // Scrolling workers
+
+  late var _data;
+  late final _registering;
+  final _loading = true;
 
   @override
   void initState() {
+    var data = Get.arguments[0];
+    if (data != null) {
+      _registering = false;
+      _data = data;
+    } else {
+      _registering = true;
+      _data = {};
+      _data['name'] = 'Имя компании';
+      _data['department'] = 'Отдел компании';
+      _data['truancy_price'] = "Введите";
+      _data['prize'] = 'Введите';
+      _data['beg_off_price'] = 'Введите';
+      _data['before_minute'] = 'Введите';
+      _data['mail'] = 'Введите';
+      _data['postponement_minute'] = 'Введите';
+      _data['truancy_minute'] = 'Введите';
+      _data['late_minute_price'] = 'Введите';
+      _data['after_minute'] = 'Введите';
+    }
     super.initState();
-    _data['company'] = 'Company';
-    _data['department'] = 'Department of the company';
-    //Getting data from server
-    _data['truancy_price'] = "3000";
-    _data['prize'] = '5000';
-    _data['beg_off_price'] = '5000';
-    _data['before_minute'] = '35';
-    _data['mail'] = "example@gmail.com";
-    _data['postponement_minute'] = '10';
-    _data['truancy_minute'] = '65';
-    _data['late_minute_price'] = '15';
-    _data['after_minute'] = '65';
   }
 
   void _onSavePressed() async {
-    Get.back();
+    if (_registering) {
+      setState(() {
+        _saveButtonLabel = const SpinKitThreeBounce(
+          color: Colors.black,
+          size: 25.0,
+        );
+      });
+      var response = await AdminBackendAPI.createCompany(
+        name: _data['name'],
+        department: _data['department'],
+        pinCode: '0000',
+        mail: _data['mail'],
+        truancyPrice: _data['truancy_price'],
+        prize: _data['prize'],
+        begOffPrice: _data['beg_off_price'],
+        beforeMinute: _data['before_minute'],
+        postponementMinute: _data['postponement_minute'],
+        truancyMinute: _data['truancy_minute'],
+        lateMinutePrice: _data['late_minute_price'],
+        afterMinute: _data['after_minute'],
+      );
+      if (response.statusCode == 201) {
+        showScaffoldMessage(context, "Компания создана");
+        Get.offAll(const AdminsMainPage());
+        return null;
+      } else {
+        showScaffoldMessage(context, "Некоторые поля введены неверно");
+      }
+      setState(() {
+        _saveButtonLabel = getSaveText();
+      });
+    } else {
+       var response = await AdminBackendAPI.editCompany(
+        name: _data['name'].toString(),
+        department: _data['department'].toString(),
+        mail: _data['mail'].toString(),
+        truancyPrice: _data['truancy_price'].toString(),
+        prize: _data['prize'].toString(),
+        begOffPrice: _data['beg_off_price'].toString(),
+        beforeMinute: _data['before_minute'].toString(),
+        postponementMinute: _data['postponement_minute'].toString(),
+        truancyMinute: _data['truancy_minute'].toString(),
+        lateMinutePrice: _data['late_minute_price'].toString(),
+        afterMinute: _data['after_minute'].toString(),
+      );
+       if (response.statusCode == 200){
+         showScaffoldMessage(context, "Успешно. Обновите страницу");
+         Get.back(result: 'update');
+       }
+       else{
+         showScaffoldMessage(context, jsonDecode(response.body));
+       }
+
+    }
   }
 
   void _changeField(String key, String label, {bool text = false}) async {
@@ -77,8 +147,9 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                         width: constraints.maxWidth * 0.3 - 4.w,
                         child: getText(
                           _data['department'],
-                          onPressed: () =>
-                              _changeField("department", "Отдел компании", text: true),
+                          onPressed: () => _changeField(
+                              "department", "Отдел компании",
+                              text: true),
                         ),
                       ),
                     ],
@@ -101,14 +172,13 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         SizedBox(
           width: width,
           child: getText(
-            _data["company"],
-            onPressed: () =>
-                _changeField("company", "Фирма", text: true),
+            _data["name"],
+            onPressed: () => _changeField("name", "Фирма", text: true),
           ),
         ),
-        getText("10:32", align: TextAlign.center, fontWeight: FontWeight.bold),
+        getText(SERVER_TIME, align: TextAlign.center, fontWeight: FontWeight.bold),
         Expanded(
-            child: getText("Август 2022",
+            child: getText(CURRENT_YEARMONTH,
                 bgColor: todayColor,
                 fontColor: Colors.white,
                 align: TextAlign.center)),
@@ -139,10 +209,15 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
             ),
             Row(
               children: [
-                getText(
-                  "Сохранить      ",
+                FloatingActionButton.extended(
+                  label: _saveButtonLabel,
                   onPressed: _onSavePressed,
-                  align: TextAlign.center,
+                  backgroundColor: Colors.white,
+                  extendedPadding: EdgeInsets.fromLTRB(2.w, 4.h, 2.w, 4.h),
+                  disabledElevation: 0,
+                ),
+                SizedBox(
+                  width: 5.w,
                 ),
                 getGoBackButton(padding: 1.w, color: Colors.white),
               ],
@@ -180,22 +255,23 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 getText(
-                  _data["truancy_price"],
+                  _data["truancy_price"].toString(),
                   onPressed: () => _changeField("truancy_price", "Прогул цена"),
                 ),
                 SizedBox(height: 4.h),
                 getText(
-                  _data["prize"],
+                  _data["prize"].toString(),
                   onPressed: () => _changeField("prize", "Премия"),
                 ),
                 SizedBox(height: 4.h),
                 getText(
-                  _data["beg_off_price"],
-                  onPressed: () => _changeField("beg_off_price", "Прогул цена"),
+                  _data["beg_off_price"].toString(),
+                  onPressed: () =>
+                      _changeField("beg_off_price", "Отпросился цена"),
                 ),
                 SizedBox(height: 4.h),
                 getText(
-                  _data["before_minute"],
+                  _data["before_minute"].toString(),
                   onPressed: () => _changeField("before_minute", "До мин"),
                 ),
                 SizedBox(height: 4.h),
@@ -240,19 +316,19 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     getText(
-                      _data["postponement_minute"],
+                      _data["postponement_minute"].toString(),
                       onPressed: () => _changeField(
                           "postponement_minute", "Отсрочка минуты"),
                     ),
                     SizedBox(height: 4.h),
                     getText(
-                      _data["truancy_minute"],
+                      _data["truancy_minute"].toString(),
                       onPressed: () =>
                           _changeField("truancy_minute", "Прогул минуты"),
                     ),
                     SizedBox(height: 4.h),
                     getText(
-                      _data["late_minute_price"],
+                      _data["late_minute_price"].toString(),
                       onPressed: () => _changeField(
                         "late_minute_price",
                         "Штраф за опоздание на минуту",
@@ -260,7 +336,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                     ),
                     SizedBox(height: 4.h),
                     getText(
-                      _data["after_minute"],
+                      _data["after_minute"].toString(),
                       minWidth: 25.w,
                       onPressed: () => _changeField(
                         "after_minute",
@@ -281,4 +357,17 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
       ),
     );
   }
+}
+
+Widget getSaveText() {
+  return Padding(
+    padding: EdgeInsets.fromLTRB(2.w, 4.h, 2.w, 4.h),
+    child: Text(
+      "Сохранить",
+      style: TextStyle(
+        color: Colors.black,
+        fontSize: 14.h,
+      ),
+    ),
+  );
 }

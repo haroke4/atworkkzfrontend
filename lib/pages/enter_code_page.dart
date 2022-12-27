@@ -9,6 +9,8 @@ import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
+import '../prefabs/scaffold_messages.dart';
+import '../utils/AdminBackendAPI.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
@@ -28,12 +30,12 @@ class _EnterCodePageState extends State<EnterCodePage> {
   final _smsController = TextEditingController();
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     _onFingerprintPressed();
   }
 
-  void _checkCode({fromOnChanged = false}) {
+  void _checkCode({fromOnChanged = false}) async {
     if (_smsController.text.length < 4) {
       if (!fromOnChanged) {
         setState(() {
@@ -42,15 +44,15 @@ class _EnterCodePageState extends State<EnterCodePage> {
       }
     } else {
       // send data to server
+      if (await AdminBackendAPI.checkPinCode(_smsController.text)) {
+        showScaffoldMessage(context, "Успешно");
+        Get.off(widget.nextPage, arguments: Get.arguments);
+      }
+      else{
+        showScaffoldMessage(context, "Неправильный код");
+        _smsController.text = "";
+      }
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Успешно'),
-          duration: Duration(seconds: 1),
-        ),
-      );
-
-      Get.off(widget.nextPage);
     }
     // Check data
   }
@@ -60,11 +62,11 @@ class _EnterCodePageState extends State<EnterCodePage> {
     if (_smsController.text.length >= 4) {
       _checkCode();
     }
-
   }
 
   void _onFingerprintPressed() async {
-    final List<BiometricType> availableBiometrics = await _auth.getAvailableBiometrics();
+    final List<BiometricType> availableBiometrics =
+        await _auth.getAvailableBiometrics();
     if (availableBiometrics.isNotEmpty) {
       try {
         final bool didAuthenticate = await _auth.authenticate(
@@ -72,7 +74,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
           options: const AuthenticationOptions(biometricOnly: true),
         );
         if (didAuthenticate) {
-          Get.off(widget.nextPage);
+          Get.off(widget.nextPage, arguments: Get.arguments);
         }
       } on PlatformException {}
     }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freelance_order/pages/admin_main_page.dart';
+import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:freelance_order/prefabs/colors.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/login_page.dart';
 
 void main() {
@@ -67,19 +70,49 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
-    duration: const Duration(milliseconds: 1000),
+    duration: const Duration(milliseconds: 2000),
     vsync: this,
   );
+  late SharedPreferences sharedPrefs;
+  StatefulWidget? nextScreen;
 
   @override
   void initState() {
     super.initState();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        Get.off(widget.nextScreen);
+
+        if (nextScreen != null){
+          Get.off(nextScreen);
+        }
+        else{
+          _controller.forward(from: 0.0);
+        }
+
       }
     });
     _controller.forward(from: 0.0);
+    asyncInitState();
+  }
+
+  void asyncInitState() async {
+    sharedPrefs = await SharedPreferences.getInstance();
+    print(sharedPrefs.getString("account_type"));
+    if (sharedPrefs.getString("account_type") == null){
+      setState((){
+        nextScreen = LoginPage();
+      });
+    }
+    else if(sharedPrefs.getString("account_type") == "admin"){
+      setState((){
+        nextScreen = const AdminsMainPage();
+      });
+    }
+    else{
+      setState((){
+        nextScreen = const WorkersMainPage();
+      });
+    }
   }
 
   @override
@@ -94,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: brownColor,
       body: Center(
         child: RotationTransition(
-          turns: Tween(begin: 0.0, end: 0.5).animate(_controller),
+          turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
           child: Image.asset("assets/icon.png", height: 200.h),
         ),
       ),

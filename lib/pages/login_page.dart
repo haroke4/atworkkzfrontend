@@ -12,11 +12,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  @override
-  void initState() {
-    super.initState();
-    print("Login page");
-  }
 
   void loginAsAdministrator() {
     Get.to(const EnterPhonePage(loginAsWorker: false));

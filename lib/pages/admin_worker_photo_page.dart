@@ -4,22 +4,55 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
+import '../utils/BackendAPI.dart';
+import 'admin_main_page.dart';
 
 class AdminWorkerPhotoPage extends StatefulWidget {
   final name;
+  final companyName;
+  final department;
+  final monthPenalty;
+  final day;
+  final latePricePerMinute;
+  final bool isStart;
 
-  const AdminWorkerPhotoPage({super.key, required this.name});
+  const AdminWorkerPhotoPage(
+      {super.key,
+      required this.name,
+      required this.companyName,
+      required this.department,
+      required this.day,
+      required this.monthPenalty,
+      required this.latePricePerMinute,
+      required this.isStart});
 
   @override
   State<AdminWorkerPhotoPage> createState() => _AdminWorkerPhotoPageState();
 }
 
 class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
+  late final _day = widget.day;
+  late final _isStart = widget.isStart;
+
+  @override
+  void initState() {
+    super.initState();
+    updateTime();
+  }
+
+  void updateTime() async {
+    var sTime = await getServerTime();
+    setState(() {
+      SERVER_TIME = sTime;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
@@ -35,7 +68,14 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
                 SizedBox(
                   width: constraints.maxWidth * 0.5,
                   height: constraints.maxHeight - 8.w,
-                  child: getPhoto(),
+                  child: AspectRatio(
+                    aspectRatio: 1 / 1,
+                    child: Image.network(
+                      headers: headers,
+                      AdminBackendAPI.getImageUrl(
+                          _day[_isStart ? 'start_photo' : 'end_photo']),
+                    ),
+                  ),
                 ),
                 getLastColumn(constraints.maxWidth * 0.25 - 4.w,
                     constraints.maxHeight - 8.w),
@@ -54,9 +94,9 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          getText("Фирма"),
+          getText(widget.companyName),
           SizedBox(height: 4.h),
-          getText("Отдел"),
+          getText(widget.department),
           SizedBox(height: 4.h),
           getText(widget.name, bgColor: brownColor, fontColor: Colors.white),
           SizedBox(height: 4.h),
@@ -65,10 +105,10 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                getText("10:32",
+                getText(SERVER_TIME,
                     align: TextAlign.center, fontWeight: FontWeight.bold),
                 SizedBox(height: 4.h),
-                getText("Август 2022",
+                getText(CURRENT_YEARMONTH,
                     bgColor: todayColor,
                     fontColor: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -106,13 +146,14 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                getText("6 мин * 15 = 90 ед", bgColor: lateColor),
+                getFirstLine(),
                 SizedBox(height: 4.h),
-                getTwoTextOneLine("Сумма месяц", "1205", bgColor: lateColor),
+                getTwoTextOneLine("Сумма месяц", "${widget.monthPenalty}",
+                    bgColor: lateColor),
                 SizedBox(height: 20.h),
-                getTextWithTime("Явка", "8:30/9:10"),
+                getThirdLine(),
                 SizedBox(height: 4.h),
-                getTwoTextOneLine('Фото с точки', '9:16', bgColor: lateColor),
+                getPhotoTime(),
               ],
             ),
           ),
@@ -128,5 +169,90 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
         ],
       ),
     );
+  }
+
+  Widget getConfirmationButton(bool data, String arg) {
+    if (data) {
+      return getText(
+        "Подтвержден",
+        align: TextAlign.center,
+        bgColor: brownColor,
+        fontColor: Colors.white,
+        fontWeight: FontWeight.bold,
+      );
+    }
+    return getText("Не подтвержден",
+        align: TextAlign.center,
+        bgColor: Colors.red,
+        fontColor: Colors.white,
+        fontWeight: FontWeight.bold);
+  }
+
+  Widget getFirstLine() {
+    if (_isStart) {
+      return getTwoTextSeperated(
+        getPenalty(),
+        " ${_day['penalty_count_end']} ",
+        secondTextBgColor: getColorByStatus(_day['worker_status_end']),
+        firstExpanded: true,
+      );
+    }
+    return getTwoTextSeperated(
+      getPenalty(),
+      " ${_day['penalty_count_start']} ",
+      secondTextBgColor: getColorByStatus(_day['worker_status_start']),
+      firstExpanded: true,
+    );
+  }
+
+  String getPenalty() {
+    if (_isStart) {
+      var cnt = _day["late_minute_count"];
+      return "$cnt * ${widget.latePricePerMinute}";
+    }
+    var cnt = _day["late_minute_count"];
+    return "$cnt * ${widget.latePricePerMinute}";
+  }
+
+  Widget getThirdLine() {
+    if (_isStart) {
+      return getTextWithTime("Явка", getCurrentDayTime('start_time'));
+    }
+    return getTextWithTime("Уход", getCurrentDayTime('end_time'));
+  }
+
+  Widget getPhotoTime() {
+    var label;
+    var key = _isStart ? 'worker_status_start' : 'worker_status_end';
+    if (_isStart) {
+      label = _day['start_photo_time'] ?? '__/__';
+    } else {
+      label = _day['end_photo_time'] ?? '__/__';
+    }
+
+    return getTwoTextOneLine('Фото с точки', label,
+        bgColor: getColorByStatus(_day[key]));
+  }
+
+  String getPhotoTimeString() {
+    if (_isStart) {
+      return _day['start_photo_time'] ?? '__/__';
+    } else {
+      return _day['end_photo_time'] ?? '__/__';
+    }
+  }
+
+  String getCurrentDayTime(String key) {
+    // key = start_time or end_time
+    String? ans = _day[key];
+    if (ans == null) {
+      return "__/__";
+    }
+    if (ans.startsWith("0")) {
+      ans = ans.substring(1, 5);
+    } else {
+      ans = ans.substring(0, 5);
+    }
+    return ans;
   }
 }
