@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import '';
 
-const host = "http://10.0.2.2:8000"; //http://45.130.43.56:8000
+const host = "http://45.130.43.56:8000"; // "http://10.0.2.2:8000";
 String token = '';
 var headers = {"Content-type": "application/json"};
 
@@ -22,10 +22,10 @@ class BackendAPI {
     return jsonDecode(response.body);
   }
 
-  static Future<void> sendSms(String username) async {
+  static Future<dynamic> sendSms(String username) async {
     final json = {'username': username};
     final response = await _post('/send_sms_code', jsonEncode(json));
-    return jsonDecode(response.body);
+    return response;
   }
 
   static Future<dynamic> getImage(String imagePath) async {

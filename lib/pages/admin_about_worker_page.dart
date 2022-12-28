@@ -24,13 +24,14 @@ class AdminAboutWorkerPage extends StatefulWidget {
   final data;
   final prevWorkerData;
 
-  const AdminAboutWorkerPage({super.key,
-    required this.name,
-    required this.workerUsername,
-    required this.today,
-    required this.currMonthMaxDay,
-    required this.data,
-    required this.prevWorkerData});
+  const AdminAboutWorkerPage(
+      {super.key,
+      required this.name,
+      required this.workerUsername,
+      required this.today,
+      required this.currMonthMaxDay,
+      required this.data,
+      required this.prevWorkerData});
 
   @override
   State<AdminAboutWorkerPage> createState() => _AdminAboutWorkerPageState();
@@ -158,8 +159,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
 
   // Adjustments buttons handlers
   void _changeField(String key, String label) async {
-    String? x = await Get.to(() =>
-        AssignDataPage(
+    String? x = await Get.to(() => AssignDataPage(
           text: label,
           inputtingTime: true,
         ));
@@ -201,7 +201,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       textConfirmPicker: "Выбрать",
       textCancelPicker: "Назад",
       initCurrentUserPosition: true,
-      initZoom: 15,
+      initZoom: 18,
     );
     if (p != null) {
       print("${p.latitude} ${p.longitude}");
@@ -224,13 +224,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     }
   }
 
-  void copyButtonPressed() async{
-    if (widget.prevWorkerData.isEmpty){
+  void copyButtonPressed() async {
+    if (widget.prevWorkerData.isEmpty) {
       showScaffoldMessage(context, "Это первый работник в списке");
       return;
     }
     final days = widget.prevWorkerData['last_month']['days'];
-    for (int i = _today + 1;i <= widget.currMonthMaxDay; i++){
+    for (int i = _today + 1; i <= widget.currMonthMaxDay; i++) {
       var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
         dayId: _days[i - 1]['id'],
@@ -246,7 +246,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           _days[i - 1] = jsonDecode(response.body)['message'];
         });
       } else {
-        showScaffoldMessage(context, "Ошибка на дате ${_days[i-1]['date']}: ${jsonDecode(response.body)['message']}");
+        showScaffoldMessage(context,
+            "Ошибка на дате ${_days[i - 1]['date']}: ${jsonDecode(response.body)['message']}");
       }
     }
     showScaffoldMessage(context, "Успешно");
@@ -256,9 +257,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme
-            .of(context)
-            .backgroundColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: update,
@@ -339,16 +338,15 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               getPhoto(
                 imagePath: _days[_today - 1]['start_photo'],
                 onTap: () {
-                  Get.to(() =>
-                  (AdminWorkerPhotoPage(
-                    name: widget.name,
-                    day: _days[_today - 1],
-                    companyName: widget.data['company_name'],
-                    department: widget.data['department'],
-                    monthPenalty: widget.data['penalty_count'],
-                    latePricePerMinute: latePricePerMinute,
-                    isStart: true,
-                  )));
+                  Get.to(() => (AdminWorkerPhotoPage(
+                        name: widget.name,
+                        day: _days[_today - 1],
+                        companyName: widget.data['company_name'],
+                        department: widget.data['department'],
+                        monthPenalty: widget.data['penalty_count'],
+                        latePricePerMinute: latePricePerMinute,
+                        isStart: true,
+                      )));
                 },
               ),
               SizedBox(height: 4.h),
@@ -358,7 +356,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 'Фото с точки',
                 getPhotoTime('start_photo_time'),
                 bgColor:
-                getColorByStatus(_days[_today - 1]['worker_status_start']),
+                    getColorByStatus(_days[_today - 1]['worker_status_start']),
               ),
             ],
           ),
@@ -519,19 +517,14 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       margin: EdgeInsets.only(left: 10.w, right: 10.w),
       child: Column(
         children: [
-          Row(
-            children: [
-              getTwoTextSeperated(
-                  getPenalty(), " ${day['penalty_count_start']} ",
-                  secondTextBgColor:
-                  getColorByStatus(day['worker_status_start'])),
-              const Expanded(child: SizedBox()),
-              getTwoTextSeperated(
-                  getPenalty(start: false), " ${day['penalty_count_end']} ",
-                  secondTextBgColor:
-                  getColorByStatus(day['worker_status_end'])),
-            ],
-          ),
+          getTwoTextSeperated(getPenalty(), " ${day['penalty_count_start']} ",
+              secondTextBgColor: getColorByStatus(day['worker_status_start']),
+              firstExpanded: true),
+          SizedBox(height: 4.h),
+          getTwoTextSeperated(
+              getPenalty(start: false), " ${day['penalty_count_end']} ",
+              secondTextBgColor: getColorByStatus(day['worker_status_end']),
+              firstExpanded: true),
           SizedBox(height: 4.h),
           getTwoTextOneLine(
               "Сумма месяц", widget.data['penalty_count'].toString(),
@@ -631,16 +624,15 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             getPhoto(
               imagePath: _days[_today - 1]['end_photo'],
               onTap: () {
-                Get.to(() =>
-                (AdminWorkerPhotoPage(
-                  name: widget.name,
-                  day: _days[_today - 1],
-                  department: widget.data['department'],
-                  companyName: widget.data['company_name'],
-                  monthPenalty: widget.data['penalty_count'],
-                  latePricePerMinute: latePricePerMinute,
-                  isStart: false,
-                )));
+                Get.to(() => (AdminWorkerPhotoPage(
+                      name: widget.name,
+                      day: _days[_today - 1],
+                      department: widget.data['department'],
+                      companyName: widget.data['company_name'],
+                      monthPenalty: widget.data['penalty_count'],
+                      latePricePerMinute: latePricePerMinute,
+                      isStart: false,
+                    )));
               },
             ),
             SizedBox(height: 4.h),

@@ -212,9 +212,9 @@ Widget getTwoTextSeperated(
   return Row(
     children: [
       firstExpanded
-          ? Expanded(child: getText(firstText, bgColor: firstTextBgColor))
-          : getText(firstText, bgColor: firstTextBgColor),
-      getText(secondText, bgColor: secondTextBgColor),
+          ? Expanded(child: getText(firstText, bgColor: firstTextBgColor, overflow: TextOverflow.visible))
+          : getText(firstText, bgColor: firstTextBgColor, overflow: TextOverflow.visible),
+      IntrinsicWidth(child: getText(secondText, bgColor: secondTextBgColor, overflow: TextOverflow.visible)),
     ],
   );
 }

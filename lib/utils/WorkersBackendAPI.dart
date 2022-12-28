@@ -58,12 +58,7 @@ class WorkersBackendAPI {
     request.headers.addAll(headers);
     request.fields.addAll(json);
     final response = await request.send();
-    // final response = await post(url, headers: headers, )
-    // final response = await _post('/assign_photo', json);
-    response.stream.transform(utf8.decoder).listen((value) {
-      print(value);
-    });
-    return;
+    return response;
   }
 }
 

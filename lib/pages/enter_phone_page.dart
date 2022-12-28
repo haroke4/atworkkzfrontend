@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/worker_main_page.dart';
+import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
@@ -44,25 +45,32 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       // );
       var adminUsername = _adminPhoneController.text.replaceAll(" ", "");
       var workerUsername = _workerPhoneController.text.replaceAll(" ", "");
+      var response;
       if (widget.loginAsWorker) {
-        await BackendAPI.sendSms(workerUsername);
+        response = await BackendAPI.sendSms(workerUsername);
       } else {
         try {
           await BackendAPI.registerAsAdmin(adminUsername);
         } on Exception {}
 
-        await BackendAPI.sendSms(adminUsername);
+        response = await BackendAPI.sendSms(adminUsername);
       }
-      widget.loginAsWorker;
-      Get.to(
-        () => EnterSMSPage(
-          nextPage: widget.loginAsWorker
-              ? const WorkersMainPage()
-              : const AdminsMainPage(),
-          adminUsername: adminUsername,
-          workerUsername: workerUsername,
-        ),
-      );
+      if (response.statusCode == 200) {
+        Get.to(
+          () => EnterSMSPage(
+            nextPage: widget.loginAsWorker
+                ? const WorkersMainPage()
+                : const AdminsMainPage(),
+            adminUsername: adminUsername,
+            workerUsername: workerUsername,
+          ),
+        );
+      } else {
+        showScaffoldMessage(context, "Неправильные номера телефонов");
+        setState((){
+          _buttonLabel = const Text('Отправить код');
+        });
+      }
     }
   }
 

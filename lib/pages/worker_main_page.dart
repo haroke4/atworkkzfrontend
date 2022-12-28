@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
+import 'map_page.dart';
 
 // TODO: CONNECT TO BACKEND!!!
 
@@ -33,12 +35,15 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   void initState() {
     super.initState();
     initializeDateFormatting();
-    asyncInitState();
+    _update();
   }
 
   Future<void> asyncInitState() async {
-    print('UPDATING');
     showScaffoldMessage(context, "Обновление...");
+    await _update();
+  }
+
+  Future<void> _update() async {
     var response = await WorkersBackendAPI.getDays();
     if (response.statusCode == 200) {
       updateMonthYear();
@@ -75,13 +80,24 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   }
 
   Future onMakeSelfiePressed({start = true}) async {
+    if (_days[_today - 1]['geoposition'] == null) {
+      showScaffoldMessage(context, "Геолокация не присвоена к этому дню");
+      return;
+    }
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null) return;
 
     final imageFile = File(image.path);
-    await WorkersBackendAPI.assignPhoto(_days[_today - 1]['id'], imageFile,
-        start: start);
-    asyncInitState();
+    String aboba = await Get.to(
+      () => MyMapView(
+        day: _days[_today - 1],
+        imageFile: imageFile,
+        start: start,
+      ),
+    );
+    if(aboba == 'update'){
+      asyncInitState();
+    }
   }
 
   @override
@@ -482,7 +498,6 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   }
 
   Color getBgColor(key) {
-    return getColorByStatus(
-        _days.isEmpty ? null : _days[_today - 1][key]);
+    return getColorByStatus(_days.isEmpty ? null : _days[_today - 1][key]);
   }
 }
