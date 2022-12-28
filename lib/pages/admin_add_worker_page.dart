@@ -9,6 +9,7 @@ import 'package:freelance_order/prefabs/tools.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import '../utils/LocalizerUtil.dart';
 import 'admin_main_page.dart';
 import 'enter_sms_page.dart';
 import '../prefabs/colors.dart';
@@ -49,7 +50,6 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
         _displayUsername = contact.displayName;
         _usernameWorker = contact.phones[0].number.replaceAll(" ", "");
         _usernameWorker = _usernameWorker.replaceAll("+", "");
-        print(_usernameWorker);
       });
     } else {
       await Permission.contacts.request();
@@ -57,19 +57,18 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
   }
 
   void _yesPressed() async {
-    showScaffoldMessage(context, "Обработка");
+    showScaffoldMessage(context, Localizer.get('processing'));
     var response;
     if (deleteWorker) {
-      response  = await AdminBackendAPI.deleteWorker(
+      response = await AdminBackendAPI.deleteWorker(
           workerUsername: widget.username.toString());
     } else {
       response = await AdminBackendAPI.registerWorker(
           displayName: _displayUsername, username: _usernameWorker);
     }
-    if (response.statusCode == 200){
+    if (response.statusCode == 200) {
       Get.back(result: "update");
-    }
-    else{
+    } else {
       showScaffoldMessage(context, response.body);
     }
   }
@@ -97,7 +96,9 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 SizedBox(width: constraints.maxWidth),
                 SizedBox(height: 40.h),
                 Text(
-                  deleteWorker ? "Удалить работника? " : "Выберите работника",
+                  deleteWorker
+                      ? Localizer.get('ban_the_nigger?')
+                      : Localizer.get('pick_the_nigger'),
                   style: TextStyle(
                     color: Theme.of(context).primaryColorDark,
                     fontSize: 40.h,
@@ -107,7 +108,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 if (!deleteWorker) ...[
                   SizedBox(height: 5.h),
                   Text(
-                    "Имя записан как в телефонной книжке",
+                    Localizer.get('name_con_book'),
                     style: TextStyle(
                       color: Theme.of(context).primaryColorDark,
                       fontSize: 25.h,
@@ -129,20 +130,20 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                   children: [
                     if (_workerInfo != '') ...[
                       getText(
-                        "Да",
+                        Localizer.get('yes'),
                         fontSize: 20.h,
                         fontWeight: FontWeight.bold,
                         onPressed: _yesPressed,
                       ),
                       getText(
-                        "Нет",
+                        Localizer.get('no'),
                         fontSize: 20.h,
                         fontWeight: FontWeight.bold,
                         onPressed: _noPressed,
                       )
                     ],
                     if (!deleteWorker) ...[
-                      getText("Назад",
+                      getText(Localizer.get('back'),
                           fontSize: 20.h,
                           fontWeight: FontWeight.bold,
                           onPressed: () => Get.back()),

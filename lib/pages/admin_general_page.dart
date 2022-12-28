@@ -9,6 +9,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/pages/tariffs_page.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
+import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/admin_tools.dart';
@@ -27,6 +28,7 @@ class AdminGeneralPage extends StatefulWidget {
 
 class _AdminGeneralPageState extends State<AdminGeneralPage> {
   late Widget _saveButtonLabel = getSaveText();
+
   // Scrolling workers
 
   late var _data;
@@ -35,24 +37,24 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
 
   @override
   void initState() {
-    var data = Get.arguments[0];
+    var data = Get.arguments;
     if (data != null) {
       _registering = false;
-      _data = data;
+      _data = data[0];
     } else {
       _registering = true;
       _data = {};
-      _data['name'] = 'Имя компании';
-      _data['department'] = 'Отдел компании';
-      _data['truancy_price'] = "Введите";
-      _data['prize'] = 'Введите';
-      _data['beg_off_price'] = 'Введите';
-      _data['before_minute'] = 'Введите';
-      _data['mail'] = 'Введите';
-      _data['postponement_minute'] = 'Введите';
-      _data['truancy_minute'] = 'Введите';
-      _data['late_minute_price'] = 'Введите';
-      _data['after_minute'] = 'Введите';
+      _data['name'] = Localizer.get('company_name');
+      _data['department'] = Localizer.get('department');
+      _data['truancy_price'] = Localizer.get('enter');
+      _data['prize'] = Localizer.get('enter');
+      _data['beg_off_price'] = Localizer.get('enter');
+      _data['before_minute'] = Localizer.get('enter');
+      _data['mail'] = Localizer.get('enter');
+      _data['postponement_minute'] = Localizer.get('enter');
+      _data['truancy_minute'] = Localizer.get('enter');
+      _data['late_minute_price'] = Localizer.get('enter');
+      _data['after_minute'] = Localizer.get('enter');
     }
     super.initState();
   }
@@ -80,18 +82,19 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         afterMinute: _data['after_minute'],
       );
       if (response.statusCode == 201) {
-        showScaffoldMessage(context, "Компания создана");
+        showScaffoldMessage(context, Localizer.get('company_created'));
         Get.offAll(const AdminsMainPage());
+        showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 10);
         return null;
       } else {
-        showScaffoldMessage(context, "Некоторые поля введены неверно");
+        showScaffoldMessage(context, Localizer.get('some_error_field'));
       }
       setState(() {
         _saveButtonLabel = getSaveText();
       });
     } else {
-      showScaffoldMessage(context, "Отправка данных...");
-       var response = await AdminBackendAPI.editCompany(
+      showScaffoldMessage(context, Localizer.get('sending_data'));
+      var response = await AdminBackendAPI.editCompany(
         name: _data['name'].toString(),
         department: _data['department'].toString(),
         mail: _data['mail'].toString(),
@@ -104,14 +107,12 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         lateMinutePrice: _data['late_minute_price'].toString(),
         afterMinute: _data['after_minute'].toString(),
       );
-       if (response.statusCode == 200){
-         showScaffoldMessage(context, "Успешно. Обновите страницу");
-         Get.back(result: 'update');
-       }
-       else{
-         showScaffoldMessage(context, response.body, time: 5);
-       }
-
+      if (response.statusCode == 200) {
+        showScaffoldMessage(context, Localizer.get('success_update'));
+        Get.back(result: 'update');
+      } else {
+        showScaffoldMessage(context, response.body, time: 5);
+      }
     }
   }
 
@@ -149,7 +150,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                         child: getText(
                           _data['department'],
                           onPressed: () => _changeField(
-                              "department", "Отдел компании",
+                              "department", Localizer.get('department'),
                               text: true),
                         ),
                       ),
@@ -174,21 +175,24 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
           width: width,
           child: getText(
             _data["name"],
-            onPressed: () => _changeField("name", "Фирма", text: true),
+            onPressed: () =>
+                _changeField("name", Localizer.get('company_name'), text: true),
           ),
         ),
-        getText(SERVER_TIME, align: TextAlign.center, fontWeight: FontWeight.bold),
+        getText(SERVER_TIME,
+            align: TextAlign.center, fontWeight: FontWeight.bold),
         Expanded(
             child: getText(CURRENT_YEARMONTH,
                 bgColor: todayColor,
                 fontColor: Colors.white,
                 align: TextAlign.center)),
         getText(
-          "Тарифы",
+          Localizer.get('plans'),
           align: TextAlign.center,
           onPressed: () => (Get.to(() => const TariffsPage())),
         ),
-        getText("Общие", fontColor: Colors.white, bgColor: brownColor),
+        getText(Localizer.get('general'),
+            fontColor: Colors.white, bgColor: brownColor),
         getText("Atwork.kz", align: TextAlign.center),
       ],
     );
@@ -239,15 +243,15 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                getText("Прогул цена"),
+                getText(Localizer.get('truancy_price')),
                 SizedBox(height: 4.h),
-                getText("Премия"),
+                getText(Localizer.get('prize')),
                 SizedBox(height: 4.h),
-                getText("Отпросился"),
+                getText(Localizer.get('beg_off')),
                 SizedBox(height: 4.h),
-                getText("До мин"),
+                getText(Localizer.get('bef_min')),
                 SizedBox(height: 4.h),
-                getText("Почта"),
+                getText(Localizer.get('email')),
               ],
             ),
           ),
@@ -257,30 +261,35 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               children: [
                 getText(
                   _data["truancy_price"].toString(),
-                  onPressed: () => _changeField("truancy_price", "Прогул цена"),
+                  onPressed: () => _changeField(
+                      "truancy_price", Localizer.get('truancy_price')),
                 ),
                 SizedBox(height: 4.h),
                 getText(
                   _data["prize"].toString(),
-                  onPressed: () => _changeField("prize", "Премия"),
+                  onPressed: () =>
+                      _changeField("prize", Localizer.get('prize')),
                 ),
                 SizedBox(height: 4.h),
                 getText(
                   _data["beg_off_price"].toString(),
                   onPressed: () =>
-                      _changeField("beg_off_price", "Отпросился цена"),
+                      _changeField("beg_off_price", Localizer.get('beg_off')),
                 ),
                 SizedBox(height: 4.h),
                 getText(
                   _data["before_minute"].toString(),
-                  onPressed: () => _changeField("before_minute", "До мин"),
+                  onPressed: () =>
+                      _changeField("before_minute", Localizer.get('bef_min')),
                 ),
                 SizedBox(height: 4.h),
                 Container(
                   constraints: BoxConstraints(maxWidth: 80.w),
                   child: getText(
                     _data["mail"],
-                    onPressed: () => _changeField("mail", "Почта", text: true),
+                    onPressed: () => _changeField(
+                        "mail", Localizer.get('email'),
+                        text: true),
                   ),
                 ),
               ],
@@ -302,13 +311,13 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    getText("Отсрочка мин"),
+                    getText(Localizer.get('postp_min')),
                     SizedBox(height: 4.h),
-                    getText("Прогул мин"),
+                    getText(Localizer.get('truancy_min')),
                     SizedBox(height: 4.h),
-                    getText("Минута цена"),
+                    getText(Localizer.get('min_price')),
                     SizedBox(height: 4.h),
-                    getText("После мин"),
+                    getText(Localizer.get('aft_min')),
                   ],
                 ),
               ),
@@ -319,20 +328,20 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                     getText(
                       _data["postponement_minute"].toString(),
                       onPressed: () => _changeField(
-                          "postponement_minute", "Отсрочка минуты"),
+                          "postponement_minute", Localizer.get('postp_min')),
                     ),
                     SizedBox(height: 4.h),
                     getText(
                       _data["truancy_minute"].toString(),
-                      onPressed: () =>
-                          _changeField("truancy_minute", "Прогул минуты"),
+                      onPressed: () => _changeField(
+                          "truancy_minute", Localizer.get('truancy_min')),
                     ),
                     SizedBox(height: 4.h),
                     getText(
                       _data["late_minute_price"].toString(),
                       onPressed: () => _changeField(
                         "late_minute_price",
-                        "Штраф за опоздание на минуту",
+                        Localizer.get('min_price'),
                       ),
                     ),
                     SizedBox(height: 4.h),
@@ -341,7 +350,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                       minWidth: 25.w,
                       onPressed: () => _changeField(
                         "after_minute",
-                        "После минуты",
+                        Localizer.get('aft_min'),
                       ),
                     ),
                   ],
@@ -351,7 +360,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
           ),
           SizedBox(height: 4.h),
           getText(
-            "Сменить пароль/опечаток",
+            Localizer.get('change_code'),
             onPressed: () => (Get.to(() => const ChangePasswordPage())),
           ),
         ],
@@ -364,7 +373,7 @@ Widget getSaveText() {
   return Padding(
     padding: EdgeInsets.fromLTRB(2.w, 4.h, 2.w, 4.h),
     child: Text(
-      "Сохранить",
+      Localizer.get('save'),
       style: TextStyle(
         color: Colors.black,
         fontSize: 14.h,

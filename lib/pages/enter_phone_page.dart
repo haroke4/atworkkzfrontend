@@ -8,6 +8,7 @@ import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
+import '../utils/LocalizerUtil.dart';
 import 'admin_main_page.dart';
 import 'enter_sms_page.dart';
 import '../prefabs/colors.dart';
@@ -26,13 +27,11 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
   final _formKey = GlobalKey<FormState>();
   final _adminPhoneController = TextEditingController();
   final _workerPhoneController = TextEditingController();
-  Widget _buttonLabel = const Text('Отправить код');
+  Widget _buttonLabel = Text(Localizer.get('send_code'));
 
   void sendTelNumbers() async {
     // Send data to backend and wait for SMS
     if (_formKey.currentState!.validate()) {
-      print(_adminPhoneController.text);
-      print(_workerPhoneController.text);
       setState(() {
         _buttonLabel = const SpinKitThreeBounce(
           color: Colors.black,
@@ -66,9 +65,9 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           ),
         );
       } else {
-        showScaffoldMessage(context, "Неправильные номера телефонов");
-        setState((){
-          _buttonLabel = const Text('Отправить код');
+        showScaffoldMessage(context, Localizer.get('invalid_phone'));
+        setState(() {
+          _buttonLabel = Text(Localizer.get('send_code'));
         });
       }
     }
@@ -87,7 +86,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
             children: [
               SizedBox(height: 40.h),
               Text(
-                "Заполнить",
+                Localizer.get("fill"),
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 40.h,
@@ -102,11 +101,11 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     getTelNumberInputField(
-                        'Телефонный номер админа', _adminPhoneController),
+                        Localizer.get('phone_admin'), _adminPhoneController),
                     SizedBox(height: 4.h),
                     // Если юзер нажал на кнопку "войти как работник" тогда показываем
                     widget.loginAsWorker
-                        ? getTelNumberInputField('Телефонный номер работника',
+                        ? getTelNumberInputField(Localizer.get('phone_worker'),
                             _workerPhoneController)
                         : const SizedBox(height: 0),
                   ],
@@ -145,11 +144,11 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
         controller: controller,
         validator: (String? value) {
           if (value == null || value == '') {
-            return 'Поле не может быть пустым';
+            return Localizer.get('field_cannot_be_empty');
           }
           if (value.length < 14) {
             // 11 - номер телефона 3 - пробела
-            return 'Неправильный номер телефона';
+            return Localizer.get('invalid_phone');
           }
 
           return null;

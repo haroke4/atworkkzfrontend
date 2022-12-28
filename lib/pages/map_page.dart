@@ -12,6 +12,7 @@ import 'package:freelance_order/prefabs/tools.dart';
 import 'package:get/get.dart';
 
 import '../prefabs/colors.dart';
+import '../utils/LocalizerUtil.dart';
 import '../utils/WorkersBackendAPI.dart';
 
 class MyMapView extends StatefulWidget {
@@ -32,18 +33,22 @@ class MyMapView extends StatefulWidget {
 
 class _MyMapViewState extends State<MyMapView> {
   late Widget sendButtonLabel = getText(
-    "Отправить фото",
+    Localizer.get('send_photo'),
     bgColor: brownColor,
     onPressed: buttonPressed,
   );
-
   MapController controller = MapController(
     initMapWithUserPosition: true,
   );
+  late GeoPoint workGeoPoint;
 
   @override
   void initState() {
     super.initState();
+    List<String> geoPos = widget.day['geoposition'].split(" ");
+    var lat = double.parse(geoPos[0]);
+    var lon = double.parse(geoPos[1]);
+    workGeoPoint = GeoPoint(latitude: lat, longitude: lon);
   }
 
   void buttonPressed() async {
@@ -54,18 +59,14 @@ class _MyMapViewState extends State<MyMapView> {
       );
     });
     GeoPoint geoPoint = await controller.myLocation();
-    List<String> geoPos = widget.day['geoposition'].split(" ");
-    var lat = double.parse(geoPos[0]);
-    var lon = double.parse(geoPos[1]);
-    GeoPoint newGeoPoint = GeoPoint(latitude: lat, longitude: lon);
-    if (await distance2point(geoPoint, newGeoPoint) < 10) {
+    if (await distance2point(geoPoint, workGeoPoint) < 10) {
       var response = await WorkersBackendAPI.assignPhoto(
         widget.day['id'],
         widget.imageFile,
         start: widget.start,
       );
       if (response.statusCode == 200) {
-        showScaffoldMessage(context, "Успешно");
+        showScaffoldMessage(context, Localizer.get('success'));
         Get.back(result: 'update');
       } else {
         String answer = "";
@@ -75,11 +76,11 @@ class _MyMapViewState extends State<MyMapView> {
         showScaffoldMessage(context, answer);
       }
     } else {
-      showScaffoldMessage(context, "Вы не находитесь в зоне для фото");
+      showScaffoldMessage(context, Localizer.get('photo_zone'));
     }
     setState(() {
       sendButtonLabel = getText(
-        "Отправить фото",
+        Localizer.get('send_photo'),
         bgColor: brownColor,
         onPressed: buttonPressed,
       );
@@ -105,11 +106,22 @@ class _MyMapViewState extends State<MyMapView> {
                     sendButtonLabel,
                     SizedBox(height: 10.h),
                     getText(
-                      "Мое местоположение",
-                      bgColor: Colors.black87,
+                      Localizer.get('my_pos'),
+                      bgColor: Colors.black45,
                       fontColor: Colors.white,
                       onPressed: () async {
                         await controller.currentLocation();
+                      },
+                    ),
+                    SizedBox(height: 10.h),
+                    getText(
+                      Localizer.get('wo_pos'),
+                      bgColor: Colors.black45,
+                      fontColor: Colors.white,
+                      onPressed: () async {
+                        await controller.addMarker(workGeoPoint);
+                        await controller.changeLocation(workGeoPoint);
+                        await controller.zoomIn();
                       },
                     ),
                     SizedBox(height: 10.h),
@@ -140,21 +152,6 @@ class _MyMapViewState extends State<MyMapView> {
             minZoomLevel: 2,
             maxZoomLevel: 19,
             stepZoom: 1.0,
-            userLocationMarker: UserLocationMaker(
-              personMarker: const MarkerIcon(
-                icon: Icon(
-                  Icons.location_history_rounded,
-                  color: Colors.red,
-                  size: 48,
-                ),
-              ),
-              directionArrowMarker: const MarkerIcon(
-                icon: Icon(
-                  Icons.double_arrow,
-                  size: 48,
-                ),
-              ),
-            ),
           ),
         ),
       ],

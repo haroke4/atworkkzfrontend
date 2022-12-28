@@ -30,24 +30,6 @@ class _AssignDataPageState extends State<AssignDataPage> {
   String _errorMessage = '';
   final _textController = TextEditingController();
 
-  void _sendAndCheckSMS() {
-    if (_textController.text.length < 4) {
-      setState(() {});
-      _errorMessage = 'Введите код';
-    } else {
-      // send data to server
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Успешно'),
-          duration: Duration(seconds: 1),
-        ),
-      );
-
-      Get.back();
-    }
-    // Check data
-  }
 
   void _onNumberButtonPressed(String value) {
     if (widget.inputtingTime) {
@@ -168,12 +150,6 @@ class _AssignDataPageState extends State<AssignDataPage> {
     );
   }
 
-  Widget getCircleNumberWidget() {
-    return CircleButton(
-      onTap: () {},
-      text: "1",
-    );
-  }
 }
 
 class CircleButton extends StatelessWidget {

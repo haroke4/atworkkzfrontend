@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:freelance_order/prefabs/colors.dart';
+import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/login_page.dart';
@@ -97,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
 
   void asyncInitState() async {
     sharedPrefs = await SharedPreferences.getInstance();
-    print(sharedPrefs.getString("account_type"));
+    // print(sharedPrefs.getString("account_type"));
     if (sharedPrefs.getString("account_type") == null){
       setState((){
         nextScreen = LoginPage();
@@ -112,6 +113,10 @@ class _SplashScreenState extends State<SplashScreen>
       setState((){
         nextScreen = const WorkersMainPage();
       });
+    }
+
+    if (sharedPrefs.getString('lang') != null){
+      Localizer.setLang(sharedPrefs.getString('lang')!);
     }
   }
 

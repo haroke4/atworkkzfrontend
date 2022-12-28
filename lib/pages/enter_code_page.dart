@@ -11,6 +11,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import '../prefabs/scaffold_messages.dart';
 import '../utils/AdminBackendAPI.dart';
+import '../utils/LocalizerUtil.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
@@ -39,17 +40,17 @@ class _EnterCodePageState extends State<EnterCodePage> {
     if (_smsController.text.length < 4) {
       if (!fromOnChanged) {
         setState(() {
-          _errorMessage = 'Введите код';
+          _errorMessage = Localizer.get('enter_code');
         });
       }
     } else {
       // send data to server
       if (await AdminBackendAPI.checkPinCode(_smsController.text)) {
-        showScaffoldMessage(context, "Успешно");
+        showScaffoldMessage(context, Localizer.get('success'));
         Get.off(widget.nextPage, arguments: Get.arguments);
       }
       else{
-        showScaffoldMessage(context, "Неправильный код");
+        showScaffoldMessage(context, Localizer.get('incorrect_code'));
         _smsController.text = "";
       }
 
@@ -70,7 +71,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
     if (availableBiometrics.isNotEmpty) {
       try {
         final bool didAuthenticate = await _auth.authenticate(
-          localizedReason: 'Пожалуйста авторизуйтесь',
+          localizedReason: Localizer.get('pls_cumin'),
           options: const AuthenticationOptions(biometricOnly: true),
         );
         if (didAuthenticate) {
@@ -93,7 +94,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
             children: [
               SizedBox(height: 40.h),
               Text(
-                "Введите код доступа",
+                Localizer.get('type_code'),
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 20.h,
@@ -203,12 +204,6 @@ class _EnterCodePageState extends State<EnterCodePage> {
     );
   }
 
-  Widget getCircleNumberWidget() {
-    return CircleButton(
-      onTap: () {},
-      text: "1",
-    );
-  }
 }
 
 class CircleButton extends StatelessWidget {

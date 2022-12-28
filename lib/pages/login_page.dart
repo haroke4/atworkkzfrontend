@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
 import 'enter_phone_page.dart';
 import '../prefabs/colors.dart';
@@ -12,7 +13,6 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-
   void loginAsAdministrator() {
     Get.to(const EnterPhonePage(loginAsWorker: false));
   }
@@ -30,24 +30,24 @@ class _LoginPageState extends State<LoginPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
-          "Вход как...",
-          style: TextStyle(
-            color: Theme.of(context).primaryColorDark,
-            fontSize: 40.h,
-            fontWeight: FontWeight.bold,
+            Localizer.get('login_as'),
+            style: TextStyle(
+              color: Theme.of(context).primaryColorDark,
+              fontSize: 40.h,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        ),
           SizedBox(height: 20.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               getLoginAsButtons(Icons.admin_panel_settings_outlined,
-                  "Админ", loginAsAdministrator),
+                  Localizer.get('admin'), loginAsAdministrator),
               SizedBox(
                 width: 50.w,
               ),
               getLoginAsButtons(
-                  Icons.person_outline, "Работник", loginAsUser),
+                  Icons.person_outline, Localizer.get('worker'), loginAsUser),
             ],
           ),
         ],

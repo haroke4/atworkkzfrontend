@@ -13,9 +13,11 @@ import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../prefabs/admin_tools.dart';
+import '../utils/LocalizerUtil.dart';
 import 'admin_add_worker_page.dart';
 import 'enter_code_page.dart';
 import 'map_page.dart';
@@ -24,6 +26,7 @@ import 'admin_about_worker_page.dart';
 
 var CURRENT_YEARMONTH = "";
 var SERVER_TIME = "__/__";
+var THIS_MONTH_ACTIVE = false;
 
 class AdminsMainPage extends StatefulWidget {
   const AdminsMainPage({super.key});
@@ -46,7 +49,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
 
   int _startIndex = 0;
 
-
   @override
   void initState() {
     super.initState();
@@ -55,24 +57,31 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   }
 
   Future<void> asyncInitState() async {
-    print('UPDATING');
     var response = await AdminBackendAPI.getWorkers();
     if (response.statusCode == 200) {
       updateMonthYear();
       updateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
-        print(_data);
+        // print(_data);
+        THIS_MONTH_ACTIVE = _data['this_month_active'];
+        if (!THIS_MONTH_ACTIVE) {
+          if (_data['month_left'] == 0) {
+            showScaffoldMessage(context, Localizer.get('ATTENTION_CANT'),
+                time: 7);
+          } else {
+            showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 7);
+          }
+        }
         _loading = false;
         _today = _data['today'];
         var curr_date = DateTime.now();
         _currMonthMaxDay =
             DateTime(curr_date.year, curr_date.month + 1, 0).day.toInt();
       });
-      showScaffoldMessage(context, "Загружено");
+      showScaffoldMessage(context, Localizer.get('loaded'));
     } else {
-      showScaffoldMessage(
-          context, "Что то пошло не так... Перезапустите приложение");
+      showScaffoldMessage(context, Localizer.get('error_restart_app'));
     }
     return;
   }
@@ -86,78 +95,44 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
 
   void updateMonthYear() {
     setState(() {
-      String locale = Localizations
-          .localeOf(context)
-          .languageCode;
       DateTime now = DateTime.now();
-      _month = DateFormat.MMM(locale).format(now);
-      _year = DateFormat.y(locale).format(now);
-      CURRENT_YEARMONTH = "$_month $_year";
+      CURRENT_YEARMONTH = "${Localizer.get(now.month.toString())} ${now.year}";
     });
   }
 
-  // Future<void> updateTime() async {
-  //   await Future.delayed(Duration(seconds: 60 - _second));
-  //   _second = 0;
-  //   setState(() {
-  //     _minute++;
-  //     if (_minute == 60) {
-  //       _hour++;
-  //       _minute = 0;
-  //       if (_hour == 24) {
-  //         _hour = 0;
-  //         _loading = true;
-  //         showScaffoldMessage(context, "Загрузка...");
-  //         asyncInitState();
-  //       }
-  //     }
-  //   });
-  //   _timer = Timer.periodic(const Duration(minutes: 1), (timer) {
-  //     setState(() {
-  //       _minute++;
-  //       if (_minute == 60) {
-  //         _hour++;
-  //         _minute = 0;
-  //         if (_hour == 24) {
-  //           _hour = 0;
-  //           _loading = true;
-  //           showScaffoldMessage(context, "Загрузка...");
-  //           asyncInitState();
-  //         }
-  //       }
-  //     });
-  //   });
-  // }
-
-  void _onWorkerNamePressed(String displayName, String username, var data,
-      var prevWorkerData) async {
+  void _onWorkerNamePressed(
+      String displayName, String username, var data, var prevWorkerData) async {
     String? ans;
     if (username == "") {
       ans = await Get.to(() => const AdminAddWorkerPage());
     } else if (_doingAdjustments) {
       ans = await Get.to(
-            () =>
-            AdminAddWorkerPage(
-              displayName: displayName,
-              username: username,
-            ),
+        () => AdminAddWorkerPage(
+          displayName: displayName,
+          username: username,
+        ),
       );
     } else {
+      if (!THIS_MONTH_ACTIVE){
+        showScaffoldMessage(context, Localizer.get('atten'), time: 2);
+      }
+      data['postponement_minute'] = _data['postponement_minute'];
+      data['before_minute'] = _data['before_minute'];
+      data['after_minute'] = _data['after_minute'];
       data['company_name'] = _data['name'];
       data['department'] = _data['department'];
       data['late_minute_price'] = _data['late_minute_price'];
       // print(da);
       // print(_data);
       ans = await Get.to(
-            () =>
-            AdminAboutWorkerPage(
-              name: displayName,
-              workerUsername: username,
-              today: _today,
-              currMonthMaxDay: _currMonthMaxDay,
-              data: data,
-              prevWorkerData: prevWorkerData,
-            ),
+        () => AdminAboutWorkerPage(
+          name: displayName,
+          workerUsername: username,
+          today: _today,
+          currMonthMaxDay: _currMonthMaxDay,
+          data: data,
+          prevWorkerData: prevWorkerData,
+        ),
       );
     }
 
@@ -166,14 +141,13 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         _loading = true;
         _startIndex = 0;
       });
-      showScaffoldMessage(context, "Загрузка...");
+      showScaffoldMessage(context, Localizer.get('loading'));
       await asyncInitState();
     }
   }
 
   void _adjustmentButtonPressed() async {
     if (_doingAdjustments) {
-      // sending saved data to server!
       _updateDays.forEach((dayId, value) async {
         await AdminBackendAPI.editDay(
             workerUsername: value['username'],
@@ -211,8 +185,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       return;
     }
 
-    showScaffoldMessage(context, "Конец списка работников");
-
+    showScaffoldMessage(context, Localizer.get('end_workers_list'));
   }
 
   void prevListOW() {
@@ -223,16 +196,14 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       });
       return;
     }
-    showScaffoldMessage(context, "Начало списка работников");
+    showScaffoldMessage(context, Localizer.get('start_workers_list'));
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme
-            .of(context)
-            .backgroundColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         body: AbsorbPointer(
           absorbing: _loading,
           child: SafeArea(
@@ -253,9 +224,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
                       ...getWorkersWidget(),
                       SizedBox(height: 4.h),
                       getBottomLineWidgets(),
-                      SizedBox(height: 4.h),
-                      FloatingActionButton(onPressed: () {}),
-                      SizedBox(height: 4.h),
                     ],
                   ),
                 ),
@@ -273,7 +241,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         SizedBox(
             width: 80.w,
             child: getText(
-              _data.isEmpty ? "Название фирмы" : _data['name'],
+              _data.isEmpty ? Localizer.get('company_name') : _data['name'],
             )),
         getText(
           SERVER_TIME,
@@ -286,18 +254,24 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
                 fontColor: Colors.white,
                 align: TextAlign.center)),
         getText(
-          "Установки",
+          Localizer.get('adjustments'),
           align: TextAlign.center,
           bgColor: _doingAdjustments ? brownColor : Colors.white,
           onPressed: _adjustmentButtonPressed,
         ),
-        getText("Общие", align: TextAlign.center, onPressed: () {
+        getText(Localizer.get('general'), align: TextAlign.center,
+            onPressed: () {
           Get.to(
-                () => (const EnterCodePage(nextPage: AdminGeneralPage())),
+            () => (const EnterCodePage(nextPage: AdminGeneralPage())),
             arguments: [_data],
           );
         }),
-        getText("Qaz / Rus / Eng", align: TextAlign.center),
+        getText("Қаз / Рус / Eng",
+            align: TextAlign.center,
+            onPressed: () => setState(() {
+                  Localizer.changeLanguage();
+                  updateMonthYear();
+                })),
       ],
     );
   }
@@ -308,7 +282,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         SizedBox(
           width: 80.w,
           child: getText(
-            _data.isEmpty ? "Название отдела" : _data['department'],
+            _data.isEmpty ? Localizer.get('department') : _data['department'],
           ),
         ),
         getRect(Colors.white, text: getValidatedDay(_today - 5)),
@@ -334,7 +308,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         getRect(Colors.white, text: getValidatedDay(_today + 4)),
         getRect(Colors.white, text: getValidatedDay(_today + 5)),
         Expanded(
-          child: getText("Результаты месяца",
+          child: getText(Localizer.get('month_results'),
               align: TextAlign.right,
               bgColor: bgColor,
               fontWeight: FontWeight.bold),
@@ -383,17 +357,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
 
   Widget getWorkerLineWidget(String name, String username, var data, var prv) {
     final days = data == null ? null : data['days'];
-    // int _workingDayCount=0;
-    // int _truancyCount=0;
-    // for (var day in days){
-    //   if (day['day_status'] == 'working_day'){
-    //     _workingDayCount++;
-    //   }
-    //   if (day['worker_status_start'] == 'truancy'){
-    //     _truancyCount++;
-    //   }
-    // }
-    // data['workind_day_count'] = 0
+
     var truancy_day_count = "0";
     var working_day_count = "0";
     var prize = _data['prize'];
@@ -457,7 +421,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       ],
     );
   }
-
 
   Widget getBottomLineWidgets() {
     return Row(

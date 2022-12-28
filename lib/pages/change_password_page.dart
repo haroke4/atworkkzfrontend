@@ -10,6 +10,7 @@ import 'package:freelance_order/prefabs/tools.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
+import '../utils/LocalizerUtil.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
@@ -31,7 +32,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     //Check if password valid
     if (_enteringNewPassword) {
       AdminBackendAPI.changePinCode(_textController.text);
-      showScaffoldMessage(context, "Успешно");
+      showScaffoldMessage(context, Localizer.get('success'));
       Get.back();
     } else {
       if (await AdminBackendAPI.checkPinCode(_textController.text)) {
@@ -39,11 +40,11 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           _enteringNewPassword = true;
           _errorMessage = "";
           _textController.text = "";
-          _buttonLabel = "Сменить пароль";
+          _buttonLabel = Localizer.get('reset_pass');
         });
       } else {
         setState(() {
-          _errorMessage = "Неправильный пароль";
+          _errorMessage = Localizer.get('i_p');
           _textController.text = "";
         });
       }
@@ -71,8 +72,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               SizedBox(height: 40.h),
               Text(
                 _enteringNewPassword
-                    ? "Введите новый пароль"
-                    : 'Введите текущий пароль',
+                    ? Localizer.get('enter_new_p')
+                    : Localizer.get('enter_currp'),
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 35.h,
@@ -166,12 +167,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     );
   }
 
-  Widget getCircleNumberWidget() {
-    return CircleButton(
-      onTap: () {},
-      text: "1",
-    );
-  }
 }
 
 class CircleButton extends StatelessWidget {

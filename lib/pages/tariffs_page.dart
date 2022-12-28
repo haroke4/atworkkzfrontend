@@ -8,6 +8,7 @@ import 'package:freelance_order/prefabs/admin_tools.dart';
 import 'package:freelance_order/prefabs/tools.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
+import '../utils/LocalizerUtil.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
@@ -36,7 +37,7 @@ class _TariffsPageState extends State<TariffsPage> {
             child: Column(
               children: [
                 Text(
-                  "Выбрать подходящий тариф",
+                  Localizer.get('choose_plan'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 28.h,
@@ -66,10 +67,10 @@ class _TariffsPageState extends State<TariffsPage> {
     return [
       TableRow(
         children: [
-          text(""),
-          text("3 месяца"),
-          text("6 месяцев"),
-          text("12 месяцев"),
+          text(Localizer.get('amount_worker')),
+          text(Localizer.get('3_m')),
+          text(Localizer.get('6_m')),
+          text(Localizer.get('12_m')),
         ],
       ),
       TableRow(

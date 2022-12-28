@@ -7,6 +7,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/admin_general_page.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
+import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
@@ -38,14 +39,14 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
     if (_smsController.text.length < 4) {
       if (!fromOnChanged) {
         setState(() {
-          _errorMessage = 'Введите код';
+          _errorMessage = Localizer.get('enter_code');
         });
       }
     } else {
       // send data to server
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Processing'),
-        duration: Duration(seconds: 1),
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(Localizer.get('processing')),
+        duration: const Duration(seconds: 1),
       ));
 
       var response;
@@ -64,9 +65,9 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
       }
       var json = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Загрузка...'),
-          duration: Duration(seconds: 1),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(Localizer.get('loading')),
+          duration: const Duration(seconds: 1),
         ));
         if (widget.workerUsername == "") {
           var response = await AdminBackendAPI.getWorkers();
@@ -77,7 +78,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
         Get.offAll(_nextPage);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('Ошибка: $json'),
+          content: Text('${Localizer.get("error")}: $json'),
           duration: const Duration(seconds: 1),
         ));
         _smsController.text = "";
@@ -106,7 +107,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
             children: [
               SizedBox(height: 40.h),
               Text(
-                "Введите присланный код с SMS",
+                Localizer.get('enter_sent_sms_come'),
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
                   fontSize: 40.h,
@@ -189,12 +190,6 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
     );
   }
 
-  Widget getCircleNumberWidget() {
-    return CircleButton(
-      onTap: () {},
-      text: "1",
-    );
-  }
 }
 
 class CircleButton extends StatelessWidget {

@@ -11,6 +11,7 @@ import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../utils/BackendAPI.dart';
+import '../utils/LocalizerUtil.dart';
 import 'admin_main_page.dart';
 
 class AdminWorkerPhotoPage extends StatefulWidget {
@@ -146,7 +147,8 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
               children: [
                 getFirstLine(),
                 SizedBox(height: 4.h),
-                getTwoTextOneLine("Сумма месяц", "${widget.monthPenalty}",
+                getTwoTextOneLine(
+                    Localizer.get('sum_month'), "${widget.monthPenalty}",
                     bgColor: lateColor),
                 SizedBox(height: 20.h),
                 getThirdLine(),
@@ -172,14 +174,14 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
   Widget getConfirmationButton(bool data) {
     if (data) {
       return getText(
-        "Подтвержден",
+        Localizer.get('confirmed'),
         align: TextAlign.center,
         bgColor: brownColor,
         fontColor: Colors.white,
         fontWeight: FontWeight.bold,
       );
     }
-    return getText("Не подтвержден",
+    return getText(Localizer.get('not_confirmed'),
         align: TextAlign.center,
         bgColor: Colors.red,
         fontColor: Colors.white,
@@ -214,9 +216,11 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
 
   Widget getThirdLine() {
     if (_isStart) {
-      return getTextWithTime("Явка", getCurrentDayTime('start_time'));
+      return getTextWithTime(
+          Localizer.get('appearance'), getCurrentDayTime('start_time'));
     }
-    return getTextWithTime("Уход", getCurrentDayTime('end_time'));
+    return getTextWithTime(
+        Localizer.get('leave'), getCurrentDayTime('end_time'));
   }
 
   Widget getPhotoTime() {
@@ -228,7 +232,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
       label = getCurrentDayTime('end_photo_time') ?? '__/__';
     }
 
-    return getTwoTextOneLine('Фото с точки', label,
+    return getTwoTextOneLine(Localizer.get('photo_from_place'), label,
         bgColor: getColorByStatus(_day[key]));
   }
 
