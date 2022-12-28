@@ -71,7 +71,7 @@ Widget getText(
   }
 
   return Container(
-    margin: EdgeInsets.only(left: 3.w, right: 3.w),
+    margin: EdgeInsets.only(left: 2.w, right: 2.w),
     child: Material(
       color: bgColor,
       child: textW,
@@ -109,7 +109,7 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
             color: const Color.fromRGBO(223, 223, 223, 1),
             child: InkWell(
               onTap: () {
-                onTap!();
+                if (onTap != null) onTap();
               },
               splashColor: Colors.black26,
               child: Column(
@@ -124,6 +124,24 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
                   Text(text),
                 ],
               ),
+            ),
+          );
+        } else if (text != "") {
+          return InkWell(
+            onTap: () {
+              onTap!();
+            },
+            splashColor: Colors.black26,
+            child: Column(
+              children: [
+                SizedBox(height: 20.h),
+                Image.asset(
+                  'assets/icon.png',
+                  fit: BoxFit.cover,
+                  height: 105.h,
+                ),
+                Text(text),
+              ],
             ),
           );
         } else {

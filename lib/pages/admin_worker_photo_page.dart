@@ -120,11 +120,9 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
                     fontSize: 22.h,
                     align: TextAlign.center),
                 SizedBox(height: 4.h),
-                getText("Подтвержден",
-                    align: TextAlign.center,
-                    bgColor: brownColor,
-                    fontColor: Colors.white,
-                    fontWeight: FontWeight.bold),
+                getConfirmationButton(widget.isStart
+                    ? _day['confirmed_start']
+                    : _day['confirmed_end']),
               ],
             ),
           )
@@ -171,7 +169,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
     );
   }
 
-  Widget getConfirmationButton(bool data, String arg) {
+  Widget getConfirmationButton(bool data) {
     if (data) {
       return getText(
         "Подтвержден",
@@ -225,21 +223,13 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
     var label;
     var key = _isStart ? 'worker_status_start' : 'worker_status_end';
     if (_isStart) {
-      label = _day['start_photo_time'] ?? '__/__';
+      label = getCurrentDayTime('start_photo_time') ?? '__/__';
     } else {
-      label = _day['end_photo_time'] ?? '__/__';
+      label = getCurrentDayTime('end_photo_time') ?? '__/__';
     }
 
     return getTwoTextOneLine('Фото с точки', label,
         bgColor: getColorByStatus(_day[key]));
-  }
-
-  String getPhotoTimeString() {
-    if (_isStart) {
-      return _day['start_photo_time'] ?? '__/__';
-    } else {
-      return _day['end_photo_time'] ?? '__/__';
-    }
   }
 
   String getCurrentDayTime(String key) {

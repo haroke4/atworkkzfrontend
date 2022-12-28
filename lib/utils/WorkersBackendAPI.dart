@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:convert';
+import 'package:path/path.dart';
 import 'dart:io';
 import 'package:http/http.dart';
 
@@ -39,19 +40,19 @@ class WorkersBackendAPI {
 
   static Future<dynamic> getDays() async {
     final response = await _get('/get_days');
-    return jsonDecode(response.body);
+    return response;
   }
 
-  static Future<dynamic> assignPhoto(dayId, photo, {start=true}) async {
+  static Future<dynamic> assignPhoto(dayId, File photo, {start=true}) async {
     final str = start ? 'start_photo' : 'end_photo';
-    final Map<String, String> json = {'day_id': dayId, str:"yes"};
+    final Map<String, String> json = {'day_id': dayId.toString(), str:"yes"};
     final url = Uri.parse("$host/api/workers/assign_photo");
     final request = MultipartRequest("POST", url);
 
-    var imageFile = File('lib/utils/Untitled.png');
+    var imageFile = photo;
     final stream = ByteStream(imageFile.readAsBytes().asStream());
     final length = await imageFile.length();
-    final multipartFile = MultipartFile('file', stream, length, filename: photo);
+    final multipartFile = MultipartFile('file', stream, length, filename: basename(photo.path));
 
     request.files.add(multipartFile);
     request.headers.addAll(headers);
@@ -72,5 +73,5 @@ void main() async {
       await WorkersBackendAPI.login("TypicalAdmin", "firstWroker", "1234");
 
   WorkersBackendAPI.getDays();
-  WorkersBackendAPI.assignPhoto("4", "Untitled.png", start: false);
+  // WorkersBackendAPI.assignPhoto("4", "Untitled.png", start: false);
 }

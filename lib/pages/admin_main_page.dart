@@ -34,7 +34,6 @@ class AdminsMainPage extends StatefulWidget {
 
 class _AdminsMainPageState extends State<AdminsMainPage> {
   var _updateDays = {}; //list of id of days which need sent to server
-  // "id": {"username":username, "day_status":day_status}
   var _data = {};
 
   bool _doingAdjustments = false;
@@ -44,6 +43,9 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   int _currMonthMaxDay = 0;
   String _month = "";
   String _year = "";
+
+  int _startIndex = 0;
+
 
   @override
   void initState() {
@@ -55,8 +57,8 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   Future<void> asyncInitState() async {
     print('UPDATING');
     var response = await AdminBackendAPI.getWorkers();
-    updateMonthYear();
     if (response.statusCode == 200) {
+      updateMonthYear();
       updateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
@@ -82,9 +84,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     });
   }
 
-  void updateMonthYear(){
+  void updateMonthYear() {
     setState(() {
-      String locale = Localizations.localeOf(context).languageCode;
+      String locale = Localizations
+          .localeOf(context)
+          .languageCode;
       DateTime now = DateTime.now();
       _month = DateFormat.MMM(locale).format(now);
       _year = DateFormat.y(locale).format(now);
@@ -125,17 +129,18 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   //   });
   // }
 
-  void _onWorkerNamePressed(
-      String displayName, String username, var data, var prevWorkerData) async {
+  void _onWorkerNamePressed(String displayName, String username, var data,
+      var prevWorkerData) async {
     String? ans;
     if (username == "") {
       ans = await Get.to(() => const AdminAddWorkerPage());
     } else if (_doingAdjustments) {
       ans = await Get.to(
-        () => AdminAddWorkerPage(
-          displayName: displayName,
-          username: username,
-        ),
+            () =>
+            AdminAddWorkerPage(
+              displayName: displayName,
+              username: username,
+            ),
       );
     } else {
       data['company_name'] = _data['name'];
@@ -144,20 +149,22 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       // print(da);
       // print(_data);
       ans = await Get.to(
-        () => AdminAboutWorkerPage(
-          name: displayName,
-          workerUsername: username,
-          today: _today,
-          currMonthMaxDay: _currMonthMaxDay,
-          data: data,
-          prevWorkerData: prevWorkerData,
-        ),
+            () =>
+            AdminAboutWorkerPage(
+              name: displayName,
+              workerUsername: username,
+              today: _today,
+              currMonthMaxDay: _currMonthMaxDay,
+              data: data,
+              prevWorkerData: prevWorkerData,
+            ),
       );
     }
 
     if (ans == 'update') {
       setState(() {
         _loading = true;
+        _startIndex = 0;
       });
       showScaffoldMessage(context, "Загрузка...");
       await asyncInitState();
@@ -197,17 +204,35 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
 
   void nextListOW() {
     //nextListOfWorkers
+    if (_data['company_max_workers'] > _startIndex + 8) {
+      setState(() {
+        _startIndex += 8;
+      });
+      return;
+    }
+
+    showScaffoldMessage(context, "Конец списка работников");
+
   }
 
   void prevListOW() {
     //prevListOfWorkers
+    if (_startIndex - 8 >= 0) {
+      setState(() {
+        _startIndex -= 8;
+      });
+      return;
+    }
+    showScaffoldMessage(context, "Начало списка работников");
   }
 
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme
+            .of(context)
+            .backgroundColor,
         body: AbsorbPointer(
           absorbing: _loading,
           child: SafeArea(
@@ -268,7 +293,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         ),
         getText("Общие", align: TextAlign.center, onPressed: () {
           Get.to(
-            () => (const EnterCodePage(nextPage: AdminGeneralPage())),
+                () => (const EnterCodePage(nextPage: AdminGeneralPage())),
             arguments: [_data],
           );
         }),
@@ -326,20 +351,21 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     if (_data == {}) {
       return [];
     }
-    var rabotniki = _data['workers'] ?? [];
-    var cnt = 8 - rabotniki.length;
-    for (int i = 0; i < cnt; i++) {
-      rabotniki.add({"display_name": "", "username": ""});
-    }
+    var workers = (_data['workers'] ?? []);
+    workers = List.from(workers);
+    var _length = workers.length;
 
-    for (int i = 0; i < rabotniki.length; i++) {
-      final e = rabotniki[i];
+    for (int i = 0; i <= _data['company_max_workers'] - _length; i++) {
+      workers.add({"display_name": "", "username": ""});
+    }
+    for (int i = _startIndex; i < _startIndex + 8; i++) {
+      final e = workers[i];
       if (i > 0) {
         a.add(getWorkerLineWidget(
           e['display_name'],
           e['username'],
           e['last_month'],
-          rabotniki[i - 1],
+          workers[i - 1],
         ));
       } else {
         a.add(getWorkerLineWidget(
@@ -433,17 +459,16 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   }
 
 
-
   Widget getBottomLineWidgets() {
     return Row(
       children: [
-        getButton(nextListOW, Icons.arrow_upward_rounded, Icons.man_outlined),
+        getButton(prevListOW, Icons.arrow_upward_rounded, Icons.man_outlined),
         const Expanded(child: SizedBox()),
         getMainMenuButton(enabled: false),
         SizedBox(width: 4.w),
         getGoBackButton(),
         const Expanded(child: SizedBox()),
-        getButton(prevListOW, Icons.man_outlined, Icons.arrow_downward_rounded),
+        getButton(nextListOW, Icons.man_outlined, Icons.arrow_downward_rounded),
       ],
     );
   }

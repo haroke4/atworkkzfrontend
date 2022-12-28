@@ -660,10 +660,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   String getPenalty({start = true}) {
     if (start) {
       var cnt = _days[_today - 1]["late_minute_count"];
-      return "$cnt * $latePricePerMinute";
+      return "$cnt мин * $latePricePerMinute";
     }
     var cnt = _days[_today - 1]["late_minute_count"];
-    return "$cnt * $latePricePerMinute";
+    return "$cnt мин * $latePricePerMinute";
   }
 
   String getPhotoTime(String key) {
@@ -673,7 +673,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     }
     final splitted = time.split(":");
     int hour = int.parse(splitted[0]);
-    int minute = int.parse(splitted[1]);
+    String minute = splitted[1];
     return "$hour:$minute";
   }
 

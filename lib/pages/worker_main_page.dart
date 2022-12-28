@@ -1,12 +1,19 @@
 import 'dart:convert';
 import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
+import 'package:freelance_order/prefabs/scaffold_messages.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:image_picker/image_picker.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
+
+// TODO: CONNECT TO BACKEND!!!
+
+var SERVER_TIME = "__/__";
+var CURRENT_YEARMONTH = "";
 
 class WorkersMainPage extends StatefulWidget {
   const WorkersMainPage({super.key});
@@ -16,20 +23,65 @@ class WorkersMainPage extends StatefulWidget {
 }
 
 class _WorkersMainPageState extends State<WorkersMainPage> {
-  File? _imageRight;
+  int _today = 1;
+  int _initToday = 0;
+  var _data = {};
+  var _days = [];
+  int _currMonthMaxDay = 0;
 
-  Future onMakeSelfiePressed() async {
+  @override
+  void initState() {
+    super.initState();
+    initializeDateFormatting();
+    asyncInitState();
+  }
+
+  Future<void> asyncInitState() async {
+    print('UPDATING');
+    showScaffoldMessage(context, "Обновление...");
+    var response = await WorkersBackendAPI.getDays();
+    if (response.statusCode == 200) {
+      updateMonthYear();
+      updateTime();
+      setState(() {
+        _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
+        _days = _data['days'];
+        print(_data);
+        _today = _data['today'];
+        _initToday = _today;
+        var curr_date = DateTime.now();
+        _currMonthMaxDay =
+            DateTime(curr_date.year, curr_date.month + 1, 0).day.toInt();
+      });
+      showScaffoldMessage(context, "Успешно");
+    }
+  }
+
+  void updateTime() async {
+    var sTime = await getServerTime();
+    setState(() {
+      SERVER_TIME = sTime;
+    });
+  }
+
+  void updateMonthYear() {
+    setState(() {
+      String locale = Localizations.localeOf(context).languageCode;
+      DateTime now = DateTime.now();
+      var _month = DateFormat.MMM(locale).format(now);
+      var _year = DateFormat.y(locale).format(now);
+      CURRENT_YEARMONTH = "$_month $_year";
+    });
+  }
+
+  Future onMakeSelfiePressed({start = true}) async {
     final image = await ImagePicker().pickImage(source: ImageSource.camera);
     if (image == null) return;
 
-    final imageTemporary = File(image.path);
-    setState(() {
-      _imageRight = imageTemporary;
-    });
-
-    List<int> imageBytes = imageTemporary.readAsBytesSync();
-    String baseImage = base64Encode(imageBytes);
-    // upload image to server
+    final imageFile = File(image.path);
+    await WorkersBackendAPI.assignPhoto(_days[_today - 1]['id'], imageFile,
+        start: start);
+    asyncInitState();
   }
 
   @override
@@ -38,18 +90,22 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       return Scaffold(
         backgroundColor: Theme.of(context).backgroundColor,
         body: SafeArea(
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Container(
-              margin: EdgeInsets.all(4.w),
-              child: Column(
-                children: [
-                  getFirstLineWidgets(constraints.maxWidth * 0.25 - 4.w),
-                  SizedBox(height: 4.h),
-                  getSecondLineWidgets(constraints.maxWidth * 0.25 - 4.w),
-                  SizedBox(height: 4.h),
-                  getThirdLineWidgets(constraints.maxWidth * 0.25 - 4.w),
-                ],
+          child: RefreshIndicator(
+            color: brownColor,
+            onRefresh: asyncInitState,
+            child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Container(
+                margin: EdgeInsets.all(4.w),
+                child: Column(
+                  children: [
+                    getFirstLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                    SizedBox(height: 4.h),
+                    getSecondLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                    SizedBox(height: 4.h),
+                    getThirdLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                  ],
+                ),
               ),
             ),
           ),
@@ -61,10 +117,13 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   Widget getFirstLineWidgets(width) {
     return Row(
       children: [
-        SizedBox(width: width, child: getText("Фирма")),
-        getText("10:32", align: TextAlign.center, fontWeight: FontWeight.bold),
+        SizedBox(
+            width: width,
+            child: getText(_data.isEmpty ? "Фирма" : _data['name'])),
+        getText(SERVER_TIME,
+            align: TextAlign.center, fontWeight: FontWeight.bold),
         Expanded(
-            child: getText("Август 2022",
+            child: getText(CURRENT_YEARMONTH,
                 bgColor: todayColor,
                 fontColor: Colors.white,
                 align: TextAlign.center)),
@@ -82,17 +141,18 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              getText("Отдел"),
+              getText(_data.isEmpty ? "Название отдела" : _data['department']),
               SizedBox(height: 4.h),
-              getText("Сериков", bgColor: brownColor, fontColor: Colors.white),
+              getText(_data.isEmpty ? "Имя" : _data['worker_name'],
+                  bgColor: brownColor, fontColor: Colors.white),
             ],
           ),
         ),
-        getArrowButton(const Icon(Icons.arrow_back), "back", (){}),
+        getArrowButton(const Icon(Icons.arrow_back), "back", leftArrow),
         const Expanded(child: SizedBox()),
         getDatesWidgets(),
         const Expanded(child: SizedBox()),
-        getArrowButton(const Icon(Icons.arrow_forward), "forward", (){}),
+        getArrowButton(const Icon(Icons.arrow_forward), "forward", rightArrow),
       ],
     );
   }
@@ -104,11 +164,26 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           width: width,
           child: Column(
             children: [
-              getPhoto(),
+              () {
+                if (_days.isEmpty ||
+                    _days[_today - 1]['start_photo'] == null &&
+                        _today == _initToday) {
+                  return getPhoto(
+                    text: "Сделать сэлфи",
+                    onTap: onMakeSelfiePressed,
+                  );
+                } else {
+                  return getPhoto(imagePath: _days[_today - 1]['start_photo']);
+                }
+              }(),
               SizedBox(height: 4.h),
-              getTextWithTime("Явка", "8:30/9:10"),
+              getTextWithTime("Явка", getCurrentDayTime("start_time")),
               SizedBox(height: 4.h),
-              getTwoTextOneLine('Фото с точки', '9:16', bgColor: lateColor),
+              getTwoTextOneLine(
+                'Фото с точки',
+                getPhotoTime("start_photo_time"),
+                bgColor: getBgColor('worker_status_start'),
+              ),
             ],
           ),
         ),
@@ -117,11 +192,31 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           width: width,
           child: Column(
             children: [
-              getPhoto(text: "Сделать сэлфи", onTap: onMakeSelfiePressed),
+              () {
+                if (_days.isEmpty) {
+                  return getPhoto(
+                    text: "Сделать сэлфи",
+                    onTap: () => onMakeSelfiePressed(start: false),
+                  );
+                }
+                if (_days[_today - 1]['end_photo'] == null &&
+                    _today == _initToday) {
+                  return getPhoto(
+                    text: "Сделать сэлфи",
+                    onTap: () => onMakeSelfiePressed(start: false),
+                  );
+                } else {
+                  return getPhoto(imagePath: _days[_today - 1]['end_photo']);
+                }
+              }(),
               SizedBox(height: 4.h),
-              getTextWithTime("Уход", "17:45/19:00"),
+              getTextWithTime("Уход", getCurrentDayTime("end_time")),
               SizedBox(height: 4.h),
-              getTwoTextOneLine('Фото с точки', '_ /_', bgColor: Colors.green),
+              getTwoTextOneLine(
+                'Фото с точки',
+                getPhotoTime("end_photo_time"),
+                bgColor: getBgColor('worker_status_end'),
+              ),
             ],
           ),
         ),
@@ -134,15 +229,15 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       children: [
         Row(
           children: [
-            getRect(Colors.white, text: '11'),
-            getRect(Colors.white, text: '12'),
-            getRect(Colors.white, text: '13'),
-            getRect(Colors.white, text: '14'),
-            getRect(Colors.white, text: '15'),
+            getRect(Colors.white, text: getValidatedDay(_today - 5)),
+            getRect(Colors.white, text: getValidatedDay(_today - 4)),
+            getRect(Colors.white, text: getValidatedDay(_today - 3)),
+            getRect(Colors.white, text: getValidatedDay(_today - 2)),
+            getRect(Colors.white, text: getValidatedDay(_today - 1)),
             SizedBox(
               width: 48.h + 12.w,
               child: Text(
-                "16",
+                "${_today}",
                 style: TextStyle(
                   color: todayColor,
                   fontWeight: FontWeight.bold,
@@ -151,35 +246,35 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                 textAlign: TextAlign.center,
               ),
             ),
-            getRect(Colors.white, text: '11'),
-            getRect(Colors.white, text: '12'),
-            getRect(Colors.white, text: '13'),
-            getRect(Colors.white, text: '14'),
-            getRect(Colors.white, text: '15'),
+            getRect(Colors.white, text: getValidatedDay(_today + 1)),
+            getRect(Colors.white, text: getValidatedDay(_today + 2)),
+            getRect(Colors.white, text: getValidatedDay(_today + 3)),
+            getRect(Colors.white, text: getValidatedDay(_today + 4)),
+            getRect(Colors.white, text: getValidatedDay(_today + 5)),
           ],
         ),
         Row(
           children: [
-            getRect(begOffColor),
-            getRect(onTimeColor),
-            getRect(validReasonColor),
-            getRect(lateColor),
-            getRect(workingDayColor),
+            getRectByDay(_today - 5),
+            getRectByDay(_today - 4),
+            getRectByDay(_today - 3),
+            getRectByDay(_today - 2),
+            getRectByDay(_today - 1),
             SizedBox(
               width: 48.h + 12.w,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getRect(onTimeColor, confirmation: true),
-                  getRect(workingDayColor),
+                  getRectByDay(_today, showConfirm: true),
+                  getRectByDay(_today, start: false, showConfirm: true),
                 ],
               ),
             ),
-            getRect(begOffColor),
-            getRect(onTimeColor),
-            getRect(validReasonColor),
-            getRect(lateColor),
-            getRect(workingDayColor),
+            getRectByDay(_today + 1, ws: false),
+            getRectByDay(_today + 2, ws: false),
+            getRectByDay(_today + 3, ws: false),
+            getRectByDay(_today + 4, ws: false),
+            getRectByDay(_today + 5, ws: false),
           ],
         )
       ],
@@ -226,17 +321,16 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller("500000"),
+                        getTextSmaller(_data['prize'].toString()),
                         SizedBox(height: 4.h),
-                        getTextSmaller("500"),
+                        getTextSmaller(_data['beg_off_price'].toString()),
                       ],
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 4.h),
-              getTextSmaller("6 мин * 15 = 90 ед",
-                  bgColor: lateColor, fontColor: Colors.black),
+              getPenalty()
             ],
           ),
         ),
@@ -277,21 +371,118 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller("15"),
+                        getTextSmaller(_data['late_minute_price'].toString()),
                         SizedBox(height: 4.h),
-                        getTextSmaller("65/3000"),
+                        getTextSmaller(
+                            "${_data['truancy_minute']}/${_data['truancy_price']}"),
                       ],
                     ),
                   ),
                 ],
               ),
               SizedBox(height: 4.h),
-              getTextSmaller("Итог август: 3620",
-                  bgColor: lateColor, fontColor: Colors.black),
+              getTwoTextOneLine(
+                "Сумма месяц",
+                _data['penalty_count'].toString(),
+                bgColor: lateColor,
+              ),
             ],
           ),
         ),
       ],
     );
+  }
+
+  String getValidatedDay(int curr) {
+    if (0 < curr && curr <= _currMonthMaxDay) {
+      return curr.toString();
+    } else {
+      return "";
+    }
+  }
+
+  Widget getRectByDay(int day, {ws = true, start = true, showConfirm = false}) {
+    // ws - is for worker status
+    if (getValidatedDay(day) == '' || _days.isEmpty) {
+      return getRect(noAssignmentColor);
+    } else if (_days[day - 1] == null) {
+      return getRect(noAssignmentColor);
+    }
+    if (ws && start) {
+      return getRect(
+        getColorByStatus(_days[day - 1]['worker_status_start']),
+        confirmation: showConfirm && !_days[day - 1]['confirmed_start'],
+      );
+    } else if (ws && !start) {
+      return getRect(
+        getColorByStatus(_days[day - 1]['worker_status_end']),
+        confirmation: showConfirm && !_days[day - 1]['confirmed_end'],
+      );
+    }
+    return getRect(getColorByStatus(_days[day - 1]['day_status']));
+  }
+
+  String getCurrentDayTime(String key) {
+    // key = start_time or end_time
+    if (_days.isEmpty) {
+      return "__/__";
+    }
+    String? ans = _days[_today - 1][key];
+    if (ans == null) {
+      return "__/__";
+    }
+    if (ans.startsWith("0")) {
+      ans = ans.substring(1, 5);
+    } else {
+      ans = ans.substring(0, 5);
+    }
+    return ans;
+  }
+
+  String getPhotoTime(String key) {
+    if (_days.isEmpty) {
+      return "__/__";
+    }
+    var time = _days[_today - 1][key];
+    if (time == null) {
+      return "__/__";
+    }
+    final splitted = time.split(":");
+    int hour = int.parse(splitted[0]);
+    String minute = splitted[1];
+    return "$hour:$minute";
+  }
+
+  void leftArrow() {
+    updateTime();
+    if (_today - 1 > 0) {
+      setState(() {
+        _today -= 1;
+      });
+    }
+  }
+
+  void rightArrow() {
+    updateTime();
+    if (_today + 1 <= _currMonthMaxDay) {
+      setState(() {
+        _today++;
+      });
+    }
+  }
+
+  Widget getPenalty({start = true}) {
+    if (_days.isEmpty) {
+      return getText("");
+    }
+    var cnt = _days[_today - 1]["late_minute_count"];
+    var str = "$cnt мин * ${_data['late_minute_price']} = ";
+    return getText("$str${_days[_today - 1]['penalty_count_start']}",
+        bgColor: getColorByStatus(_days[_today - 1]['worker_status_start']));
+  }
+
+  Color getBgColor(key) {
+    return getColorByStatus(
+        _days.isEmpty ? null : _days[_today - 1][key]);
   }
 }

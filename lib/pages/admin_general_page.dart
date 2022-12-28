@@ -90,6 +90,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         _saveButtonLabel = getSaveText();
       });
     } else {
+      showScaffoldMessage(context, "Отправка данных...");
        var response = await AdminBackendAPI.editCompany(
         name: _data['name'].toString(),
         department: _data['department'].toString(),
@@ -108,7 +109,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
          Get.back(result: 'update');
        }
        else{
-         showScaffoldMessage(context, jsonDecode(response.body));
+         showScaffoldMessage(context, response.body, time: 5);
        }
 
     }

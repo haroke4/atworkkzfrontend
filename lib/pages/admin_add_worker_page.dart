@@ -47,7 +47,9 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
       setState(() {
         _workerInfo = "${contact!.displayName} ${contact.phones[0].number}";
         _displayUsername = contact.displayName;
-        _usernameWorker = contact.phones[0].number;
+        _usernameWorker = contact.phones[0].number.replaceAll(" ", "");
+        _usernameWorker = _usernameWorker.replaceAll("+", "");
+        print(_usernameWorker);
       });
     } else {
       await Permission.contacts.request();
@@ -74,9 +76,9 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
 
   void _noPressed() async {
     if (deleteWorker) {
-      _addContactPressed();
-    } else {
       Get.back();
+    } else {
+      _addContactPressed();
     }
   }
 

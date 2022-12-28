@@ -94,7 +94,6 @@ class AdminBackendAPI {
       "after_minute": afterMinute,
     };
     final response = await _post('/edit_company', json);
-    final jsonResponse = jsonDecode(response.body);
     return response;
   }
 
