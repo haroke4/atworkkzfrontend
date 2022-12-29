@@ -36,6 +36,11 @@ class Localizer {
       'ru': 'Неправильный номер телефона',
       'kz': 'Қате телефон номері'
     },
+    'invalid_phone_or_code': {
+      'en': 'Invalid phone number or entered',
+      'ru': 'Неправильный номер телефона или введенный код',
+      'kz': 'Телефон номері қате немесе енгізілген код қате'
+    },
     'enter_code': {
       'en': 'Enter the code',
       'ru': 'Введите код',
@@ -53,9 +58,9 @@ class Localizer {
       'kz': 'Қателік',
     },
     'enter_sent_sms_come': {
-      'en': 'Enter the code from SMS',
-      'ru': 'Введите присланный код с SMS',
-      'kz': 'SMS-тен келген кодты енгізіңіз'
+      'en': 'Enter the code sent to you',
+      'ru': 'Введите присланный вам код',
+      'kz': 'Сізге жіберілген кодты енгізіңіз'
     },
     'company_name': {
       'en': 'Company name',
@@ -324,9 +329,9 @@ class Localizer {
     },
     'name': {'en': 'Name', 'ru': 'Имя', 'kz': 'Аты'},
     'make_photo': {
-      'en': 'Make a photo',
-      'ru': 'Сделать фото',
-      'kz': 'Суретке түсу'
+      'en': 'Make a selfie',
+      'ru': 'Сделать селфи',
+      'kz': 'Селфиге түсу'
     },
     'no_ass': {
       'en': 'No assignment',

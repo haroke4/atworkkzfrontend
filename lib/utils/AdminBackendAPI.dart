@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:convert';
 import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'BackendAPI.dart';
 
@@ -103,6 +104,7 @@ class AdminBackendAPI {
     final jsonResponse = jsonDecode(response.body);
     return response;
   }
+
   static Future<bool> checkPinCode(String PinCode) async {
     final json = {"pin_code": PinCode};
     final response = await _post('/check_company_password', json);
@@ -181,4 +183,3 @@ class AdminBackendAPI {
     return await _post('/extend_plan', {});
   }
 }
-

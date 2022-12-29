@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:freelance_order/prefabs/colors.dart';
+import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -82,14 +83,11 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-
-        if (nextScreen != null){
+        if (nextScreen != null) {
           Get.off(nextScreen);
-        }
-        else{
+        } else {
           _controller.forward(from: 0.0);
         }
-
       }
     });
     _controller.forward(from: 0.0);
@@ -99,23 +97,30 @@ class _SplashScreenState extends State<SplashScreen>
   void asyncInitState() async {
     sharedPrefs = await SharedPreferences.getInstance();
     // print(sharedPrefs.getString("account_type"));
-    if (sharedPrefs.getString("account_type") == null){
-      setState((){
+    if (sharedPrefs.getString("account_type") == null) {
+      setState(() {
         nextScreen = LoginPage();
       });
+    } else if (sharedPrefs.getString("account_type") == "admin") {
+      var token = sharedPrefs.getString('token').toString();
+      if (await BackendAPI.isTokenValid(token)) {
+        headers["Authorization"] = "Token $token";
+        setState(() {
+          nextScreen = const AdminsMainPage();
+        });
+      }
+    } else {
+      var token = sharedPrefs.getString('token').toString();
+      if (await BackendAPI.isTokenValid(token)) {
+        headers["Authorization"] = "Token $token";
+        setState(() {
+          nextScreen = const WorkersMainPage();
+        });
+      }
     }
-    else if(sharedPrefs.getString("account_type") == "admin"){
-      setState((){
-        nextScreen = const AdminsMainPage();
-      });
-    }
-    else{
-      setState((){
-        nextScreen = const WorkersMainPage();
-      });
-    }
+    // sharedPrefs.clear();
 
-    if (sharedPrefs.getString('lang') != null){
+    if (sharedPrefs.getString('lang') != null) {
       Localizer.setLang(sharedPrefs.getString('lang')!);
     }
   }

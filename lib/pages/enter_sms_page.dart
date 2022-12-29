@@ -11,6 +11,7 @@ import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../prefabs/scaffold_messages.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
@@ -32,9 +33,20 @@ class EnterSMSPage extends StatefulWidget {
 }
 
 class _EnterSMSPageState extends State<EnterSMSPage> {
+  late SharedPreferences sharedPrefs;
   String _errorMessage = '';
   final _smsController = TextEditingController();
   late var _nextPage = widget.nextPage;
+
+  @override
+  void initState(){
+    super.initState();
+    initSharedPrefs();
+  }
+
+  void initSharedPrefs() async{
+    sharedPrefs = await SharedPreferences.getInstance();
+}
 
   void sendAndCheckSMS({fromOnChanged = false}) async {
     if (_smsController.text.length < 4) {
@@ -70,15 +82,19 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
           content: Text(Localizer.get('loading')),
           duration: const Duration(seconds: 1),
         ));
-        if (!isWorker) {
+
+        if (!isWorker) { // if admin does not set up company
           var response = await AdminBackendAPI.getWorkers();
           if (response.statusCode != 200) {
             _nextPage = AdminGeneralPage();
           }
         }
+        final jsonResponse = jsonDecode(response.body);
+        sharedPrefs.setString('account_type', isWorker ? "worker" : "admin");
+        sharedPrefs.setString('token', jsonResponse['token']);
         Get.offAll(_nextPage);
       } else {
-        showScaffoldMessage(context, Localizer.get('invalid_phone'));
+        showScaffoldMessage(context, Localizer.get('invalid_phone_or_code'));
         _smsController.text = "";
       }
     }

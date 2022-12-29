@@ -65,6 +65,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           ),
         );
       } else {
+
         showScaffoldMessage(context, Localizer.get('invalid_phone'));
         setState(() {
           _buttonLabel = Text(Localizer.get('send_code'));

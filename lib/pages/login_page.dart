@@ -41,13 +41,23 @@ class _LoginPageState extends State<LoginPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              getLoginAsButtons(Icons.admin_panel_settings_outlined,
-                  Localizer.get('admin'), loginAsAdministrator),
+              getLoginAsButtons(
+                  Image.asset(
+                    "assets/admin.png",
+                    height: 150.h,
+                  ),
+                  Localizer.get('admin'),
+                  loginAsAdministrator),
               SizedBox(
                 width: 50.w,
               ),
               getLoginAsButtons(
-                  Icons.person_outline, Localizer.get('worker'), loginAsUser),
+                  Image.asset(
+                    "assets/worker.png",
+                    height: 150.h,
+                  ),
+                  Localizer.get('worker'),
+                  loginAsUser),
             ],
           ),
         ],
@@ -55,7 +65,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget getLoginAsButtons(IconData icon, String text, var _onPressed) {
+  Widget getLoginAsButtons(Image image, String text, var _onPressed) {
     return Container(
       // тени
       decoration: const BoxDecoration(
@@ -78,11 +88,7 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(
-                  icon,
-                  size: 70.w,
-                  color: Theme.of(context).primaryColorDark,
-                ),
+                image,
                 const SizedBox(
                   height: 6,
                 ),
