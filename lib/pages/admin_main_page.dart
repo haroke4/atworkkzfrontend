@@ -68,9 +68,9 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         if (!THIS_MONTH_ACTIVE) {
           if (_data['month_left'] == 0) {
             showScaffoldMessage(context, Localizer.get('ATTENTION_CANT'),
-                time: 7);
+                time: 15);
           } else {
-            showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 7);
+            showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 15);
           }
         }
         _loading = false;

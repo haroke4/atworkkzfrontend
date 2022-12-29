@@ -11,6 +11,7 @@ import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
+import '../prefabs/scaffold_messages.dart';
 import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/appbar_prefab.dart';
@@ -50,7 +51,8 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
       ));
 
       var response;
-      if (widget.workerUsername != "") {
+      bool isWorker = widget.workerUsername.length > 5;
+      if (isWorker) {
         response = await WorkersBackendAPI.login(
           widget.adminUsername,
           widget.workerUsername,
@@ -63,13 +65,12 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
           _smsController.text,
         );
       }
-      var json = jsonDecode(response.body);
       if (response.statusCode == 200) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(Localizer.get('loading')),
           duration: const Duration(seconds: 1),
         ));
-        if (widget.workerUsername == "") {
+        if (!isWorker) {
           var response = await AdminBackendAPI.getWorkers();
           if (response.statusCode != 200) {
             _nextPage = AdminGeneralPage();
@@ -77,10 +78,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
         }
         Get.offAll(_nextPage);
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text('${Localizer.get("error")}: $json'),
-          duration: const Duration(seconds: 1),
-        ));
+        showScaffoldMessage(context, Localizer.get('invalid_phone'));
         _smsController.text = "";
       }
     }

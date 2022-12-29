@@ -37,7 +37,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
     super.initState();
 
     _workerInfo = widget.displayName != null
-        ? "${widget.displayName} ${widget.username}"
+        ? "${widget.displayName} +${widget.username}"
         : ""; // split it into 2 parameter
   }
 
@@ -46,11 +46,16 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
     if (status.isGranted) {
       final contact = await FlutterContacts.openExternalPick();
       setState(() {
-        _workerInfo = "${contact!.displayName} ${contact.phones[0].number}";
-        _displayUsername = contact.displayName;
+        _displayUsername = contact!.displayName;
         _usernameWorker = contact.phones[0].number.replaceAll(" ", "");
         _usernameWorker = _usernameWorker.replaceAll("+", "");
+        if(!_usernameWorker.startsWith("7")){
+          _usernameWorker = '7${_usernameWorker.substring(1,)}';
+        }
+        _workerInfo = "$_displayUsername +$_usernameWorker";
+
       });
+
     } else {
       await Permission.contacts.request();
     }
@@ -69,7 +74,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
     if (response.statusCode == 200) {
       Get.back(result: "update");
     } else {
-      showScaffoldMessage(context, response.body);
+      showScaffoldMessage(context, Localizer.get('already_exists'), time: 2);
     }
   }
 

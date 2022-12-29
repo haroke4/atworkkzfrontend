@@ -382,6 +382,11 @@ class Localizer {
       'en': 'Your current month is inactive',
       'ru': 'Ваш нынешний месяц неактивен',
       'kz': 'Сіздің қазіргі айыңыз белсенді емес'
+    },
+    'already_exists': {
+      'en': 'The phone number is already registered under another company or is the administrator of another company',
+      'ru': 'Телефонный номер уже зарегистрирован под другую компанию или является админом другой компании',
+      'kz': 'Телефон нөмірі басқа компанияда тіркелген немесе басқа компанияның админы болып табылады'
     }
   };
 

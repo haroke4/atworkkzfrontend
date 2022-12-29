@@ -42,8 +42,8 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       // ScaffoldMessenger.of(context).showSnackBar(
       //   const SnackBar(content: Text('Processing Data')),
       // );
-      var adminUsername = _adminPhoneController.text.replaceAll(" ", "");
-      var workerUsername = _workerPhoneController.text.replaceAll(" ", "");
+      var adminUsername = "7${_adminPhoneController.text.replaceAll(" ", "")}";
+      var workerUsername = "7${_workerPhoneController.text.replaceAll(" ", "")}";
       var response;
       if (widget.loginAsWorker) {
         response = await BackendAPI.sendSms(workerUsername);
@@ -146,7 +146,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           if (value == null || value == '') {
             return Localizer.get('field_cannot_be_empty');
           }
-          if (value.length < 14) {
+          if (value.length < 12) {
             // 11 - номер телефона 3 - пробела
             return Localizer.get('invalid_phone');
           }
@@ -155,18 +155,19 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
         },
         onChanged: (value) {
           _formKey.currentState!.validate();
-          if (value.length == 14) {
+          if (value.length == 12) {
             FocusScope.of(context).nextFocus();
           }
         },
         decoration: InputDecoration(
           labelText: label,
+          prefixText: '+7 '
         ),
         cursorColor: Theme.of(context).primaryColorLight,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,
-          LengthLimitingTextInputFormatter(11),
+          LengthLimitingTextInputFormatter(10),
           TelNumberFormatter(),
         ],
       ),
@@ -182,7 +183,7 @@ class TelNumberFormatter extends TextInputFormatter {
     int counter = 0;
 
     for (var element in newValue.text.runes) {
-      if (counter == 1 || counter == 4 || counter == 7) {
+      if (counter == 3 || counter == 6) {
         ans += ' ';
       }
       ans += String.fromCharCode(element);
