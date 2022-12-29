@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import '../utils/BackendAPI.dart';
@@ -120,6 +121,14 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
                     AdminBackendAPI.getImageUrl(imagePath),
                     height: 140.h,
                     fit: BoxFit.cover,
+                    loadingBuilder: (BuildContext context, Widget child,
+                        ImageChunkEvent? loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return SpinKitThreeBounce(
+                        color: Colors.black,
+                        size: 20.h,
+                      );
+                    },
                   ),
                   Text(text),
                 ],
@@ -212,9 +221,14 @@ Widget getTwoTextSeperated(
   return Row(
     children: [
       firstExpanded
-          ? Expanded(child: getText(firstText, bgColor: firstTextBgColor, overflow: TextOverflow.visible))
-          : getText(firstText, bgColor: firstTextBgColor, overflow: TextOverflow.visible),
-      IntrinsicWidth(child: getText(secondText, bgColor: secondTextBgColor, overflow: TextOverflow.visible)),
+          ? Expanded(
+              child: getText(firstText,
+                  bgColor: firstTextBgColor, overflow: TextOverflow.visible))
+          : getText(firstText,
+              bgColor: firstTextBgColor, overflow: TextOverflow.visible),
+      IntrinsicWidth(
+          child: getText(secondText,
+              bgColor: secondTextBgColor, overflow: TextOverflow.visible)),
     ],
   );
 }

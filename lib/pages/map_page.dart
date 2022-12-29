@@ -53,9 +53,9 @@ class _MyMapViewState extends State<MyMapView> {
 
   void buttonPressed() async {
     setState(() {
-      sendButtonLabel = const SpinKitThreeBounce(
+      sendButtonLabel = SpinKitThreeBounce(
         color: Colors.black,
-        size: 25.0,
+        size: 20.h,
       );
     });
     GeoPoint geoPoint = await controller.myLocation();

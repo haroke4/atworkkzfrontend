@@ -33,9 +33,9 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
     // Send data to backend and wait for SMS
     if (_formKey.currentState!.validate()) {
       setState(() {
-        _buttonLabel = const SpinKitThreeBounce(
+        _buttonLabel = SpinKitThreeBounce(
           color: Colors.black,
-          size: 25.0,
+          size: 20.h,
         );
       });
 

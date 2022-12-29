@@ -62,9 +62,9 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
   void _onSavePressed() async {
     if (_registering) {
       setState(() {
-        _saveButtonLabel = const SpinKitThreeBounce(
+        _saveButtonLabel = SpinKitThreeBounce(
           color: Colors.black,
-          size: 25.0,
+          size: 20.h,
         );
       });
       var response = await AdminBackendAPI.createCompany(
