@@ -92,6 +92,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
         final jsonResponse = jsonDecode(response.body);
         sharedPrefs.setString('account_type', isWorker ? "worker" : "admin");
         sharedPrefs.setString('token', jsonResponse['token']);
+        sharedPrefs.setString('code', _smsController.text);
         Get.offAll(_nextPage);
       } else {
         showScaffoldMessage(context, Localizer.get('invalid_phone_or_code'));

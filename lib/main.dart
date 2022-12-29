@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
+import 'package:freelance_order/pages/enter_code_page.dart';
 import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:freelance_order/prefabs/colors.dart';
 import 'package:freelance_order/utils/BackendAPI.dart';
@@ -97,24 +98,33 @@ class _SplashScreenState extends State<SplashScreen>
   void asyncInitState() async {
     sharedPrefs = await SharedPreferences.getInstance();
     // print(sharedPrefs.getString("account_type"));
+    nextScreen = LoginPage();
     if (sharedPrefs.getString("account_type") == null) {
       setState(() {
         nextScreen = LoginPage();
       });
     } else if (sharedPrefs.getString("account_type") == "admin") {
       var token = sharedPrefs.getString('token').toString();
-      if (await BackendAPI.isTokenValid(token)) {
+      var code = sharedPrefs.getString('code');
+      if (await BackendAPI.isTokenValid(token) && code != null) {
         headers["Authorization"] = "Token $token";
         setState(() {
-          nextScreen = const AdminsMainPage();
+          nextScreen = EnterCodePage(
+            nextPage: const AdminsMainPage(),
+            code: code.toString(),
+          );
         });
       }
     } else {
       var token = sharedPrefs.getString('token').toString();
-      if (await BackendAPI.isTokenValid(token)) {
+      var code = sharedPrefs.getString('code');
+      if (await BackendAPI.isTokenValid(token) && code != null) {
         headers["Authorization"] = "Token $token";
         setState(() {
-          nextScreen = const WorkersMainPage();
+          nextScreen = EnterCodePage(
+            nextPage: const WorkersMainPage(),
+            code: code.toString(),
+          );
         });
       }
     }

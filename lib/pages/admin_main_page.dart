@@ -262,7 +262,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         getText(Localizer.get('general'), align: TextAlign.center,
             onPressed: () {
           Get.to(
-            () => (const EnterCodePage(nextPage: AdminGeneralPage())),
+            () => (EnterCodePage(nextPage: const AdminGeneralPage())),
             arguments: [_data],
           );
         }),

@@ -18,8 +18,8 @@ import '../prefabs/appbar_prefab.dart';
 
 class EnterCodePage extends StatefulWidget {
   final nextPage;
-
-  const EnterCodePage({super.key, required this.nextPage});
+  var code;
+  EnterCodePage({super.key, required this.nextPage, this.code=""});
 
   @override
   State<EnterCodePage> createState() => _EnterCodePageState();
@@ -45,15 +45,27 @@ class _EnterCodePageState extends State<EnterCodePage> {
       }
     } else {
       // send data to server
-      if (await AdminBackendAPI.checkPinCode(_smsController.text)) {
-        showScaffoldMessage(context, Localizer.get('success'));
-        Get.off(widget.nextPage, arguments: Get.arguments);
+      if(widget.code != ""){
+        print(widget.code);
+        if (_smsController.text == widget.code){
+          showScaffoldMessage(context, Localizer.get('success'));
+          Get.off(widget.nextPage, arguments: Get.arguments);
+        }
+        else {
+          showScaffoldMessage(context, Localizer.get('incorrect_code'));
+          _smsController.text = "";
+        }
       }
-      else{
-        showScaffoldMessage(context, Localizer.get('incorrect_code'));
-        _smsController.text = "";
+      else {
+        if (await AdminBackendAPI.checkPinCode(_smsController.text)) {
+          showScaffoldMessage(context, Localizer.get('success'));
+          Get.off(widget.nextPage, arguments: Get.arguments);
+        }
+        else {
+          showScaffoldMessage(context, Localizer.get('incorrect_code'));
+          _smsController.text = "";
+        }
       }
-
     }
     // Check data
   }

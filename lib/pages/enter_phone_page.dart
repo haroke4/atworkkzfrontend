@@ -55,6 +55,9 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
         response = await BackendAPI.sendSms(adminUsername);
       }
       if (response.statusCode == 200) {
+        setState(() {
+          _buttonLabel = Text(Localizer.get('send_code'));
+        });
         Get.to(
           () => EnterSMSPage(
             nextPage: widget.loginAsWorker
