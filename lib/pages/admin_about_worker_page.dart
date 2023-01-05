@@ -9,7 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:location/location.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
@@ -214,10 +214,32 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   }
 
   Future<dynamic> hereGeoposition() async {
-    final hasPermission = await _handleLocationPermission();
-    if (!hasPermission) return;
-    var p = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+
+    if (!_geopoint) {
+      return;
+    }
+
+    Location location = new Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
+        return;
+      }
+    }
+
+    LocationData p = await location.getLocation();
     tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
     showScaffoldMessage(context, Localizer.get('loc_success'));
   }
@@ -234,10 +256,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       textCancelPicker: Localizer.get('back'),
       initCurrentUserPosition: true,
       initZoom: 17,
-
     );
     if (p != null) {
       tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
+      showScaffoldMessage(context, Localizer.get('loc_success'));
     }
   }
 
@@ -924,27 +946,4 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     );
   }
 
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      showScaffoldMessage(context, Localizer.get('loc_disabled'));
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        showScaffoldMessage(context, Localizer.get('loc_denied'));
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever) {
-      showScaffoldMessage(context, Localizer.get('loc_perm_denied'));
-      return false;
-    }
-    return true;
-  }
 }
