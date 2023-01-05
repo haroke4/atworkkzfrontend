@@ -255,7 +255,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       textConfirmPicker: Localizer.get('pick'),
       textCancelPicker: Localizer.get('back'),
       initCurrentUserPosition: true,
-      initZoom: 17,
+      initZoom: 15,
     );
     if (p != null) {
       tempValues['geoposition'] = "${p.latitude} ${p.longitude}";

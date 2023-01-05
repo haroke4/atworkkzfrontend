@@ -19,8 +19,6 @@ void main() {
     DeviceOrientation.landscapeLeft,
   ]);
   runApp(const MyApp());
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky,
-      overlays: []);
 }
 
 class MyApp extends StatelessWidget {
@@ -82,6 +80,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (nextScreen != null) {
@@ -99,7 +98,7 @@ class _SplashScreenState extends State<SplashScreen>
     sharedPrefs = await SharedPreferences.getInstance();
     // print(sharedPrefs.getString("account_type"));
     nextScreen = LoginPage();
-    if (true) { //sharedPrefs.getString("account_type") == null
+    if (sharedPrefs.getString("account_type") == null) { //
       setState(() {
         nextScreen = LoginPage();
       });
