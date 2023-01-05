@@ -1,27 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_general_page.dart';
-import 'package:freelance_order/pages/enter_sms_page.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
-import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../prefabs/admin_tools.dart';
 import '../utils/LocalizerUtil.dart';
 import 'admin_add_worker_page.dart';
 import 'enter_code_page.dart';
-import 'map_page.dart';
-import 'worker_main_page.dart';
 import 'admin_about_worker_page.dart';
 
 var CURRENT_YEARMONTH = "";
@@ -44,8 +35,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
 
   int _today = 0;
   int _currMonthMaxDay = 0;
-  String _month = "";
-  String _year = "";
 
   int _startIndex = 0;
 
@@ -96,24 +85,29 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   void updateMonthYear() {
     setState(() {
       DateTime now = DateTime.now();
-      CURRENT_YEARMONTH = "${Localizer.get(now.month.toString())} ${now.year}";
+      CURRENT_YEARMONTH =
+          "${Localizer.get(now.month.toString())} / ${now.year}";
     });
   }
 
   void _onWorkerNamePressed(
-      String displayName, String username, var data, var prevWorkerData) async {
+      String displayName, String username, var data, var prevWorkerData,
+      {longPress = false}) async {
     String? ans;
-    if (username == "") {
-      ans = await Get.to(() => const AdminAddWorkerPage());
-    } else if (_doingAdjustments) {
-      ans = await Get.to(
-        () => AdminAddWorkerPage(
-          displayName: displayName,
-          username: username,
-        ),
-      );
+
+    if (longPress  && _doingAdjustments) {
+      if (username == "") {
+        ans = await Get.to(() => const AdminAddWorkerPage());
+      } else {
+        ans = await Get.to(
+          () => AdminAddWorkerPage(
+            displayName: displayName,
+            username: username,
+          ),
+        );
+      }
     } else {
-      if (!THIS_MONTH_ACTIVE){
+      if (!THIS_MONTH_ACTIVE) {
         showScaffoldMessage(context, Localizer.get('atten'), time: 2);
       }
       data['postponement_minute'] = _data['postponement_minute'];
@@ -132,6 +126,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           currMonthMaxDay: _currMonthMaxDay,
           data: data,
           prevWorkerData: prevWorkerData,
+          doingAdjustments: _doingAdjustments,
         ),
       );
     }
@@ -239,7 +234,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return Row(
       children: [
         SizedBox(
-            width: 80.w,
+            width: 95.w,
             child: getText(
               _data.isEmpty ? Localizer.get('company_name') : _data['name'],
             )),
@@ -247,6 +242,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           SERVER_TIME,
           align: TextAlign.center,
           fontWeight: FontWeight.bold,
+          minWidth: 40.w
         ),
         Expanded(
             child: getText(CURRENT_YEARMONTH,
@@ -280,7 +276,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return Row(
       children: [
         SizedBox(
-          width: 80.w,
+          width: 95.w,
           child: getText(
             _data.isEmpty ? Localizer.get('department') : _data['department'],
           ),
@@ -349,7 +345,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           {},
         ));
       }
-      a.add(SizedBox(height: 1.h));
+      a.add(SizedBox(height: 2.h));
     }
 
     return a;
@@ -373,9 +369,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return Row(
       children: [
         SizedBox(
-          width: 80.w,
-          child: getText(name,
-              onPressed: () => _onWorkerNamePressed(name, username, data, prv)),
+          width: 95.w,
+          child: getTextSmaller(name,
+              onPressed: () => _onWorkerNamePressed(name, username, data, prv),
+              onLongPress: () => _onWorkerNamePressed(name, username, data, prv,
+                  longPress: true)),
         ),
         getRectByDay(_today - 5, days),
         getRectByDay(_today - 4, days),
@@ -425,44 +423,33 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   Widget getBottomLineWidgets() {
     return Row(
       children: [
-        getButton(prevListOW, Icons.arrow_upward_rounded, Icons.man_outlined),
+        getButton(prevListOW, Image.asset('assets/up.png')),
+        const Expanded(child: SizedBox()),
         const Expanded(child: SizedBox()),
         getMainMenuButton(enabled: false),
         SizedBox(width: 4.w),
         getGoBackButton(),
         const Expanded(child: SizedBox()),
-        getButton(nextListOW, Icons.man_outlined, Icons.arrow_downward_rounded),
+        getText("Atwork.kz", align: TextAlign.center),
+        getButton(nextListOW, Image.asset('assets/down.png'), ),
       ],
     );
   }
 
-  Widget getButton(onPressed, IconData firstIcon, IconData secondIcon) {
+  Widget getButton(onPressed, Image image) {
     return Container(
-      width: 74.w,
+      width: 90.w,
       height: 32.h,
       margin: EdgeInsets.only(left: 3.w, right: 3.w),
       decoration: BoxDecoration(
+        color: Colors.white,
         border: Border.all(color: greyColor),
         borderRadius: const BorderRadius.all(Radius.circular(10)),
       ),
       child: InkWell(
-        onTap: onPressed,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Icon(
-              firstIcon,
-              color: greyColor,
-            ),
-            Icon(
-              secondIcon,
-              color: greyColor,
-            )
-          ],
-        ),
-      ),
+          onTap: onPressed,
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
+          child: image),
     );
   }
 

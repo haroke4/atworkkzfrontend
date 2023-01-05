@@ -27,13 +27,11 @@ class AdminAddWorkerPage extends StatefulWidget {
 
 class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
   String _workerInfo = "";
-  bool deleteWorker = false;
   String _displayUsername = "";
   String _usernameWorker = "";
 
   @override
   void initState() {
-    deleteWorker = widget.username != null && widget.displayName != null;
     super.initState();
 
     _workerInfo = widget.displayName != null
@@ -49,13 +47,13 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
         _displayUsername = contact!.displayName;
         _usernameWorker = contact.phones[0].number.replaceAll(" ", "");
         _usernameWorker = _usernameWorker.replaceAll("+", "");
-        if(!_usernameWorker.startsWith("7")){
-          _usernameWorker = '7${_usernameWorker.substring(1,)}';
+        if (!_usernameWorker.startsWith("7")) {
+          _usernameWorker = '7${_usernameWorker.substring(
+            1,
+          )}';
         }
         _workerInfo = "$_displayUsername +$_usernameWorker";
-
       });
-
     } else {
       await Permission.contacts.request();
     }
@@ -64,9 +62,11 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
   void _yesPressed() async {
     showScaffoldMessage(context, Localizer.get('processing'));
     var response;
-    if (deleteWorker) {
+    if (widget.username != null && widget.displayName != null) {
       response = await AdminBackendAPI.deleteWorker(
           workerUsername: widget.username.toString());
+      response = await AdminBackendAPI.registerWorker(
+          displayName: _displayUsername, username: _usernameWorker);
     } else {
       response = await AdminBackendAPI.registerWorker(
           displayName: _displayUsername, username: _usernameWorker);
@@ -79,11 +79,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
   }
 
   void _noPressed() async {
-    if (deleteWorker) {
-      Get.back();
-    } else {
-      _addContactPressed();
-    }
+    _addContactPressed();
   }
 
   @override
@@ -101,33 +97,29 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 SizedBox(width: constraints.maxWidth),
                 SizedBox(height: 40.h),
                 Text(
-                  deleteWorker
-                      ? Localizer.get('ban_the_nigger?')
-                      : Localizer.get('pick_the_nigger'),
+                  Localizer.get('pick_worker'),
                   style: TextStyle(
                     color: Theme.of(context).primaryColorDark,
                     fontSize: 40.h,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                if (!deleteWorker) ...[
-                  SizedBox(height: 5.h),
-                  Text(
-                    Localizer.get('name_con_book'),
-                    style: TextStyle(
-                      color: Theme.of(context).primaryColorDark,
-                      fontSize: 25.h,
-                      fontWeight: FontWeight.bold,
-                      overflow: TextOverflow.visible,
-                    ),
+                SizedBox(height: 5.h),
+                Text(
+                  Localizer.get('name_con_book'),
+                  style: TextStyle(
+                    color: Theme.of(context).primaryColorDark,
+                    fontSize: 25.h,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.visible,
                   ),
-                ],
+                ),
                 SizedBox(height: 20.h),
                 getText(
                   _workerInfo == "" ? " " * 50 : _workerInfo,
                   fontSize: 25.h,
                   fontWeight: FontWeight.bold,
-                  onPressed: deleteWorker ? () {} : _addContactPressed,
+                  onPressed: _addContactPressed,
                 ),
                 SizedBox(height: 20.h),
                 Row(
@@ -147,12 +139,10 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                         onPressed: _noPressed,
                       )
                     ],
-                    if (!deleteWorker) ...[
-                      getText(Localizer.get('back'),
-                          fontSize: 20.h,
-                          fontWeight: FontWeight.bold,
-                          onPressed: () => Get.back()),
-                    ]
+                    getText(Localizer.get('back'),
+                        fontSize: 20.h,
+                        fontWeight: FontWeight.bold,
+                        onPressed: () => Get.back()),
                   ],
                 ),
                 SizedBox(

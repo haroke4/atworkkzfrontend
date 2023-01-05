@@ -81,21 +81,42 @@ Widget getText(
 }
 
 Widget getTextSmaller(String text,
-    {Color bgColor = Colors.white, Color fontColor = Colors.black}) {
+    {Color bgColor = Colors.white,
+    Color fontColor = Colors.black,
+    TextOverflow overflow = TextOverflow.visible,
+    Function? onPressed,
+    Function? onLongPress}) {
   return Container(
     margin: EdgeInsets.only(left: 2.w, right: 2.w),
-    padding: EdgeInsets.all(4.w),
+    padding: EdgeInsets.all(3.w),
     decoration: BoxDecoration(
       color: bgColor,
     ),
-    child: Text(
-      text,
-      style: TextStyle(
-        color: fontColor,
-        fontSize: 12.h,
-      ),
-      overflow: TextOverflow.visible,
-    ),
+    child: onPressed == null
+        ? Text(
+            text,
+            style: TextStyle(
+              color: fontColor,
+              fontSize: 14.h,
+            ),
+            overflow: overflow,
+          )
+        : InkWell(
+            onTap: () {
+              onPressed();
+            },
+            onLongPress: () {
+              onLongPress!();
+            },
+            child: Text(
+              text,
+              style: TextStyle(
+                color: fontColor,
+                fontSize: 14.h,
+              ),
+              overflow: overflow,
+            ),
+          ),
   );
 }
 
@@ -242,6 +263,7 @@ Widget getArrowButton(Icon icon, String heroTag, onPressed) {
       label: icon,
       foregroundColor: Colors.black,
       backgroundColor: Colors.white,
+      elevation: 4,
       shape: const CircleBorder(),
     ),
   );
@@ -277,3 +299,4 @@ Widget getRect(Color color,
     ),
   );
 }
+

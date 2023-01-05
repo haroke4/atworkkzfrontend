@@ -204,7 +204,7 @@ class Localizer {
     'photo_from_place': {
       'en': 'Photo from place',
       'ru': 'Фото с точки',
-      'kz': 'Орындағы фотосурет'
+      'kz': 'Фотосурет'
     },
     'working_day': {
       'en': 'Working day',
@@ -242,12 +242,12 @@ class Localizer {
       'ru': 'Не подтвержден',
       'kz': 'Расталмаған'
     },
-    'ban_the_nigger?': {
+    'del_worker': {
       'en': 'Delete the worker?',
       'ru': 'Удалить работника?',
       'kz': 'Жұмысшыны өшіру керек пе?'
     },
-    'pick_the_nigger': {
+    'pick_worker': {
       'en': 'Choose a worker',
       'ru': 'Выберите работника',
       'kz': 'Жұмысшыны таңдаңыз'
@@ -344,9 +344,9 @@ class Localizer {
     'con': {'en': 'Confirming', 'ru': 'Подтверждение', 'kz': 'Расталыну'},
     'min_p': {'en': 'Minute price', 'ru': 'Цена минуты', 'kz': 'Минут бағасы'},
     'tru_min': {
-      'en': 'Truancy min/unit',
+      'en': 'Truancy min/un',
       'ru': 'Прогул мин/ед',
-      'kz': 'Келмеу мин/бір'
+      'kz': 'Келмеу мин/б'
     },
     'send_photo': {
       'en': 'Send the photo',
@@ -389,10 +389,43 @@ class Localizer {
       'kz': 'Сіздің қазіргі айыңыз белсенді емес'
     },
     'already_exists': {
-      'en': 'The phone number is already registered under another company or is the administrator of another company',
-      'ru': 'Телефонный номер уже зарегистрирован под другую компанию или является админом другой компании',
-      'kz': 'Телефон нөмірі басқа компанияда тіркелген немесе басқа компанияның админы болып табылады'
-    }
+      'en':
+          'The phone number is already registered under another company or is the administrator of another company',
+      'ru':
+          'Телефонный номер уже зарегистрирован под другую компанию или является админом другой компании',
+      'kz':
+          'Телефон нөмірі басқа компанияда тіркелген немесе басқа компанияның админы болып табылады'
+    },
+    'today_appear_leave': {
+      'en': 'Today, turnout/leave',
+      'ru': 'Сегодня, явка/уход',
+      'kz': 'Бүгін, келу/кету'
+    },
+    'geopoint': {'en': 'Geopoint', 'ru': 'Геоточка', 'kz': 'Геонүкте'},
+    'loc_disabled': {
+      'en': 'Location services are disabled. Please enable the services',
+      'ru':
+          'Службы определения местоположения отключены. Пожалуйста, включите службы',
+      'kz': 'Орналасу қызметтері өшірілген. Қызметтерді қосыңыз'
+    },
+    'loc_denied': {
+      'en': 'Location permissions are denied',
+      'ru': 'В разрешениях на местоположение отказано',
+      'kz': 'Орналасқан жеріне рұқсат берілмеді'
+    },
+    'loc_perm_denied': {
+      'en':
+          'Location permissions are permanently denied, we cannot request permissions',
+      'ru':
+          'Разрешения на местоположение постоянно отклоняются, мы не можем запрашивать разрешения',
+      'kz':
+          'Орналасуға рұқсаттар үнемі қабылданбайды, біз рұқсат сұрай алмаймыз'
+    },
+    'loc_success': {
+      'en': 'Geolocation received successfully',
+      'ru': 'Местоположение получено успешно',
+      'kz': 'Орналасқан жері сәтті алынды'
+    },
   };
 
   static String get(String key) {

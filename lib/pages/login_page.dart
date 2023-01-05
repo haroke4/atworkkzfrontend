@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'enter_phone_page.dart';
 import '../prefabs/colors.dart';
 
@@ -13,6 +14,25 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
+  @override
+  void initState(){
+    super.initState();
+    asyncInitState();
+  }
+
+  void asyncInitState() async{
+    var calendar = await Permission.calendar.status;
+    if (calendar.isGranted || calendar.isRestricted){
+      return;
+    }
+    else{
+      await Permission.calendar.request();
+    }
+    asyncInitState();
+}
+
+
   void loginAsAdministrator() {
     Get.to(const EnterPhonePage(loginAsWorker: false));
   }

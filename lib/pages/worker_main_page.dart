@@ -7,11 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../utils/LocalizerUtil.dart';
 import 'map_page.dart';
-
 
 var SERVER_TIME = "__/__";
 var CURRENT_YEARMONTH = "";
@@ -75,11 +75,16 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   void updateMonthYear() {
     setState(() {
       DateTime now = DateTime.now();
-      CURRENT_YEARMONTH = "${Localizer.get(now.month.toString())} ${now.year}";
+      CURRENT_YEARMONTH = "${Localizer.get(now.month.toString())} / ${now.year}";
     });
   }
 
   Future onMakeSelfiePressed({start = true}) async {
+    var cameraStatus = await Permission.camera.status;
+    if (!cameraStatus.isGranted){
+      await Permission.camera.request();
+    }
+
     if (!THIS_MONTH_ACTIVE) {
       showScaffoldMessage(context, Localizer.get('atten'), time: 2);
       return;
@@ -156,13 +161,15 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             width: width,
             child: getText(
                 _data.isEmpty ? Localizer.get('company_name') : _data['name'])),
-        getText(SERVER_TIME,
-            align: TextAlign.center, fontWeight: FontWeight.bold),
         Expanded(
-            child: getText(CURRENT_YEARMONTH,
-                bgColor: todayColor,
-                fontColor: Colors.white,
-                align: TextAlign.center)),
+          child: getText(SERVER_TIME,
+              align: TextAlign.center, fontWeight: FontWeight.bold),
+        ),
+        getText(CURRENT_YEARMONTH,
+            bgColor: todayColor,
+            fontColor: Colors.white,
+            align: TextAlign.center,
+        minWidth: 70.w),
         getText("Қаз / Рус / Eng",
             align: TextAlign.center,
             onPressed: () => setState(() {
@@ -330,9 +337,15 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(children: [getRect(todayColor), Text("Сегодня, явка/уход")]),
+              Row(children: [
+                getRect(todayColor),
+                Text(Localizer.get('today_appear_leave'))
+              ]),
               SizedBox(height: 4.h),
-              Row(children: [getRect(workingDayColor), Text("Рабочий день")]),
+              Row(children: [
+                getRect(workingDayColor),
+                Text(Localizer.get('working_day'))
+              ]),
               SizedBox(height: 4.h),
               Row(children: [
                 getRect(nonWorkingDayColor),
@@ -407,7 +420,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                       children: [
                         getTextSmaller(Localizer.get('min_p')),
                         SizedBox(height: 4.h),
-                        getTextSmaller(Localizer.get('tru_min')),
+                        getTextSmaller(Localizer.get('tru_min'), overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -478,7 +491,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
     }
     String ans2 = '';
     if (key == 'start_time') {
-      print(_data);
+      // print(_data);
       var _hour = int.parse(ans.split(':')[0]);
       var _minute = int.parse(ans.split(':')[1]);
 
@@ -494,7 +507,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       _hour -= _d_hour;
       _minute -= int.parse((_data['before_minute'] - 60 * _d_hour).toString());
 
-      if (_minute < 0){
+      if (_minute < 0) {
         _minute += 60;
         _hour -= 1;
       }
@@ -504,7 +517,9 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       var _minute = int.parse(ans.split(':')[1]);
       var _d_hour = int.parse((_data['after_minute'] ~/ 60).toString());
       var _hour2 = _d_hour + _hour;
-      var _minute2 = int.parse((_data['after_minute'] - 60 * _d_hour).toString()) + _minute;
+      var _minute2 =
+          int.parse((_data['after_minute'] - 60 * _d_hour).toString()) +
+              _minute;
       var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
       _hour2 += _d_hour2;
       _minute2 -= 60 * _d_hour2;

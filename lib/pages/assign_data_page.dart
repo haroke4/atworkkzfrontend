@@ -14,13 +14,11 @@ import '../prefabs/appbar_prefab.dart';
 class AssignDataPage extends StatefulWidget {
   final String text;
   final bool inputtingText;
-  final bool inputtingTime;
 
   const AssignDataPage(
       {super.key,
       required this.text,
-      this.inputtingText = false,
-      this.inputtingTime = false});
+      this.inputtingText = false});
 
   @override
   State<AssignDataPage> createState() => _AssignDataPageState();
@@ -32,17 +30,8 @@ class _AssignDataPageState extends State<AssignDataPage> {
 
 
   void _onNumberButtonPressed(String value) {
-    if (widget.inputtingTime) {
-      if (_textController.text.length < 5) {
-        _textController.text += value;
-        if (_textController.text.length == 2) {
-          _textController.text += ':';
-        }
-      }
-    }
-    else{
-      _textController.text += value;
-    }
+
+    _textController.text += value;
   }
 
   void _onGoBackPressed() {

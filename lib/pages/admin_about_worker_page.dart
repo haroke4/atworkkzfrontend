@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
@@ -24,6 +25,7 @@ class AdminAboutWorkerPage extends StatefulWidget {
   final currMonthMaxDay;
   final data;
   final prevWorkerData;
+  final doingAdjustments;
 
   const AdminAboutWorkerPage(
       {super.key,
@@ -32,7 +34,8 @@ class AdminAboutWorkerPage extends StatefulWidget {
       required this.today,
       required this.currMonthMaxDay,
       required this.data,
-      required this.prevWorkerData});
+      required this.prevWorkerData,
+      required this.doingAdjustments});
 
   @override
   State<AdminAboutWorkerPage> createState() => _AdminAboutWorkerPageState();
@@ -49,14 +52,18 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   var tempValues = {};
   var _pressedLine = "";
   var _result = '';
+  bool _geopoint = false;
+  TextEditingController startController = TextEditingController();
+  TextEditingController leaveController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     updateTime();
     setState(() {
-      tempValues['start_time'] = getCurrentDayTimeForTemp('start_time');
-      tempValues['end_time'] = getCurrentDayTimeForTemp('end_time');
+      _doingAdjustments = widget.doingAdjustments;
+      startController.text = getCurrentDayTimeForTemp('start_time');
+      leaveController.text = getCurrentDayTimeForTemp('end_time');
       tempValues['geoposition'] = _days[_today - 1]['geoposition'];
       tempValues['day_status'] = _days[_today - 1]['day_status'];
       _pressedLine = _days[_today - 1]['day_status'].toString();
@@ -137,8 +144,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_today - 1 > 0) {
       setState(() {
         _today -= 1;
-        tempValues['start_time'] = getCurrentDayTimeForTemp('start_time');
-        tempValues['end_time'] = getCurrentDayTimeForTemp('end_time');
+        _geopoint = false;
+        startController.text = getCurrentDayTimeForTemp('start_time');
+        leaveController.text = getCurrentDayTimeForTemp('end_time');
         tempValues['geoposition'] = _days[_today - 1]['geoposition'];
         tempValues['day_status'] = _days[_today - 1]['day_status'];
         _pressedLine = _days[_today - 1]['day_status'].toString();
@@ -151,8 +159,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_today + 1 <= widget.currMonthMaxDay) {
       setState(() {
         _today++;
-        tempValues['start_time'] = getCurrentDayTimeForTemp('start_time');
-        tempValues['end_time'] = getCurrentDayTimeForTemp('end_time');
+        _geopoint = false;
+        startController.text = getCurrentDayTimeForTemp('start_time');
+        leaveController.text = getCurrentDayTimeForTemp('end_time');
         tempValues['geoposition'] = _days[_today - 1]['geoposition'];
         tempValues['day_status'] = _days[_today - 1]['day_status'];
         _pressedLine = _days[_today - 1]['day_status'].toString();
@@ -164,7 +173,6 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   void _changeField(String key, String label) async {
     String? x = await Get.to(() => AssignDataPage(
           text: label,
-          inputtingTime: true,
         ));
     if (x != null && x != "") {
       setState(() {
@@ -174,15 +182,20 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   }
 
   void save() async {
+    String? defaultGeopos;
+    if (_today != 1) {
+      defaultGeopos = _days[_today - 1]['geoposition'];
+    }
     var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
         dayId: _days[_today - 1]['id'],
-        startTime: tempValues['start_time'],
-        endTime: tempValues['end_time'],
-        geoposition: tempValues['geoposition'],
+        startTime: startController.text,
+        endTime: leaveController.text,
+        geoposition: tempValues['geoposition'] ?? defaultGeopos,
         dayStatus: tempValues['day_status'],
         updateWorkerPenalty: widget.today >= _today,
         today: widget.today == _today);
+
     var scaffoldMessage = "";
     if (response.statusCode == 200) {
       _result = 'update';
@@ -194,12 +207,25 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       });
       scaffoldMessage = Localizer.get('success');
     } else {
-      scaffoldMessage = (jsonDecode(response.body)['message']).toString();
+      scaffoldMessage = '${Localizer.get('error')} '
+          '${(jsonDecode(response.body)['message']).toString()}';
     }
     showScaffoldMessage(context, scaffoldMessage);
   }
 
+  Future<dynamic> hereGeoposition() async {
+    final hasPermission = await _handleLocationPermission();
+    if (!hasPermission) return;
+    var p = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
+    showScaffoldMessage(context, Localizer.get('loc_success'));
+  }
+
   void selectGeoposition() async {
+    if (!_geopoint) {
+      return;
+    }
     GeoPoint? p = await showSimplePickerLocation(
       context: context,
       isDismissible: true,
@@ -208,6 +234,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       textCancelPicker: Localizer.get('back'),
       initCurrentUserPosition: true,
       initZoom: 17,
+
     );
     if (p != null) {
       tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
@@ -218,8 +245,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_today - 1 > 0) {
       setState(() {
         // _today - 2 because _today - 1 = index in massiv of element so -2 prev
-        tempValues['start_time'] = _days[_today - 2]['start_time'];
-        tempValues['end_time'] = _days[_today - 2]['end_time'];
+        startController.text = getCurrentDayTimeForTemp('start_time');
+        leaveController.text = getCurrentDayTimeForTemp('end_time');
         tempValues['geoposition'] = _days[_today - 2]['geoposition'];
         tempValues['day_status'] = _days[_today - 2]['day_status'];
         _pressedLine = _days[_today - 2]['day_status'];
@@ -272,11 +299,11 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 margin: EdgeInsets.all(4.w),
                 child: Column(
                   children: [
-                    getFirstLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                    getFirstLineWidgets(95.w, constraints.maxWidth - 98.w * 2),
                     SizedBox(height: 4.h),
-                    getSecondLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                    getSecondLineWidgets(95.w, constraints.maxWidth - 95.w * 2),
                     SizedBox(height: 4.h),
-                    getThirdLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                    getThirdLineWidgets(95.w, constraints.maxHeight - 133.h),
                   ],
                 ),
               ),
@@ -287,29 +314,39 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     });
   }
 
-  Widget getFirstLineWidgets(width) {
+  Widget getFirstLineWidgets(width, width2) {
     return Row(
       children: [
         SizedBox(width: width, child: getText(widget.data['company_name'])),
-        getText(SERVER_TIME,
-            align: TextAlign.center, fontWeight: FontWeight.bold),
-        Expanded(
-            child: getText(CURRENT_YEARMONTH,
-                bgColor: todayColor,
-                fontColor: Colors.white,
-                align: TextAlign.center)),
-        getText(
-          Localizer.get('adjustments'),
-          align: TextAlign.center,
-          onPressed: onAdjustmentsPressed,
-          bgColor: _doingAdjustments ? brownColor : Colors.white,
+        SizedBox(
+          width: width2,
+          child: Row(
+            children: [
+              getText(SERVER_TIME,
+                  align: TextAlign.center,
+                  fontWeight: FontWeight.bold,
+                  minWidth: 40.w),
+              Expanded(
+                  child: getText(CURRENT_YEARMONTH,
+                      bgColor: todayColor,
+                      fontColor: Colors.white,
+                      align: TextAlign.center)),
+              getText(
+                Localizer.get('adjustments'),
+                align: TextAlign.center,
+                onPressed: onAdjustmentsPressed,
+                bgColor: _doingAdjustments ? brownColor : Colors.white,
+              ),
+            ],
+          ),
         ),
+        const Expanded(child: SizedBox()),
         getText("Atwork.kz", align: TextAlign.center),
       ],
     );
   }
 
-  Widget getSecondLineWidgets(width) {
+  Widget getSecondLineWidgets(width, width2) {
     return Row(
       children: [
         SizedBox(
@@ -324,66 +361,84 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             ],
           ),
         ),
-        getArrowButton(const Icon(Icons.arrow_back), "back", leftArrow),
-        const Expanded(child: SizedBox()),
-        getDatesWidgets(),
-        const Expanded(child: SizedBox()),
-        getArrowButton(const Icon(Icons.arrow_forward), "forward", rightArrow),
+        SizedBox(
+          width: width2,
+          child: getDatesWidgets(),
+        ),
       ],
     );
   }
 
-  Widget getThirdLineWidgets(width) {
-    return Row(
-      children: [
-        SizedBox(
-          width: width,
-          child: Column(
-            children: [
-              getPhoto(
-                imagePath: _days[_today - 1]['start_photo'],
-                onTap: () {
-                  Get.to(() => (AdminWorkerPhotoPage(
-                        name: widget.name,
-                        day: _days[_today - 1],
-                        companyName: widget.data['company_name'],
-                        department: widget.data['department'],
-                        monthPenalty: _monthPenalty,
-                        latePricePerMinute: latePricePerMinute,
-                        isStart: true,
-                      )));
-                },
-              ),
-              SizedBox(height: 4.h),
-              getTextWithTime(
-                  Localizer.get('appearance'), getCurrentDayTime('start_time')),
-              SizedBox(height: 4.h),
-              getTwoTextOneLine(
-                Localizer.get('photo_from_place'),
-                getPhotoTime('start_photo_time'),
-                bgColor:
-                    getColorByStatus(_days[_today - 1]['worker_status_start']),
-              ),
-            ],
+  Widget getThirdLineWidgets(width, height) {
+    return SizedBox(
+      height: height,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: width,
+            child: Column(
+              children: [
+                SizedBox(
+                  width: width - 10.w,
+                  child: getPhoto(
+                    imagePath: _days[_today - 1]['start_photo'],
+                    onTap: () {
+                      Get.to(() => (AdminWorkerPhotoPage(
+                            name: widget.name,
+                            day: _days[_today - 1],
+                            companyName: widget.data['company_name'],
+                            department: widget.data['department'],
+                            monthPenalty: _monthPenalty,
+                            latePricePerMinute: latePricePerMinute,
+                            isStart: true,
+                          )));
+                    },
+                  ),
+                ),
+                SizedBox(height: 4.h),
+                getTextWithTime(Localizer.get('appearance'),
+                    getCurrentDayTime('start_time')),
+                SizedBox(height: 4.h),
+                getTwoTextOneLine(
+                  Localizer.get('photo_from_place'),
+                  getPhotoTime('start_photo_time'),
+                  bgColor: getColorByStatus(
+                      _days[_today - 1]['worker_status_start']),
+                ),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: Column(
-            children: [
-              getMiddleInfoWidgets(),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  getMainMenuButton(),
-                  SizedBox(width: 4.w),
-                  getGoBackButton(result: _result),
-                ],
-              ),
-            ],
+          Expanded(
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    getArrowButton(
+                        const Icon(Icons.arrow_back), "back", leftArrow),
+                    const Expanded(child: SizedBox()),
+                    getArrowButton(
+                        const Icon(Icons.arrow_forward), "forw", rightArrow),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+                getMiddleInfoWidgets(),
+                Expanded(child: SizedBox()),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    getMainMenuButton(),
+                    SizedBox(width: 4.w),
+                    getGoBackButton(result: _result),
+                  ],
+                ),
+                SizedBox(height: 10.h),
+              ],
+            ),
           ),
-        ),
-        getLeftInfoWidgets(width),
-      ],
+          getRightInfoWidgets(width),
+        ],
+      ),
     );
   }
 
@@ -416,6 +471,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             getRect(Colors.white, text: getValidatedDay(_today + 5)),
           ],
         ),
+        SizedBox(
+          height: 4.h,
+        ),
         Row(
           children: [
             getRectByDay(_today - 5),
@@ -446,95 +504,139 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
 
   Widget getMiddleInfoWidgets() {
     if (_doingAdjustments) {
-      return Column(
+      return Row(
         children: [
-          Container(
-            color: _pressedLine == 'working_day' ? Colors.black26 : bgColor,
-            padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-            child: Row(children: [
-              getRect(
-                workingDayColor,
-                onTap: () {
-                  tempValues['day_status'] = 'working_day';
-                  setState(() {
-                    _pressedLine = 'working_day';
-                  });
-                },
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
+                color:
+                    _pressedLine == 'valid_reason' ? Colors.black26 : bgColor,
+                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                child: Row(children: [
+                  Text(Localizer.get('valid_reason')),
+                  getRect(
+                    validReasonColor,
+                    onTap: () {
+                      tempValues['day_status'] = 'valid_reason';
+                      setState(() {
+                        _pressedLine = 'valid_reason';
+                      });
+                    },
+                  ),
+                ]),
               ),
-              Text(Localizer.get('working_day'))
-            ]),
+              SizedBox(height: 20.h),
+              Container(
+                color: _pressedLine == 'beg_off' ? Colors.black26 : bgColor,
+                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                child: Row(children: [
+                  Text(Localizer.get("beg_off_text")),
+                  getRect(
+                    begOffColor,
+                    onTap: () {
+                      tempValues['day_status'] = 'beg_off';
+                      setState(() {
+                        _pressedLine = 'beg_off';
+                      });
+                    },
+                  ),
+                ]),
+              ),
+            ],
           ),
-          SizedBox(height: 4.h),
-          Container(
-            color: _pressedLine == 'valid_reason' ? Colors.black26 : bgColor,
-            padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-            child: Row(children: [
-              getRect(
-                validReasonColor,
-                onTap: () {
-                  tempValues['day_status'] = 'valid_reason';
-                  setState(() {
-                    _pressedLine = 'valid_reason';
-                  });
-                },
+          SizedBox(width: 5.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                color: _pressedLine == 'working_day' ? Colors.black26 : bgColor,
+                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                child: Row(children: [
+                  getRect(
+                    workingDayColor,
+                    onTap: () {
+                      tempValues['day_status'] = 'working_day';
+                      setState(() {
+                        _pressedLine = 'working_day';
+                      });
+                    },
+                  ),
+                  Text(Localizer.get('working_day'))
+                ]),
               ),
-              Text(Localizer.get('valid_reason'))
-            ]),
-          ),
-          SizedBox(height: 4.h),
-          Container(
-            color: _pressedLine == 'non_working_day' ? Colors.black26 : bgColor,
-            padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-            child: Row(children: [
-              getRect(
-                nonWorkingDayColor,
-                onTap: () {
-                  tempValues['day_status'] = 'non_working_day';
-                  setState(() {
-                    _pressedLine = 'non_working_day';
-                  });
-                },
+              SizedBox(height: 20.h),
+              Container(
+                color: _pressedLine == 'non_working_day'
+                    ? Colors.black26
+                    : bgColor,
+                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                child: Row(children: [
+                  getRect(
+                    nonWorkingDayColor,
+                    onTap: () {
+                      tempValues['day_status'] = 'non_working_day';
+                      setState(() {
+                        _pressedLine = 'non_working_day';
+                      });
+                    },
+                  ),
+                  Text(Localizer.get('non_working_day'))
+                ]),
               ),
-              Text(Localizer.get('non_working_day'))
-            ]),
-          ),
-          SizedBox(height: 4.h),
-          Container(
-            color: _pressedLine == 'beg_off' ? Colors.black26 : bgColor,
-            padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-            child: Row(children: [
-              getRect(
-                begOffColor,
-                onTap: () {
-                  tempValues['day_status'] = 'beg_off';
-                  setState(() {
-                    _pressedLine = 'beg_off';
-                  });
-                },
+              SizedBox(height: 20.h),
+              Container(
+                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                child: Row(children: [
+                  getGeopointButton(),
+                  Text(Localizer.get("geopoint"))
+                ]),
               ),
-              Text(Localizer.get("beg_off_text"))
-            ]),
+            ],
           ),
         ],
       );
     }
     var day = _days[_today - 1];
     return Container(
-      margin: EdgeInsets.only(left: 10.w, right: 10.w),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          getTwoTextSeperated(getPenalty(), " ${day['penalty_count_start']} ",
-              secondTextBgColor: getColorByStatus(day['worker_status_start']),
-              firstExpanded: true),
-          SizedBox(height: 4.h),
-          getTwoTextSeperated(
-              getPenalty(start: false), " ${day['penalty_count_end']} ",
-              secondTextBgColor: getColorByStatus(day['worker_status_end']),
-              firstExpanded: true),
-          SizedBox(height: 4.h),
-          getTwoTextOneLine(Localizer.get('sum_month'), _monthPenalty,
-              bgColor: lateColor),
-          SizedBox(height: 20.h),
+          Row(
+            children: [
+              getTwoTextSeperated(
+                  getPenalty(), " ${day['penalty_count_start']} ",
+                  secondTextBgColor:
+                      getColorByStatus(day['worker_status_start'])),
+              const Expanded(child: SizedBox()),
+              getTwoTextSeperated(
+                  getPenalty(start: false), " ${day['penalty_count_end']} ",
+                  secondTextBgColor:
+                      getColorByStatus(day['worker_status_end'])),
+            ],
+          ),
+          SizedBox(height: 15.h),
+          IntrinsicWidth(
+            child: Container(
+              margin: EdgeInsets.only(left: 3.w, right: 3.w),
+              padding: EdgeInsets.fromLTRB(10.w, 4.w, 10.w, 4.w),
+              decoration: BoxDecoration(
+                color: lateColor,
+              ),
+              child: Row(
+                children: [
+                  Text(Localizer.get('sum_month')),
+                  SizedBox(width: 5.w),
+                  Text(
+                    _monthPenalty,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.white),
+                  )
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 15.h),
           Row(
             children: [
               Expanded(
@@ -547,19 +649,20 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               )
             ],
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 4.h),
         ],
       ),
     );
   }
 
-  Widget getLeftInfoWidgets(width) {
+  Widget getRightInfoWidgets(width) {
     if (_doingAdjustments) {
       return SizedBox(
         width: width,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            SizedBox(height: 45.h),
             Row(
               children: [
                 Expanded(
@@ -567,14 +670,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                       align: TextAlign.center),
                 ),
                 Expanded(
-                  child: getText(
-                    tempValues['start_time'],
-                    align: TextAlign.center,
-                    onPressed: () => _changeField(
-                      "start_time",
-                      Localizer.get('appearance'),
-                    ),
-                  ),
+                  child: getInputTimeField(startController),
                 )
               ],
             ),
@@ -587,12 +683,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     child: getText(Localizer.get('leave'),
                         align: TextAlign.center)),
                 Expanded(
-                  child: getText(
-                    tempValues['end_time'],
-                    align: TextAlign.center,
-                    onPressed: () =>
-                        _changeField("end_time", Localizer.get('leave')),
-                  ),
+                  child: getInputTimeField(leaveController),
                 )
               ],
             ),
@@ -603,10 +694,16 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               children: [
                 Expanded(
                     child: getText(Localizer.get('here'),
-                        align: TextAlign.center, onPressed: selectGeoposition)),
+                        align: TextAlign.center,
+                        onPressed: hereGeoposition,
+                        bgColor: _geopoint ? Colors.white : Colors.white70,
+                        fontColor: _geopoint ? Colors.black : Colors.black54)),
                 Expanded(
                     child: getText(Localizer.get('pick'),
-                        align: TextAlign.center, onPressed: selectGeoposition))
+                        align: TextAlign.center,
+                        onPressed: selectGeoposition,
+                        bgColor: _geopoint ? Colors.white : Colors.white70,
+                        fontColor: _geopoint ? Colors.black : Colors.black54))
               ],
             ),
             SizedBox(
@@ -619,15 +716,19 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                         align: TextAlign.center,
                         onPressed: repeatButtonPressed)),
                 Expanded(
-                    child: getText(Localizer.get('copy'),
-                        align: TextAlign.center, onPressed: copyButtonPressed))
+                    child: getText(
+                  Localizer.get('copy'),
+                  align: TextAlign.center,
+                  onPressed: copyButtonPressed,
+                ))
               ],
             ),
             SizedBox(
               height: 4.h,
             ),
-            getText(Localizer.get('save'),
-                align: TextAlign.center, onPressed: save),
+            const Expanded(child: SizedBox()),
+            getSaveButton(save),
+            SizedBox(height: 10.h),
           ],
         ),
       );
@@ -636,19 +737,22 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         width: width,
         child: Column(
           children: [
-            getPhoto(
-              imagePath: _days[_today - 1]['end_photo'],
-              onTap: () {
-                Get.to(() => (AdminWorkerPhotoPage(
-                      name: widget.name,
-                      day: _days[_today - 1],
-                      department: widget.data['department'],
-                      companyName: widget.data['company_name'],
-                      monthPenalty: widget.data['penalty_count'],
-                      latePricePerMinute: latePricePerMinute,
-                      isStart: false,
-                    )));
-              },
+            SizedBox(
+              width: width - 10.w,
+              child: getPhoto(
+                imagePath: _days[_today - 1]['end_photo'],
+                onTap: () {
+                  Get.to(() => (AdminWorkerPhotoPage(
+                        name: widget.name,
+                        day: _days[_today - 1],
+                        department: widget.data['department'],
+                        companyName: widget.data['company_name'],
+                        monthPenalty: widget.data['penalty_count'],
+                        latePricePerMinute: latePricePerMinute,
+                        isStart: false,
+                      )));
+                },
+              ),
             ),
             SizedBox(height: 4.h),
             getTextWithTime(
@@ -793,5 +897,54 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         fontColor: Colors.white,
         fontWeight: FontWeight.bold,
         onPressed: () => onButtonConfirmButtonPressed(arg));
+  }
+
+  Widget getGeopointButton() {
+    return Container(
+      width: 22.h,
+      height: 22.h,
+      margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
+      child: Material(
+        color: Colors.white,
+        child: InkWell(
+          splashColor: Colors.black12,
+          highlightColor: Colors.black12,
+          onTap: () {
+            setState(() {
+              _geopoint = true;
+            });
+          },
+          child: const Center(
+              child: Icon(
+            Icons.circle,
+            size: 10,
+          )),
+        ),
+      ),
+    );
+  }
+
+  Future<bool> _handleLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      showScaffoldMessage(context, Localizer.get('loc_disabled'));
+      return false;
+    }
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        showScaffoldMessage(context, Localizer.get('loc_denied'));
+        return false;
+      }
+    }
+    if (permission == LocationPermission.deniedForever) {
+      showScaffoldMessage(context, Localizer.get('loc_perm_denied'));
+      return false;
+    }
+    return true;
   }
 }

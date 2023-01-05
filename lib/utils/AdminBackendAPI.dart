@@ -1,7 +1,5 @@
-import 'dart:collection';
 import 'dart:convert';
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'BackendAPI.dart';
 
@@ -64,7 +62,6 @@ class AdminBackendAPI {
       "after_minute": afterMinute,
     };
     final response = await _post('/create_company', json);
-    final jsonResponse = jsonDecode(response.body);
     return response;
   }
 
@@ -101,7 +98,6 @@ class AdminBackendAPI {
   static Future<dynamic> changePinCode(String newPinCode) async {
     final json = {"pin_code": newPinCode};
     final response = await _post('/change_pin_code', json);
-    final jsonResponse = jsonDecode(response.body);
     return response;
   }
 
@@ -117,11 +113,9 @@ class AdminBackendAPI {
   }) async {
     final json = {"display_name": displayName, "username": username};
     final response = await _post('/register_worker', json);
-    final jsonResponse = jsonDecode(response.body);
     return response;
   }
 
-  // final json = {"nigger": "shit"};
   // final response = await _post('/register_worker', json);
   // final jsonResponse = jsonDecode(response.body);
   // print(jsonResponse);
@@ -130,7 +124,6 @@ class AdminBackendAPI {
   static Future<dynamic> deleteWorker({required String workerUsername}) async {
     final json = {"worker_username": workerUsername};
     final response = await _post('/delete_worker', json);
-    final jsonResponse = jsonDecode(response.body);
     return response;
   }
 
@@ -175,7 +168,6 @@ class AdminBackendAPI {
       "today": today,
     };
     final response = await _post('/edit_day', json);
-    final jsonResponse = jsonDecode(response.body);
     return response;
   }
 

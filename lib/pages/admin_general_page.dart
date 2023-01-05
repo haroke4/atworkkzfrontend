@@ -141,12 +141,12 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getFirstLineWidgets(constraints.maxWidth * 0.25 - 4.w),
+                  getFirstLineWidgets(95.w),
                   SizedBox(height: 4.h),
                   Row(
                     children: [
                       SizedBox(
-                        width: constraints.maxWidth * 0.3 - 4.w,
+                        width: 95.w,
                         child: getText(
                           _data['department'],
                           onPressed: () => _changeField(
@@ -214,13 +214,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
             ),
             Row(
               children: [
-                FloatingActionButton.extended(
-                  label: _saveButtonLabel,
-                  onPressed: _onSavePressed,
-                  backgroundColor: Colors.white,
-                  extendedPadding: EdgeInsets.fromLTRB(2.w, 4.h, 2.w, 4.h),
-                  disabledElevation: 0,
-                ),
+                getSaveButton(_onSavePressed),
                 SizedBox(
                   width: 5.w,
                 ),

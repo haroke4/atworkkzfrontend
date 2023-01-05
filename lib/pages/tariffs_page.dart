@@ -33,7 +33,7 @@ class _TariffsPageState extends State<TariffsPage> {
         physics: const BouncingScrollPhysics(),
         child: SafeArea(
           child: Container(
-            margin: EdgeInsets.fromLTRB(40.w, 40.h, 40.w, 40.h),
+            margin: EdgeInsets.fromLTRB(40.w, 5.h, 40.w, 2.h),
             child: Column(
               children: [
                 Text(
