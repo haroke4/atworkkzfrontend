@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as Loc;
 import 'package:permission_handler/permission_handler.dart';
 import 'enter_phone_page.dart';
 import '../prefabs/colors.dart';
@@ -27,16 +27,14 @@ class _LoginPageState extends State<LoginPage> {
     var camera = await Permission.camera.status;
     var contact = await Permission.contacts.status;
 
-    Location location =  Location();
-    bool geopos = await location.serviceEnabled();
+    var location =  Loc.Location();
+    var geopos = await location.hasPermission() == Loc.PermissionStatus.granted;
 
     if(calendar.isGranted && camera.isGranted && contact.isGranted && geopos){
       return;
     }
     if (!geopos){
-      if (await location.requestService()) {
-        return;
-      }
+      await location.requestPermission();
     }
     if (!calendar.isGranted) {
       Permission.calendar.request();

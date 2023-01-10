@@ -140,7 +140,7 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
                   Image.network(
                     headers: headers,
                     AdminBackendAPI.getImageUrl(imagePath),
-                    height: 140.h,
+                    height: 135.h,
                     fit: BoxFit.cover,
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {

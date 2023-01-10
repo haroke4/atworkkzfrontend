@@ -427,7 +427,12 @@ class Localizer {
       'ru': 'Местоположение получено успешно',
       'kz': 'Орналасқан жері сәтті алынды'
     },
-    'itog': {'en': 'Total', 'ru': 'Итог', 'kz': 'Жалпы'}
+    'itog': {'en': 'Total', 'ru': 'Итог', 'kz': 'Жалпы'},
+    'photo_time_er': {
+      'en': 'Too early or too late to send photo',
+      'ru': 'Слишком рано или слишком поздно чтобы отправлять фото',
+      'kz': 'Фотосуретті жіберу үшін ерте немесе кеш'
+    }
   };
 
   static String get(String key) {

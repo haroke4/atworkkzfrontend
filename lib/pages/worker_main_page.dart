@@ -75,13 +75,14 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   void updateMonthYear() {
     setState(() {
       DateTime now = DateTime.now();
-      CURRENT_YEARMONTH = "${Localizer.get(now.month.toString())} / ${now.year}";
+      CURRENT_YEARMONTH =
+          "${Localizer.get(now.month.toString())} / ${now.year}";
     });
   }
 
   Future onMakeSelfiePressed({start = true}) async {
     var cameraStatus = await Permission.camera.status;
-    if (!cameraStatus.isGranted){
+    if (!cameraStatus.isGranted) {
       await Permission.camera.request();
     }
 
@@ -98,12 +99,34 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         showScaffoldMessage(context, Localizer.get('no_appea_time'));
         return;
       }
+      // Checking time
+      updateTime();
+
+      //Checking if user in time duration
+      var hour = int.parse(SERVER_TIME.split(':')[0]);
+      var minute = int.parse(SERVER_TIME.split(':')[1]);
+      var time = hour * 60 + minute;
+      var a = _getHoursAndMinutesStart();
+      if (a![0] * 60 + a[1] > time || time > a[2] * 60 + a[3]) {
+        showScaffoldMessage(context, Localizer.get('photo_time_er'));
+        return;
+      }
     } else {
       if (_days[_today - 1]['end_time'] == null) {
         showScaffoldMessage(context, Localizer.get('no_leave_time'));
         return;
       } else if (_days[_today - 1]['start_photo'] == null) {
         showScaffoldMessage(context, Localizer.get('first_send'));
+        return;
+      }
+
+      //Checking if user in time duration
+      var hour = int.parse(SERVER_TIME.split(':')[0]);
+      var minute = int.parse(SERVER_TIME.split(':')[1]);
+      var time = hour * 60 + minute;
+      var a = _getHoursAndMinutesEnd();
+      if (a![0] * 60 + a[1] > time || time > a[2] * 60 + a[3]) {
+        showScaffoldMessage(context, Localizer.get('photo_time_er'));
         return;
       }
     }
@@ -169,7 +192,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             bgColor: todayColor,
             fontColor: Colors.white,
             align: TextAlign.center,
-        minWidth: 70.w),
+            minWidth: 70.w),
         getText("Қаз / Рус / Eng",
             align: TextAlign.center,
             onPressed: () => setState(() {
@@ -420,7 +443,8 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                       children: [
                         getTextSmaller(Localizer.get('min_p')),
                         SizedBox(height: 4.h),
-                        getTextSmaller(Localizer.get('tru_min'), overflow: TextOverflow.ellipsis),
+                        getTextSmaller(Localizer.get('tru_min'),
+                            overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -486,48 +510,68 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       return "__/__";
     }
     String? ans = _days[_today - 1][key];
+    String ans2 = '';
+
     if (ans == null) {
       return "__/__";
     }
-    String ans2 = '';
-    if (key == 'start_time') {
-      // print(_data);
-      var _hour = int.parse(ans.split(':')[0]);
-      var _minute = int.parse(ans.split(':')[1]);
 
-      var _d_hour = int.parse((_data['postponement_minute'] ~/ 60).toString());
-      var _hour2 = _hour + _d_hour;
-      var _minute2 = _minute + _data['postponement_minute'] - 60 * _d_hour;
-      var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
-      _hour2 += _d_hour2;
-      _minute2 -= 60 * _d_hour2;
-      ans2 = "${_hour2}:${_minute2 < 10 ? 0 : ""}$_minute2";
+    var a = key == 'start_time'
+        ? _getHoursAndMinutesStart()
+        : _getHoursAndMinutesEnd();
 
-      _d_hour = int.parse((_data['before_minute'] ~/ 60).toString());
-      _hour -= _d_hour;
-      _minute -= int.parse((_data['before_minute'] - 60 * _d_hour).toString());
-
-      if (_minute < 0) {
-        _minute += 60;
-        _hour -= 1;
-      }
-      ans = "$_hour:${_minute < 10 ? 0 : ''}$_minute";
-    } else {
-      var _hour = int.parse(ans.split(':')[0]);
-      var _minute = int.parse(ans.split(':')[1]);
-      var _d_hour = int.parse((_data['after_minute'] ~/ 60).toString());
-      var _hour2 = _d_hour + _hour;
-      var _minute2 =
-          int.parse((_data['after_minute'] - 60 * _d_hour).toString()) +
-              _minute;
-      var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
-      _hour2 += _d_hour2;
-      _minute2 -= 60 * _d_hour2;
-      ans2 = "$_hour2:${_minute2 < 10 ? 0 : ""}$_minute2";
-      ans = "$_hour:${_minute < 10 ? 0 : ''}$_minute";
-    }
+    ans = "${a![0]}:${a[1] < 10 ? 0 : ''}${a[1]}";
+    ans2 = "${a[2]}:${a[3] < 10 ? 0 : ''}${a[3]}";
 
     return '$ans/$ans2';
+  }
+
+  List<int>? _getHoursAndMinutesStart() {
+    // Returns time duration for start of day
+
+    String? startTime = _days[_today - 1]['start_time'];
+
+    if (startTime == null) {
+      return null;
+    }
+
+    var _hour = int.parse(startTime.split(':')[0]);
+    var _minute = int.parse(startTime.split(':')[1]);
+
+    var _d_hour = int.parse((_data['postponement_minute'] ~/ 60).toString());
+    var _hour2 = _hour + _d_hour;
+    var _minute2 = _minute + _data['postponement_minute'] - 60 * _d_hour;
+    var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
+    _hour2 += _d_hour2;
+    _minute2 -= 60 * _d_hour2;
+
+    _d_hour = int.parse((_data['before_minute'] ~/ 60).toString());
+    _hour -= _d_hour;
+    _minute -= int.parse((_data['before_minute'] - 60 * _d_hour).toString());
+
+    if (_minute < 0) {
+      _minute += 60;
+      _hour -= 1;
+    }
+
+    return [_hour, _minute, _hour2, _minute2.toInt()];
+  }
+
+  List<int>? _getHoursAndMinutesEnd() {
+    String? startTime = _days[_today - 1]['end_time'];
+    if (startTime == null) {
+      return null;
+    }
+    var _hour = int.parse(startTime.split(':')[0]);
+    var _minute = int.parse(startTime.split(':')[1]);
+    var _d_hour = int.parse((_data['after_minute'] ~/ 60).toString());
+    var _hour2 = _d_hour + _hour;
+    var _minute2 =
+        int.parse((_data['after_minute'] - 60 * _d_hour).toString()) + _minute;
+    var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
+    _hour2 += _d_hour2;
+    _minute2 -= 60 * _d_hour2;
+    return [_hour, _minute, _hour2, _minute2];
   }
 
   String getPhotoTime(String key) {

@@ -222,13 +222,6 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
 
     _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
@@ -237,6 +230,15 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         return;
       }
     }
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
+        return;
+      }
+    }
+
 
     LocationData p = await location.getLocation();
     tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
@@ -271,7 +273,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         leaveController.text =
             getCurrentDayTimeForTemp('end_time', day: _today - 2);
         tempValues['geoposition'] = _days[_today - 2]['geoposition'];
-        tempValues['day_status'] = _days[_today - 2]['day_status'];
+        tempValues['day_status'] = _days[_today - 2]['d ay_status'];
         _pressedLine = _days[_today - 2]['day_status'];
       });
     } else {
@@ -892,9 +894,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
 
   String getCurrentDayTimeForTemp(String key, {int? day}) {
     // key = start_time or end_time
-    if (day == null) {
-      day == _today - 1;
-    }
+    day ??= _today - 1;
+
     String? ans = _days[day][key];
     if (ans == null) {
       return "__/__";
