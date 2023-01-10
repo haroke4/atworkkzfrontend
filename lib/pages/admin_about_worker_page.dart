@@ -214,12 +214,11 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   }
 
   Future<dynamic> hereGeoposition() async {
-
     if (!_geopoint) {
       return;
     }
 
-    Location location = new Location();
+    Location location = Location();
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
 
@@ -267,8 +266,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_today - 1 > 0) {
       setState(() {
         // _today - 2 because _today - 1 = index in massiv of element so -2 prev
-        startController.text = getCurrentDayTimeForTemp('start_time');
-        leaveController.text = getCurrentDayTimeForTemp('end_time');
+        startController.text =
+            getCurrentDayTimeForTemp('start_time', day: _today - 2);
+        leaveController.text =
+            getCurrentDayTimeForTemp('end_time', day: _today - 2);
         tempValues['geoposition'] = _days[_today - 2]['geoposition'];
         tempValues['day_status'] = _days[_today - 2]['day_status'];
         _pressedLine = _days[_today - 2]['day_status'];
@@ -889,9 +890,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     return '$ans/$ans2';
   }
 
-  String getCurrentDayTimeForTemp(String key) {
+  String getCurrentDayTimeForTemp(String key, {int? day}) {
     // key = start_time or end_time
-    String? ans = _days[_today - 1][key];
+    if (day == null) {
+      day == _today - 1;
+    }
+    String? ans = _days[day][key];
     if (ans == null) {
       return "__/__";
     }
@@ -945,5 +949,4 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       ),
     );
   }
-
 }

@@ -365,7 +365,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller(Localizer.get('prize')),
+                        getTextSmaller(Localizer.get('prize_w')),
                         SizedBox(height: 4.h),
                         getTextSmaller(Localizer.get('beg_off_text')),
                       ],
@@ -440,7 +440,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               ),
               SizedBox(height: 4.h),
               getTwoTextOneLine(
-                Localizer.get('sum_month'),
+                '${Localizer.get('itog')} ${CURRENT_YEARMONTH.split("/")[0]}:',
                 _data['penalty_count'].toString(),
                 bgColor: lateColor,
               ),

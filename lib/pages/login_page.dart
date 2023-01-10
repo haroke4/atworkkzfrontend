@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
+import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'enter_phone_page.dart';
 import '../prefabs/colors.dart';
@@ -23,12 +24,32 @@ class _LoginPageState extends State<LoginPage> {
 
   void asyncInitState() async{
     var calendar = await Permission.calendar.status;
-    if (calendar.isGranted || calendar.isRestricted){
+    var camera = await Permission.camera.status;
+    var contact = await Permission.contacts.status;
+
+    Location location =  Location();
+    bool geopos = await location.serviceEnabled();
+
+    if(calendar.isGranted && camera.isGranted && contact.isGranted && geopos){
       return;
     }
-    else{
-      await Permission.calendar.request();
+    if (!geopos){
+      if (await location.requestService()) {
+        return;
+      }
     }
+    if (!calendar.isGranted) {
+      Permission.calendar.request();
+    }
+
+    if (!camera.isGranted) {
+      Permission.camera.request();
+    }
+
+    if (!contact.isGranted) {
+      Permission.contacts.request();
+    }
+
     asyncInitState();
 }
 

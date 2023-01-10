@@ -79,6 +79,7 @@ class Localizer {
       'kz': 'Келмеу бағасы'
     },
     'prize': {'en': 'Prize', 'ru': 'Премия', 'kz': 'Премия'},
+    'prize_w': {'en': 'Prize m/u', 'ru': 'Премия мес/ед', 'kz': 'Премия ай/ед'},
     'beg_off': {
       'en': 'Asked off price',
       'ru': 'Отпросился цена',
@@ -426,6 +427,7 @@ class Localizer {
       'ru': 'Местоположение получено успешно',
       'kz': 'Орналасқан жері сәтті алынды'
     },
+    'itog': {'en': 'Total', 'ru': 'Итог', 'kz': 'Жалпы'}
   };
 
   static String get(String key) {

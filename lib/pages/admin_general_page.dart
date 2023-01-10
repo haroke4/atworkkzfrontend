@@ -218,7 +218,6 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                 SizedBox(
                   width: 5.w,
                 ),
-                getGoBackButton(padding: 1.w, color: Colors.white),
               ],
             )
           ],
