@@ -94,10 +94,11 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       showScaffoldMessage(context, Localizer.get('no_geo_pos'));
       return;
     }
-    if(_days[_today - 1]['day_status'] != 'working_day'){
+    if (_days[_today - 1]['day_status'] != 'working_day') {
       showScaffoldMessage(context, Localizer.get('today_not_w_d'));
+      return;
     }
-    
+
     if (start) {
       if (_days[_today - 1]['start_time'] == null) {
         showScaffoldMessage(context, Localizer.get('no_appea_time'));
