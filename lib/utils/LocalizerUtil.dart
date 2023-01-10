@@ -428,6 +428,11 @@ class Localizer {
       'kz': 'Орналасқан жері сәтті алынды'
     },
     'itog': {'en': 'Total', 'ru': 'Итог', 'kz': 'Жалпы'},
+    'today_not_w_d': {
+      'en': 'Today is not working day',
+      'ru': 'Сегодня не рабочий день',
+      'kz': 'Бүгін жұмыс күні емес'
+    },
     'photo_time_er': {
       'en': 'Too early or too late to send photo',
       'ru': 'Слишком рано или слишком поздно чтобы отправлять фото',
