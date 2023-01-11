@@ -22,6 +22,8 @@ class AdminWorkerPhotoPage extends StatefulWidget {
   final day;
   final latePricePerMinute;
   final bool isStart;
+  final date;
+  final time;
 
   const AdminWorkerPhotoPage(
       {super.key,
@@ -31,7 +33,9 @@ class AdminWorkerPhotoPage extends StatefulWidget {
       required this.day,
       required this.monthPenalty,
       required this.latePricePerMinute,
-      required this.isStart});
+      required this.isStart,
+      required this.date,
+      required this.time});
 
   @override
   State<AdminWorkerPhotoPage> createState() => _AdminWorkerPhotoPageState();
@@ -44,15 +48,17 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
   @override
   void initState() {
     super.initState();
-    updateTime();
+    updateDateTime();
   }
 
-  void updateTime() async {
-    var sTime = await getServerTime();
+  void updateDateTime() async {
+    var dateTime = await getServerDateTime();
     setState(() {
-      SERVER_TIME = sTime;
+      SERVER_TIME = dateTime["time"];
+      CURRENT_YEARMONTH = "${Localizer.get(dateTime["month"])} / ${dateTime["year"]}";
     });
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,15 +72,17 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
               children: [
                 getFirstColumn(constraints.maxWidth * 0.25 - 4.w,
                     constraints.maxHeight - 8.w),
-                SizedBox(
-                  width: constraints.maxWidth * 0.5,
-                  height: constraints.maxHeight - 8.w,
-                  child: AspectRatio(
-                    aspectRatio: 1 / 1,
-                    child: Image.network(
-                      headers: headers,
-                      AdminBackendAPI.getImageUrl(
-                          _day[_isStart ? 'start_photo' : 'end_photo']),
+                Expanded(
+                  child: SizedBox(
+                    width: constraints.maxWidth * 0.5,
+                    height: constraints.maxHeight - 8.w,
+                    child: AspectRatio(
+                      aspectRatio: 1 / 1,
+                      child: Image.network(
+                        headers: headers,
+                        AdminBackendAPI.getImageUrl(
+                            _day[_isStart ? 'start_photo' : 'end_photo']),
+                      ),
                     ),
                   ),
                 ),
@@ -114,7 +122,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
                     fontColor: Colors.white,
                     fontWeight: FontWeight.bold,
                     align: TextAlign.center),
-                getText("16",
+                getText(widget.date.toString(),
                     bgColor: todayColor,
                     fontColor: Colors.white,
                     fontWeight: FontWeight.bold,
@@ -139,7 +147,12 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          getText("Atwork.kz", align: TextAlign.center),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              getText("Atwork.kz", align: TextAlign.center),
+            ],
+          ),
           Expanded(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -217,10 +230,10 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
   Widget getThirdLine() {
     if (_isStart) {
       return getTextWithTime(
-          Localizer.get('appearance'), getCurrentDayTime('start_time'));
+          Localizer.get('appearance'), widget.time);
     }
     return getTextWithTime(
-        Localizer.get('leave'), getCurrentDayTime('end_time'));
+        Localizer.get('leave'), widget.time);
   }
 
   Widget getPhotoTime() {

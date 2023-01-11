@@ -53,13 +53,14 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   var _pressedLine = "";
   var _result = '';
   bool _geopoint = false;
+  bool _canEditDayStatus = false;
   TextEditingController startController = TextEditingController();
   TextEditingController leaveController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    updateTime();
+    updateDateTime();
     setState(() {
       _doingAdjustments = widget.doingAdjustments;
       startController.text = getCurrentDayTimeForTemp('start_time');
@@ -70,10 +71,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     });
   }
 
-  void updateTime() async {
-    var sTime = await getServerTime();
+  void updateDateTime() async {
+    var dateTime = await getServerDateTime();
     setState(() {
-      SERVER_TIME = sTime;
+      SERVER_TIME = dateTime["time"];
+      CURRENT_YEARMONTH =
+          "${Localizer.get(dateTime["month"])} / ${dateTime["year"]}";
     });
   }
 
@@ -89,7 +92,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         workerUsername: widget.workerUsername, dayId: _days[_today - 1]['id']);
     var json = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      updateTime();
+      updateDateTime();
       setState(() {
         _days[_today - 1] = json['message'];
       });
@@ -127,7 +130,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     }
     if (response != null) {
       if (response.statusCode == 200) {
-        updateTime();
+        updateDateTime();
         setState(() {
           _days[_today - 1] = jsonDecode(response.body)['message'];
         });
@@ -140,52 +143,48 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   }
 
   void leftArrow() {
-    updateTime();
+    updateDateTime();
     if (_today - 1 > 0) {
-      setState(() {
-        _today -= 1;
-        _geopoint = false;
-        startController.text = getCurrentDayTimeForTemp('start_time');
-        leaveController.text = getCurrentDayTimeForTemp('end_time');
-        tempValues['geoposition'] = _days[_today - 1]['geoposition'];
-        tempValues['day_status'] = _days[_today - 1]['day_status'];
-        _pressedLine = _days[_today - 1]['day_status'].toString();
-      });
+      _today--;
+      updateTempValues();
     }
   }
 
   void rightArrow() {
-    updateTime();
+    updateDateTime();
     if (_today + 1 <= widget.currMonthMaxDay) {
-      setState(() {
-        _today++;
-        _geopoint = false;
-        startController.text = getCurrentDayTimeForTemp('start_time');
-        leaveController.text = getCurrentDayTimeForTemp('end_time');
-        tempValues['geoposition'] = _days[_today - 1]['geoposition'];
-        tempValues['day_status'] = _days[_today - 1]['day_status'];
-        _pressedLine = _days[_today - 1]['day_status'].toString();
-      });
+      _today++;
+      updateTempValues();
     }
   }
 
-  // Adjustments buttons handlers
-  void _changeField(String key, String label) async {
-    String? x = await Get.to(() => AssignDataPage(
-          text: label,
-        ));
-    if (x != null && x != "") {
-      setState(() {
-        tempValues[key] = x;
-      });
-    }
+  void updateTempValues() {
+    setState(() {
+      _geopoint = false;
+      _canEditDayStatus = widget.today < _today ||
+          (widget.today == 1 && _days[_today]['day_status'] == null);
+      startController.text = getCurrentDayTimeForTemp('start_time');
+      leaveController.text = getCurrentDayTimeForTemp('end_time');
+      if (_today - 2 < 0) {
+        tempValues['geoposition'] = _days[_today - 1]['geoposition'];
+      } else {
+        tempValues['geoposition'] = _days[_today - 1]['geoposition'] ??
+            _days[_today - 2]['geoposition'];
+      }
+      tempValues['day_status'] = _days[_today - 1]['day_status'];
+      _pressedLine = _days[_today - 1]['day_status'].toString();
+    });
   }
+
+  // Adjustments buttons handlers
 
   void save() async {
     String? defaultGeopos;
     if (_today != 1) {
       defaultGeopos = _days[_today - 1]['geoposition'];
     }
+    print(tempValues);
+    print(tempValues['day_status']);
     var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
         dayId: _days[_today - 1]['id'],
@@ -193,13 +192,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         endTime: leaveController.text,
         geoposition: tempValues['geoposition'] ?? defaultGeopos,
         dayStatus: tempValues['day_status'],
-        updateWorkerPenalty: widget.today >= _today,
-        today: widget.today == _today);
+        updateWorkerPenalty: widget.today >= _today);
 
     var scaffoldMessage = "";
     if (response.statusCode == 200) {
       _result = 'update';
-      updateTime();
+      updateDateTime();
       var _json = jsonDecode(response.body)['message'];
       setState(() {
         _days[_today - 1] = _json;
@@ -207,8 +205,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       });
       scaffoldMessage = Localizer.get('success');
     } else {
-      scaffoldMessage = '${Localizer.get('error')} '
-          '${(jsonDecode(response.body)['message']).toString()}';
+      var e = jsonDecode(response.body)['message'].toString();
+      if (e.startsWith('error_78')) {
+        scaffoldMessage = Localizer.get('edit_error');
+      } else {
+        scaffoldMessage = '${Localizer.get('error')} $e';
+      }
     }
     showScaffoldMessage(context, scaffoldMessage);
   }
@@ -221,7 +223,6 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     Location location = Location();
     bool _serviceEnabled;
     PermissionStatus _permissionGranted;
-
 
     _permissionGranted = await location.hasPermission();
     if (_permissionGranted == PermissionStatus.denied) {
@@ -238,7 +239,6 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         return;
       }
     }
-
 
     LocationData p = await location.getLocation();
     tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
@@ -273,7 +273,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         leaveController.text =
             getCurrentDayTimeForTemp('end_time', day: _today - 2);
         tempValues['geoposition'] = _days[_today - 2]['geoposition'];
-        tempValues['day_status'] = _days[_today - 2]['d ay_status'];
+        tempValues['day_status'] = _days[_today - 2]['day_status'];
         _pressedLine = _days[_today - 2]['day_status'];
       });
     } else {
@@ -298,7 +298,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         updateWorkerPenalty: false,
       );
       if (response.statusCode == 200) {
-        updateTime();
+        updateDateTime();
         setState(() {
           _days[i - 1] = jsonDecode(response.body)['message'];
         });
@@ -410,14 +410,15 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     imagePath: _days[_today - 1]['start_photo'],
                     onTap: () {
                       Get.to(() => (AdminWorkerPhotoPage(
-                            name: widget.name,
-                            day: _days[_today - 1],
-                            companyName: widget.data['company_name'],
-                            department: widget.data['department'],
-                            monthPenalty: _monthPenalty,
-                            latePricePerMinute: latePricePerMinute,
-                            isStart: true,
-                          )));
+                          name: widget.name,
+                          day: _days[_today - 1],
+                          companyName: widget.data['company_name'],
+                          department: widget.data['department'],
+                          monthPenalty: _monthPenalty,
+                          latePricePerMinute: latePricePerMinute,
+                          isStart: true,
+                          date: _today,
+                          time: getCurrentDayTime('start_time'))));
                     },
                   ),
                 ),
@@ -581,13 +582,21 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   getRect(
                     workingDayColor,
                     onTap: () {
+                      if (!_canEditDayStatus) {
+                        return;
+                      }
                       tempValues['day_status'] = 'working_day';
                       setState(() {
                         _pressedLine = 'working_day';
                       });
                     },
                   ),
-                  Text(Localizer.get('working_day'))
+                  Text(
+                    Localizer.get('working_day'),
+                    style: TextStyle(
+                      color: _canEditDayStatus ? Colors.black : Colors.black54,
+                    ),
+                  )
                 ]),
               ),
               SizedBox(height: 20.h),
@@ -600,13 +609,21 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   getRect(
                     nonWorkingDayColor,
                     onTap: () {
+                      if (!_canEditDayStatus) {
+                        return;
+                      }
                       tempValues['day_status'] = 'non_working_day';
                       setState(() {
                         _pressedLine = 'non_working_day';
                       });
                     },
                   ),
-                  Text(Localizer.get('non_working_day'))
+                  Text(
+                    Localizer.get('non_working_day'),
+                    style: TextStyle(
+                      color: _canEditDayStatus ? Colors.black : Colors.black54,
+                    ),
+                  )
                 ]),
               ),
               SizedBox(height: 20.h),
@@ -768,14 +785,15 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 imagePath: _days[_today - 1]['end_photo'],
                 onTap: () {
                   Get.to(() => (AdminWorkerPhotoPage(
-                        name: widget.name,
-                        day: _days[_today - 1],
-                        department: widget.data['department'],
-                        companyName: widget.data['company_name'],
-                        monthPenalty: widget.data['penalty_count'],
-                        latePricePerMinute: latePricePerMinute,
-                        isStart: false,
-                      )));
+                      name: widget.name,
+                      day: _days[_today - 1],
+                      department: widget.data['department'],
+                      companyName: widget.data['company_name'],
+                      monthPenalty: widget.data['penalty_count'],
+                      latePricePerMinute: latePricePerMinute,
+                      isStart: false,
+                      date: _today,
+                      time: getCurrentDayTime('end_time'))));
                 },
               ),
             ),

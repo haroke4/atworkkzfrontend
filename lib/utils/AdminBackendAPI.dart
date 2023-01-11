@@ -148,7 +148,6 @@ class AdminBackendAPI {
     bool? confirmedStart,
     bool? confirmedEnd,
     bool updateWorkerPenalty = false,
-    bool today = false,
   }) async {
     final json = {
       "worker_username": workerUsername,
@@ -165,7 +164,6 @@ class AdminBackendAPI {
       "confirmed_start": confirmedStart,
       "confirmed_end": confirmedEnd,
       "update_worker_penalty": updateWorkerPenalty,
-      "today": today,
     };
     final response = await _post('/edit_day', json);
     return response;

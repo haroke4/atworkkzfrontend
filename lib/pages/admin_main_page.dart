@@ -48,8 +48,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   Future<void> asyncInitState() async {
     var response = await AdminBackendAPI.getWorkers();
     if (response.statusCode == 200) {
-      updateMonthYear();
-      updateTime();
+      updateDateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
         // print(_data);
@@ -75,20 +74,15 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return;
   }
 
-  void updateTime() async {
-    var sTime = await getServerTime();
+  void updateDateTime() async {
+    var dateTime = await getServerDateTime();
     setState(() {
-      SERVER_TIME = sTime;
+      SERVER_TIME = dateTime["time"];
+      CURRENT_YEARMONTH = "${Localizer. get(dateTime["month"])} / ${dateTime["year"]}";
     });
   }
 
-  void updateMonthYear() {
-    setState(() {
-      DateTime now = DateTime.now();
-      CURRENT_YEARMONTH =
-          "${Localizer.get(now.month.toString())} / ${now.year}";
-    });
-  }
+
 
   void _onWorkerNamePressed(
       String displayName, String username, var data, var prevWorkerData,
@@ -110,6 +104,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       if (!THIS_MONTH_ACTIVE) {
         showScaffoldMessage(context, Localizer.get('atten'), time: 2);
       }
+      if (data == null){return;}
       data['postponement_minute'] = _data['postponement_minute'];
       data['before_minute'] = _data['before_minute'];
       data['after_minute'] = _data['after_minute'];
@@ -266,7 +261,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             align: TextAlign.center,
             onPressed: () => setState(() {
                   Localizer.changeLanguage();
-                  updateMonthYear();
+                  updateDateTime();
                 })),
       ],
     );

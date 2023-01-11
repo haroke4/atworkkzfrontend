@@ -161,18 +161,18 @@ class Localizer {
       'ru': 'Результаты месяца',
       'kz': 'Айдың қорытындысы'
     },
-    '1': {'en': 'January', 'ru': 'Январь', 'kz': 'Қаңтар'},
-    '2': {'en': 'February', 'ru': 'Февраль', 'kz': 'Ақпан'},
-    '3': {'en': 'March', 'ru': 'Март', 'kz': 'Наурыз'},
-    '4': {'en': 'April', 'ru': 'Апрель', 'kz': 'Сәуір'},
-    '5': {'en': 'May', 'ru': 'Май', 'kz': 'Мамыр'},
-    '6': {'en': 'June', 'ru': 'Июнь', 'kz': 'Маусым'},
-    '7': {'en': 'July', 'ru': 'Июль', 'kz': 'Шілде'},
-    '8': {'en': 'August', 'ru': 'Август', 'kz': 'Тамыз'},
-    '9': {'en': 'September', 'ru': 'Сентябрь', 'kz': 'Қыркүйек'},
-    '10': {'en': 'October', 'ru': 'Октябрь', 'kz': 'Қазан'},
-    '11': {'en': 'November', 'ru': 'Ноябрь', 'kz': 'Қараша'},
-    '12': {'en': 'December', 'ru': 'Декабрь', 'kz': 'Желтоқсан'},
+    1: {'en': 'January', 'ru': 'Январь', 'kz': 'Қаңтар'},
+    2: {'en': 'February', 'ru': 'Февраль', 'kz': 'Ақпан'},
+    3: {'en': 'March', 'ru': 'Март', 'kz': 'Наурыз'},
+    4: {'en': 'April', 'ru': 'Апрель', 'kz': 'Сәуір'},
+    5: {'en': 'May', 'ru': 'Май', 'kz': 'Мамыр'},
+    6: {'en': 'June', 'ru': 'Июнь', 'kz': 'Маусым'},
+    7: {'en': 'July', 'ru': 'Июль', 'kz': 'Шілде'},
+    8: {'en': 'August', 'ru': 'Август', 'kz': 'Тамыз'},
+    9: {'en': 'September', 'ru': 'Сентябрь', 'kz': 'Қыркүйек'},
+    10: {'en': 'October', 'ru': 'Октябрь', 'kz': 'Қазан'},
+    11: {'en': 'November', 'ru': 'Ноябрь', 'kz': 'Қараша'},
+    12: {'en': 'December', 'ru': 'Декабрь', 'kz': 'Желтоқсан'},
     'success': {'en': 'Success', 'ru': 'Успешно', 'kz': 'Сәтті'},
     'cant_confirm_worker': {
       'en': 'Cannot be confirmed. The worker did not upload the photo',
@@ -437,10 +437,15 @@ class Localizer {
       'en': 'Too early or too late to send photo',
       'ru': 'Слишком рано или слишком поздно чтобы отправлять фото',
       'kz': 'Фотосуретті жіберу үшін ерте немесе кеш'
-    }
+    },
+    'edit_error': {
+      'en': 'You cannot change the status of the day of today/past dates',
+      'ru': 'Вы не можете изменять статус дня сегодняшнего/прошедших дат',
+      'kz': 'Сіз бүгінгі/өткен күндердің күйін өзгерте алмайсыз'
+    },
   };
 
-  static String get(String key) {
+  static String get(dynamic key) {
     if (_words[key] != null) {
       if (_words[key]![_localize] != null) {
         return _words[key]![_localize].toString();

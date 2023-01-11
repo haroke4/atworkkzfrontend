@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import '';
 
-const host = "http://45.130.43.56:8000"; //"http://10.0.2.2:8000";
+const host = "http://10.0.2.2:8000"; // "http://45.130.43.56:8000"; //
 String token = '';
 var headers = {"Content-type": "application/json"};
 
@@ -36,9 +36,9 @@ class BackendAPI {
     return '$host/api/get_image$imagePath'; //TEST THIS SHIT
   }
 
-  static Future<dynamic> getServerTime() async {
+  static Future<dynamic> getServerDateTime() async {
     final response = await _get('/get_time');
-    return jsonDecode(response.body)['message']['time'];
+    return jsonDecode(response.body)['message'];
   }
 
   static Future<bool> isTokenValid(String t) async {

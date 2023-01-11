@@ -7,11 +7,14 @@ import 'package:get/get.dart';
 import '../utils/BackendAPI.dart';
 import 'colors.dart';
 
-Future<String> getServerTime() async {
-  String time = await BackendAPI.getServerTime();
+Future<dynamic> getServerDateTime() async {
+  var response = await BackendAPI.getServerDateTime();
+  String time = response['time'];
+  List<String> date = response['date'].split('-');
+
   final splitted = time.split(":");
   int hour = int.parse(splitted[0]);
-  return "$hour:${splitted[1]}";
+  return {"time": "$hour:${splitted[1]}", "month": int.parse(date[1]), "year": date[0]};
 }
 
 Widget __getOnlyText(
@@ -41,7 +44,7 @@ Widget getText(
   double? fontSize,
   Function? onPressed,
 }) {
-  fontSize = fontSize ?? 14.h;
+  fontSize = fontSize ?? 12.h;
   var textW;
   if (onPressed != null) {
     textW = InkWell(

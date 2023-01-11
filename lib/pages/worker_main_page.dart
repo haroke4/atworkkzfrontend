@@ -46,8 +46,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   Future<void> _update() async {
     var response = await WorkersBackendAPI.getDays();
     if (response.statusCode == 200) {
-      updateMonthYear();
-      updateTime();
+      updateDateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
         _days = _data['days'];
@@ -65,20 +64,14 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
     }
   }
 
-  void updateTime() async {
-    var sTime = await getServerTime();
+  void updateDateTime() async {
+    var dateTime = await getServerDateTime();
     setState(() {
-      SERVER_TIME = sTime;
+      SERVER_TIME = dateTime["time"];
+      CURRENT_YEARMONTH = "${Localizer.get(dateTime["month"])} / ${dateTime["year"]}";
     });
   }
 
-  void updateMonthYear() {
-    setState(() {
-      DateTime now = DateTime.now();
-      CURRENT_YEARMONTH =
-          "${Localizer.get(now.month.toString())} / ${now.year}";
-    });
-  }
 
   Future onMakeSelfiePressed({start = true}) async {
     var cameraStatus = await Permission.camera.status;
@@ -105,7 +98,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         return;
       }
       // Checking time
-      updateTime();
+      updateDateTime();
 
       //Checking if user in time duration
       var hour = int.parse(SERVER_TIME.split(':')[0]);
@@ -202,7 +195,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             align: TextAlign.center,
             onPressed: () => setState(() {
                   Localizer.changeLanguage();
-                  updateMonthYear();
+                  updateDateTime();
                 })),
         getText("Atwork.kz", align: TextAlign.center),
       ],
@@ -594,7 +587,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   }
 
   void leftArrow() {
-    updateTime();
+    updateDateTime();
     if (_today - 1 > 0) {
       setState(() {
         _today -= 1;
@@ -603,7 +596,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   }
 
   void rightArrow() {
-    updateTime();
+    updateDateTime();
     if (_today + 1 <= _currMonthMaxDay) {
       setState(() {
         _today++;
