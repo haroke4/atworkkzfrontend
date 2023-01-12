@@ -10,6 +10,7 @@ import 'package:get/get.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../prefabs/admin_tools.dart';
+import 'package:intl/intl.dart';
 import '../utils/LocalizerUtil.dart';
 import 'admin_add_worker_page.dart';
 import 'enter_code_page.dart';
@@ -34,9 +35,10 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   bool _loading = true;
 
   int _today = 0;
+  int _month = 1;
+  int _year = 2022;
   int _currMonthMaxDay = 0;
-
-  int _startIndex = 0;
+  double rectSize = 12.h + 6.w;
 
   @override
   void initState() {
@@ -51,14 +53,14 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       updateDateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
-        // print(_data);
+
         THIS_MONTH_ACTIVE = _data['this_month_active'];
         if (!THIS_MONTH_ACTIVE) {
           if (_data['month_left'] == 0) {
             showScaffoldMessage(context, Localizer.get('ATTENTION_CANT'),
-                time: 15);
+                time: 8);
           } else {
-            showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 15);
+            showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 8);
           }
         }
         _loading = false;
@@ -77,19 +79,19 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   void updateDateTime() async {
     var dateTime = await getServerDateTime();
     setState(() {
+      _month = dateTime["month"];
+      _year = dateTime["year"];
       SERVER_TIME = dateTime["time"];
-      CURRENT_YEARMONTH = "${Localizer. get(dateTime["month"])} / ${dateTime["year"]}";
+      CURRENT_YEARMONTH = "${Localizer.get(_month)} / $_year";
     });
   }
-
-
 
   void _onWorkerNamePressed(
       String displayName, String username, var data, var prevWorkerData,
       {longPress = false}) async {
     String? ans;
 
-    if (longPress  && _doingAdjustments) {
+    if (longPress && _doingAdjustments) {
       if (username == "") {
         ans = await Get.to(() => const AdminAddWorkerPage());
       } else {
@@ -103,16 +105,18 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     } else {
       if (!THIS_MONTH_ACTIVE) {
         showScaffoldMessage(context, Localizer.get('atten'), time: 2);
+        return;
       }
-      if (data == null){return;}
+      if (data == null) {
+        return;
+      }
       data['postponement_minute'] = _data['postponement_minute'];
       data['before_minute'] = _data['before_minute'];
       data['after_minute'] = _data['after_minute'];
       data['company_name'] = _data['name'];
       data['department'] = _data['department'];
       data['late_minute_price'] = _data['late_minute_price'];
-      // print(da);
-      // print(_data);
+
       ans = await Get.to(
         () => AdminAboutWorkerPage(
           name: displayName,
@@ -129,7 +133,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     if (ans == 'update') {
       setState(() {
         _loading = true;
-        _startIndex = 0;
       });
       showScaffoldMessage(context, Localizer.get('loading'));
       await asyncInitState();
@@ -166,29 +169,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     };
   }
 
-  void nextListOW() {
-    //nextListOfWorkers
-    if (_data['company_max_workers'] > _startIndex + 8) {
-      setState(() {
-        _startIndex += 8;
-      });
-      return;
-    }
-
-    showScaffoldMessage(context, Localizer.get('end_workers_list'));
-  }
-
-  void prevListOW() {
-    //prevListOfWorkers
-    if (_startIndex - 8 >= 0) {
-      setState(() {
-        _startIndex -= 8;
-      });
-      return;
-    }
-    showScaffoldMessage(context, Localizer.get('start_workers_list'));
-  }
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
@@ -212,8 +192,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
                       getSecondLineWidgets(),
                       SizedBox(height: 4.h),
                       ...getWorkersWidget(),
-                      SizedBox(height: 4.h),
-                      getBottomLineWidgets(),
                     ],
                   ),
                 ),
@@ -233,12 +211,10 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             child: getText(
               _data.isEmpty ? Localizer.get('company_name') : _data['name'],
             )),
-        getText(
-          SERVER_TIME,
-          align: TextAlign.center,
-          fontWeight: FontWeight.bold,
-          minWidth: 40.w
-        ),
+        getText(SERVER_TIME,
+            align: TextAlign.center,
+            fontWeight: FontWeight.bold,
+            minWidth: 40.w),
         Expanded(
             child: getText(CURRENT_YEARMONTH,
                 bgColor: todayColor,
@@ -257,12 +233,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             arguments: [_data],
           );
         }),
-        getText("Қаз / Рус / Eng",
-            align: TextAlign.center,
-            onPressed: () => setState(() {
-                  Localizer.changeLanguage();
-                  updateDateTime();
-                })),
       ],
     );
   }
@@ -276,11 +246,31 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             _data.isEmpty ? Localizer.get('department') : _data['department'],
           ),
         ),
-        getRect(Colors.white, text: getValidatedDay(_today - 5)),
-        getRect(Colors.white, text: getValidatedDay(_today - 4)),
-        getRect(Colors.white, text: getValidatedDay(_today - 3)),
-        getRect(Colors.white, text: getValidatedDay(_today - 2)),
-        getRect(Colors.white, text: getValidatedDay(_today - 1)),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today - 5),
+          secText: getNameOfWeek(_today - 5),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today - 4),
+          secText: getNameOfWeek(_today - 4),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today - 3),
+          secText: getNameOfWeek(_today - 3),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today - 2),
+          secText: getNameOfWeek(_today - 2),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today - 1),
+          secText: getNameOfWeek(_today - 1),
+        ),
         SizedBox(
           width: 48.h + 12.w,
           child: Text(
@@ -293,11 +283,31 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             textAlign: TextAlign.center,
           ),
         ),
-        getRect(Colors.white, text: getValidatedDay(_today + 1)),
-        getRect(Colors.white, text: getValidatedDay(_today + 2)),
-        getRect(Colors.white, text: getValidatedDay(_today + 3)),
-        getRect(Colors.white, text: getValidatedDay(_today + 4)),
-        getRect(Colors.white, text: getValidatedDay(_today + 5)),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today + 1),
+          secText: getNameOfWeek(_today + 1),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today + 2),
+          secText: getNameOfWeek(_today + 2),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today + 3),
+          secText: getNameOfWeek(_today + 3),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today + 4),
+          secText: getNameOfWeek(_today + 4),
+        ),
+        getRect(
+          Colors.white,
+          text: getValidatedDay(_today + 5),
+          secText: getNameOfWeek(_today + 5),
+        ),
         Expanded(
           child: getText(Localizer.get('month_results'),
               align: TextAlign.right,
@@ -312,10 +322,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     if (_loading) {
       return [];
     }
-    List<Widget> a = [];
     if (_data == {}) {
       return [];
     }
+    List<Widget> a = [];
+
     var workers = (_data['workers'] ?? []);
     workers = List.from(workers);
     var _length = workers.length;
@@ -323,7 +334,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     for (int i = 0; i <= _data['company_max_workers'] - _length; i++) {
       workers.add({"display_name": "", "username": ""});
     }
-    for (int i = _startIndex; i < _startIndex + 8; i++) {
+    for (int i = 0; i < workers.length; i++) {
       final e = workers[i];
       if (i > 0) {
         a.add(getWorkerLineWidget(
@@ -365,7 +376,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       children: [
         SizedBox(
           width: 95.w,
-          child: getTextSmaller(name,
+          child: getText(name,
               onPressed: () => _onWorkerNamePressed(name, username, data, prv),
               onLongPress: () => _onWorkerNamePressed(name, username, data, prv,
                   longPress: true)),
@@ -398,35 +409,12 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         SizedBox(
           width: 7.w,
         ),
-        getRect(
-          workingDayColor,
-          text: working_day_count,
-          fontColor: Colors.white,
-        ),
-        getRect(
-          truancyColor,
-          text: truancy_day_count,
-          fontColor: Colors.white,
-        ),
+        getRect(workingDayColor,
+            text: working_day_count, fontColor: Colors.white),
+        getRect(truancyColor, text: truancy_day_count, fontColor: Colors.white),
         Expanded(
           child: getRect(prizeColor, text: prize.toString()),
         )
-      ],
-    );
-  }
-
-  Widget getBottomLineWidgets() {
-    return Row(
-      children: [
-        getButton(prevListOW, Image.asset('assets/up.png')),
-        const Expanded(child: SizedBox()),
-        const Expanded(child: SizedBox()),
-        getMainMenuButton(enabled: false),
-        SizedBox(width: 4.w),
-        getGoBackButton(),
-        const Expanded(child: SizedBox()),
-        getText("Atwork.kz", align: TextAlign.center),
-        getButton(nextListOW, Image.asset('assets/down.png'), ),
       ],
     );
   }
@@ -456,8 +444,14 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     }
   }
 
-  Widget getRectByDay(int day, days,
-      {ws = true, start = true, showConfirm = false, Function? onTap}) {
+  Widget getRectByDay(
+    int day,
+    days, {
+    ws = true,
+    start = true,
+    showConfirm = false,
+    Function? onTap,
+  }) {
     // ws - is for worker status
 
     if (days == null || getValidatedDay(day) == '' || days.isEmpty) {
@@ -466,16 +460,16 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       return getRect(noAssignmentColor);
     }
     if (ws && start) {
-      return getRect(
-        getColorByStatus(days[day - 1]['worker_status_start']),
-        confirmation: showConfirm && !days[day - 1]['confirmed_start'],
-      );
+      return getRect(getColorByStatus(days[day - 1]['worker_status_start']),
+          confirmation: showConfirm && !days[day - 1]['confirmed_start']);
     } else if (ws && !start) {
-      return getRect(
-        getColorByStatus(days[day - 1]['worker_status_end']),
-        confirmation: showConfirm && !days[day - 1]['confirmed_end'],
-      );
+      return getRect(getColorByStatus(days[day - 1]['worker_status_end']),
+          confirmation: showConfirm && !days[day - 1]['confirmed_end']);
     }
     return getRect(getColorByStatus(days[day - 1]['day_status']), onTap: onTap);
+  }
+
+  String getNameOfWeek(day) {
+    return Localizer.get(DateFormat('EE').format(DateTime(_year, _month, day)));
   }
 }

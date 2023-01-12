@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -43,6 +43,9 @@ class AdminAboutWorkerPage extends StatefulWidget {
 
 class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   bool _doingAdjustments = false;
+  int _year = 2022;
+  int _month = 1;
+
   late int latePricePerMinute = widget.data['late_minute_price'];
   late int _today = widget.today;
   late final _days = widget.data['days'];
@@ -74,9 +77,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   void updateDateTime() async {
     var dateTime = await getServerDateTime();
     setState(() {
+      _month = dateTime["month"];
+      _year = dateTime["year"];
       SERVER_TIME = dateTime["time"];
-      CURRENT_YEARMONTH =
-          "${Localizer.get(dateTime["month"])} / ${dateTime["year"]}";
+      CURRENT_YEARMONTH = "${Localizer.get(_month)} / $_year";
     });
   }
 
@@ -165,12 +169,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           (widget.today == 1 && _days[_today]['day_status'] == null);
       startController.text = getCurrentDayTimeForTemp('start_time');
       leaveController.text = getCurrentDayTimeForTemp('end_time');
-      if (_today - 2 < 0) {
-        tempValues['geoposition'] = _days[_today - 1]['geoposition'];
-      } else {
-        tempValues['geoposition'] = _days[_today - 1]['geoposition'] ??
-            _days[_today - 2]['geoposition'];
-      }
+      tempValues['geoposition'] = _days[_today - 1]['geoposition'];
       tempValues['day_status'] = _days[_today - 1]['day_status'];
       _pressedLine = _days[_today - 1]['day_status'].toString();
     });
@@ -181,10 +180,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   void save() async {
     String? defaultGeopos;
     if (_today != 1) {
-      defaultGeopos = _days[_today - 1]['geoposition'];
+      defaultGeopos = _days[_today - 2]['geoposition'];
     }
-    print(tempValues);
-    print(tempValues['day_status']);
     var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
         dayId: _days[_today - 1]['id'],
@@ -274,7 +271,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             getCurrentDayTimeForTemp('end_time', day: _today - 2);
         tempValues['geoposition'] = _days[_today - 2]['geoposition'];
         tempValues['day_status'] = _days[_today - 2]['day_status'];
-        _pressedLine = _days[_today - 2]['day_status'];
+        _pressedLine = _days[_today - 2]['day_status'].toString();
       });
     } else {
       showScaffoldMessage(context, Localizer.get('first_day_of_month'));
@@ -298,6 +295,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         updateWorkerPenalty: false,
       );
       if (response.statusCode == 200) {
+        _result = 'update';
         updateDateTime();
         setState(() {
           _days[i - 1] = jsonDecode(response.body)['message'];
@@ -324,11 +322,11 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 margin: EdgeInsets.all(4.w),
                 child: Column(
                   children: [
-                    getFirstLineWidgets(95.w, constraints.maxWidth - 98.w * 2),
+                    getFirstLineWidgets(90.w, constraints.maxWidth - 90.w * 2),
                     SizedBox(height: 4.h),
-                    getSecondLineWidgets(95.w, constraints.maxWidth - 95.w * 2),
+                    getSecondLineWidgets(90.w, constraints.maxWidth - 90.w * 2),
                     SizedBox(height: 4.h),
-                    getThirdLineWidgets(95.w, constraints.maxHeight - 133.h),
+                    getThirdLineWidgets(90.w, constraints.maxHeight - 133.h),
                   ],
                 ),
               ),
@@ -472,12 +470,33 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     return Column(
       children: [
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            getRect(Colors.white, text: getValidatedDay(_today - 5)),
-            getRect(Colors.white, text: getValidatedDay(_today - 4)),
-            getRect(Colors.white, text: getValidatedDay(_today - 3)),
-            getRect(Colors.white, text: getValidatedDay(_today - 2)),
-            getRect(Colors.white, text: getValidatedDay(_today - 1)),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today - 5),
+              secText: getNameOfWeek(_today - 5),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today - 4),
+              secText: getNameOfWeek(_today - 4),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today - 3),
+              secText: getNameOfWeek(_today - 3),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today - 2),
+              secText: getNameOfWeek(_today - 2),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today - 1),
+              secText: getNameOfWeek(_today - 1),
+            ),
             SizedBox(
               width: 48.h + 12.w,
               child: Text(
@@ -490,17 +509,38 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 textAlign: TextAlign.center,
               ),
             ),
-            getRect(Colors.white, text: getValidatedDay(_today + 1)),
-            getRect(Colors.white, text: getValidatedDay(_today + 2)),
-            getRect(Colors.white, text: getValidatedDay(_today + 3)),
-            getRect(Colors.white, text: getValidatedDay(_today + 4)),
-            getRect(Colors.white, text: getValidatedDay(_today + 5)),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today + 1),
+              secText: getNameOfWeek(_today + 1),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today + 2),
+              secText: getNameOfWeek(_today + 2),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today + 3),
+              secText: getNameOfWeek(_today + 3),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today + 4),
+              secText: getNameOfWeek(_today + 4),
+            ),
+            getRect(
+              Colors.white,
+              text: getValidatedDay(_today + 5),
+              secText: getNameOfWeek(_today + 5),
+            ),
           ],
         ),
         SizedBox(
           height: 4.h,
         ),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             getRectByDay(_today - 5),
             getRectByDay(_today - 4),
@@ -574,6 +614,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           SizedBox(width: 5.w),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Container(
                 color: _pressedLine == 'working_day' ? Colors.black26 : bgColor,
@@ -596,6 +637,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     style: TextStyle(
                       color: _canEditDayStatus ? Colors.black : Colors.black54,
                     ),
+                    maxLines: 1,
+                    softWrap: false,
+                    overflow: TextOverflow.ellipsis,
                   )
                 ]),
               ),
@@ -605,7 +649,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     ? Colors.black26
                     : bgColor,
                 padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-                child: Row(children: [
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
                   getRect(
                     nonWorkingDayColor,
                     onTap: () {
@@ -618,12 +662,16 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                       });
                     },
                   ),
-                  Text(
-                    Localizer.get('non_working_day'),
-                    style: TextStyle(
-                      color: _canEditDayStatus ? Colors.black : Colors.black54,
+                  SizedBox(
+                    width: 50.w,
+                    child: Text(
+                      Localizer.get('non_working_day'),
+                      style: TextStyle(
+                        color:
+                            _canEditDayStatus ? Colors.black : Colors.black54,
+                      ),
                     ),
-                  )
+                  ),
                 ]),
               ),
               SizedBox(height: 20.h),
@@ -969,5 +1017,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         ),
       ),
     );
+  }
+
+  String getNameOfWeek(day) {
+    return Localizer.get(DateFormat('EE').format(DateTime(_year, _month, day)));
   }
 }

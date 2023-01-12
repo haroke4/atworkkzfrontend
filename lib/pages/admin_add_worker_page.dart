@@ -7,6 +7,7 @@ import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/prefabs/tools.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
+import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../utils/LocalizerUtil.dart';
@@ -35,7 +36,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
     super.initState();
 
     _workerInfo = widget.displayName != null
-        ? "${widget.displayName} +${widget.username}"
+        ? "${widget.displayName}"
         : ""; // split it into 2 parameter
   }
 
@@ -43,8 +44,11 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
     var status = await Permission.contacts.status;
     if (status.isGranted) {
       final contact = await FlutterContacts.openExternalPick();
+      if (contact == null) {
+        return;
+      }
       setState(() {
-        _displayUsername = contact!.displayName;
+        _displayUsername = contact.displayName;
         _usernameWorker = contact.phones[0].number.replaceAll(" ", "");
         _usernameWorker = _usernameWorker.replaceAll("+", "");
         if (!_usernameWorker.startsWith("7")) {
@@ -52,7 +56,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
             1,
           )}';
         }
-        _workerInfo = "$_displayUsername +$_usernameWorker";
+        _workerInfo = _displayUsername;
       });
     } else {
       await Permission.contacts.request();
@@ -63,15 +67,16 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
     showScaffoldMessage(context, Localizer.get('processing'));
     var response;
     if (widget.username != null && widget.displayName != null) {
-      response = await AdminBackendAPI.deleteWorker(
-          workerUsername: widget.username.toString());
-      response = await AdminBackendAPI.registerWorker(
-          displayName: _displayUsername, username: _usernameWorker);
+      response = await AdminBackendAPI.replaceWorker(
+          oldWorkerUsername: widget.username.toString(),
+          newWorkerUsername: _usernameWorker,
+          newWorkerDisplayName: _displayUsername);
     } else {
       response = await AdminBackendAPI.registerWorker(
           displayName: _displayUsername, username: _usernameWorker);
     }
     if (response.statusCode == 200) {
+      showScaffoldMessage(context, Localizer.get('ok_worker_replace'), time: 3);
       Get.back(result: "update");
     } else {
       showScaffoldMessage(context, Localizer.get('already_exists'), time: 2);
@@ -99,7 +104,9 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 Text(
                   Localizer.get('pick_worker'),
                   style: TextStyle(
-                    color: Theme.of(context).primaryColorDark,
+                    color: Theme
+                        .of(context)
+                        .primaryColorDark,
                     fontSize: 40.h,
                     fontWeight: FontWeight.bold,
                   ),
@@ -108,7 +115,9 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 Text(
                   Localizer.get('name_con_book'),
                   style: TextStyle(
-                    color: Theme.of(context).primaryColorDark,
+                    color: Theme
+                        .of(context)
+                        .primaryColorDark,
                     fontSize: 25.h,
                     fontWeight: FontWeight.bold,
                     overflow: TextOverflow.visible,

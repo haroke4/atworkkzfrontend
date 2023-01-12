@@ -44,9 +44,9 @@ class _EnterCodePageState extends State<EnterCodePage> {
         });
       }
     } else {
-      // send data to server
+
       if(widget.code != ""){
-        print(widget.code);
+
         if (_smsController.text == widget.code){
           showScaffoldMessage(context, Localizer.get('success'));
           Get.off(widget.nextPage, arguments: Get.arguments);

@@ -96,9 +96,9 @@ class _SplashScreenState extends State<SplashScreen>
 
   void asyncInitState() async {
     sharedPrefs = await SharedPreferences.getInstance();
-    // print(sharedPrefs.getString("account_type"));
+
     nextScreen = LoginPage();
-    if (true) { // sharedPrefs.getString("account_type") == null
+    if (sharedPrefs.getString("account_type") == null) { //
       setState(() {
         nextScreen = LoginPage();
       });

@@ -116,14 +116,23 @@ class AdminBackendAPI {
     return response;
   }
 
-  // final response = await _post('/register_worker', json);
-  // final jsonResponse = jsonDecode(response.body);
-  // print(jsonResponse);
-  // return jsonResponse;
-
   static Future<dynamic> deleteWorker({required String workerUsername}) async {
     final json = {"worker_username": workerUsername};
     final response = await _post('/delete_worker', json);
+    return response;
+  }
+
+  static Future<dynamic> replaceWorker({
+    required String oldWorkerUsername,
+    required String newWorkerUsername,
+    required String newWorkerDisplayName,
+  }) async {
+    final json = {
+      "old_worker_username": oldWorkerUsername,
+      "new_worker_username": newWorkerUsername,
+      "new_worker_display_name": newWorkerDisplayName
+    };
+    final response = await _post('/replace_worker', json);
     return response;
   }
 

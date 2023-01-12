@@ -14,7 +14,11 @@ Future<dynamic> getServerDateTime() async {
 
   final splitted = time.split(":");
   int hour = int.parse(splitted[0]);
-  return {"time": "$hour:${splitted[1]}", "month": int.parse(date[1]), "year": date[0]};
+  return {
+    "time": "$hour:${splitted[1]}",
+    "month": int.parse(date[1]),
+    "year": int.parse(date[0])
+  };
 }
 
 Widget __getOnlyText(
@@ -29,6 +33,8 @@ Widget __getOnlyText(
           fontWeight: weight,
         ),
         textAlign: align,
+        maxLines: 1,
+        softWrap: false,
         overflow: overflow),
   );
 }
@@ -37,21 +43,21 @@ Widget getText(
   String text, {
   Color bgColor = Colors.white,
   Color fontColor = Colors.black,
-  TextOverflow overflow = TextOverflow.ellipsis,
+  TextOverflow overflow = TextOverflow.fade,
   TextAlign align = TextAlign.left,
   FontWeight fontWeight = FontWeight.normal,
   double minWidth = 0,
   double? fontSize,
-  Function? onPressed,
+  VoidCallback? onPressed,
+  VoidCallback? onLongPress,
 }) {
   fontSize = fontSize ?? 12.h;
   var textW;
   if (onPressed != null) {
     textW = InkWell(
       splashColor: Colors.black26,
-      onTap: () {
-        onPressed();
-      },
+      onTap: onPressed,
+      onLongPress: onLongPress,
       child: __getOnlyText(
         text,
         fontColor,
@@ -86,7 +92,7 @@ Widget getText(
 Widget getTextSmaller(String text,
     {Color bgColor = Colors.white,
     Color fontColor = Colors.black,
-    TextOverflow overflow = TextOverflow.visible,
+    TextOverflow overflow = TextOverflow.fade,
     Function? onPressed,
     Function? onLongPress}) {
   return Container(
@@ -102,6 +108,8 @@ Widget getTextSmaller(String text,
               color: fontColor,
               fontSize: 14.h,
             ),
+            maxLines: 1,
+            softWrap: false,
             overflow: overflow,
           )
         : InkWell(
@@ -117,6 +125,8 @@ Widget getTextSmaller(String text,
                 color: fontColor,
                 fontSize: 14.h,
               ),
+              maxLines: 1,
+              softWrap: false,
               overflow: overflow,
             ),
           ),
@@ -143,7 +153,7 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
                   Image.network(
                     headers: headers,
                     AdminBackendAPI.getImageUrl(imagePath),
-                    height: 135.h,
+                    height: 120.h,
                     fit: BoxFit.cover,
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
@@ -272,16 +282,37 @@ Widget getArrowButton(Icon icon, String heroTag, onPressed) {
   );
 }
 
-Widget getRect(Color color,
-    {String text = "",
-    bool confirmation = false,
-    Color fontColor = Colors.black,
-    Function? onTap}) {
+Widget getRect(
+  Color color, {
+  String text = "",
+  String secText = "",
+  bool confirmation = false,
+  Color fontColor = Colors.black,
+  double? width,
+  double? height,
+  Function? onTap,
+}) {
+  width = width ?? 26.h;
+  height = height ?? width;
+  Widget secTWidget = Padding(
+    padding: EdgeInsets.only(top: height / 1.5),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          secText,
+          style: const TextStyle(fontSize: 7),
+        )
+      ],
+    ),
+  );
   return Container(
-    width: 22.h,
-    height: 22.h,
-    margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
+    width: width,
+    height: height,
+    margin: EdgeInsets.only(left: 1.w, right: 1.w),
     child: Material(
+      borderRadius: BorderRadius.circular(5),
       color: color,
       child: onTap == null
           ? Center(
@@ -290,7 +321,16 @@ Widget getRect(Color color,
                       "assets/confirmation.png",
                       height: 13.h,
                     )
-                  : Text(text, style: TextStyle(color: fontColor)),
+                  : Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Text(
+                          text,
+                          style: TextStyle(color: fontColor, fontSize: 12),
+                        ),
+                        secText == "" ? const SizedBox(height: 0) : secTWidget,
+                      ],
+                    ),
             )
           : InkWell(
               splashColor: Colors.black12,
@@ -302,4 +342,3 @@ Widget getRect(Color color,
     ),
   );
 }
-

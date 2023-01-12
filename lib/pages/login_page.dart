@@ -4,6 +4,7 @@ import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
 import 'package:location/location.dart' as Loc;
 import 'package:permission_handler/permission_handler.dart';
+import '../prefabs/tools.dart';
 import 'enter_phone_page.dart';
 import '../prefabs/colors.dart';
 
@@ -83,7 +84,7 @@ class _LoginPageState extends State<LoginPage> {
               getLoginAsButtons(
                   Image.asset(
                     "assets/admin.png",
-                    height: 150.h,
+                    height: 140.h,
                   ),
                   Localizer.get('admin'),
                   loginAsAdministrator),
@@ -93,12 +94,19 @@ class _LoginPageState extends State<LoginPage> {
               getLoginAsButtons(
                   Image.asset(
                     "assets/worker.png",
-                    height: 150.h,
+                    height: 140.h,
                   ),
                   Localizer.get('worker'),
                   loginAsUser),
             ],
           ),
+          SizedBox(height: 20.h),
+          getText("Қаз / Рус / Eng",
+              align: TextAlign.center,
+              fontSize: 14,
+              onPressed: () => setState(() {
+                Localizer.changeLanguage();
+              })),
         ],
       ),
     );
@@ -123,7 +131,7 @@ class _LoginPageState extends State<LoginPage> {
           splashColor: Colors.black26,
           onTap: _onPressed,
           child: Padding(
-            padding: EdgeInsets.all(10.w),
+            padding: EdgeInsets.all(6.w),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [

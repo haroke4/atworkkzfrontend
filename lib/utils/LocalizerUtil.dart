@@ -5,7 +5,7 @@ class Localizer {
   static var _words = {
     "login_as": {
       'en': 'Login as...',
-      'ru': 'Войти как...',
+      'ru': 'Вход как...',
       'kz': 'Ретінде кіру...'
     },
     "worker": {'en': 'Worker', 'ru': 'Работник', 'kz': 'Жұмысшы'},
@@ -173,6 +173,15 @@ class Localizer {
     10: {'en': 'October', 'ru': 'Октябрь', 'kz': 'Қазан'},
     11: {'en': 'November', 'ru': 'Ноябрь', 'kz': 'Қараша'},
     12: {'en': 'December', 'ru': 'Декабрь', 'kz': 'Желтоқсан'},
+    // Months
+    'Mon': {'en': 'mo ', 'ru': 'пн ', 'kz': 'дс '},
+    'Tue': {'en': 'tu ', 'ru': 'вт ', 'kz': 'сс '},
+    'Wed': {'en': 'we ', 'ru': 'ср ', 'kz': 'ср '},
+    'Thu': {'en': 'th ', 'ru': 'чт ', 'kz': 'бс '},
+    'Fri': {'en': 'fr ', 'ru': 'пт ', 'kz': 'жм '},
+    'Sat': {'en': 'sa ', 'ru': 'сб ', 'kz': 'сб '},
+    'Sun': {'en': 'su ', 'ru': 'вс ', 'kz': 'жк '},
+
     'success': {'en': 'Success', 'ru': 'Успешно', 'kz': 'Сәтті'},
     'cant_confirm_worker': {
       'en': 'Cannot be confirmed. The worker did not upload the photo',
@@ -442,6 +451,11 @@ class Localizer {
       'en': 'You cannot change the status of the day of today/past dates',
       'ru': 'Вы не можете изменять статус дня сегодняшнего/прошедших дат',
       'kz': 'Сіз бүгінгі/өткен күндердің күйін өзгерте алмайсыз'
+    },
+    'ok_worker_replace': {
+      'en': 'The worker will be replaced on the first day of the next month',
+      'ru': 'Работник будет заменён в первое число следующего месяца',
+      'kz': 'Қызметкер келесі айдың бірінші күнінде ауыстырылады'
     },
   };
 

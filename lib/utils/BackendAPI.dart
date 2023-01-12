@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart';
 import '';
 
-const host = "http://10.0.2.2:8000"; // "http://45.130.43.56:8000"; //
+const host = "http://45.130.43.56:8000"; // "http://10.0.2.2:8000";
 String token = '';
 var headers = {"Content-type": "application/json"};
 
