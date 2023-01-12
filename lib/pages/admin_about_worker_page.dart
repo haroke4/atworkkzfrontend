@@ -850,11 +850,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       return getRect(noAssignmentColor);
     }
     if (ws && start) {
-      return getRect(
-        getColorByStatus(_days[day - 1]['worker_status_start']),
-      );
+      return getRect(getColorByStatus(_days[day - 1]['worker_status_start']),
+          confirmation: !_days[day - 1]['confirmed_start'] && day == _today);
     } else if (ws && !start) {
-      return getRect(getColorByStatus(_days[day - 1]['worker_status_end']));
+      return getRect(
+        getColorByStatus(_days[day - 1]['worker_status_end']),
+        confirmation: !_days[day - 1]['confirmed_end'] && day == _today,
+      );
     }
     return getRect(getColorByStatus(_days[day - 1]['day_status']));
   }
