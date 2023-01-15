@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:freelance_order/utils/BackendAPI.dart';
+import 'package:intl/intl.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -13,8 +15,6 @@ import '../prefabs/tools.dart';
 import '../utils/LocalizerUtil.dart';
 import 'map_page.dart';
 
-var SERVER_TIME = "__/__";
-var CURRENT_YEARMONTH = "";
 var THIS_MONTH_ACTIVE = false;
 
 class WorkersMainPage extends StatefulWidget {
@@ -46,7 +46,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   Future<void> _update() async {
     var response = await WorkersBackendAPI.getDays();
     if (response.statusCode == 200) {
-      updateDateTime();
+      await ServerTime.updateDateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
         _days = _data['days'];
@@ -62,15 +62,6 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         showScaffoldMessage(context, Localizer.get('atten'), time: 2);
       }
     }
-  }
-
-  void updateDateTime() async {
-    var dateTime = await getServerDateTime();
-    setState(() {
-      SERVER_TIME = dateTime["time"];
-      CURRENT_YEARMONTH =
-          "${Localizer.get(dateTime["month"])} / ${dateTime["year"]}";
-    });
   }
 
   Future onMakeSelfiePressed({start = true}) async {
@@ -98,12 +89,10 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         return;
       }
       // Checking time
-      updateDateTime();
+      await ServerTime.updateDateTime();
 
       //Checking if user in time duration
-      var hour = int.parse(SERVER_TIME.split(':')[0]);
-      var minute = int.parse(SERVER_TIME.split(':')[1]);
-      var time = hour * 60 + minute;
+      var time = ServerTime.time.hour * 60 + ServerTime.time.minute;
       var a = _getHoursAndMinutesStart();
       if (a![0] * 60 + a[1] > time || time > a[2] * 60 + a[3]) {
         showScaffoldMessage(context, Localizer.get('photo_time_er'));
@@ -119,9 +108,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       }
 
       //Checking if user in time duration
-      var hour = int.parse(SERVER_TIME.split(':')[0]);
-      var minute = int.parse(SERVER_TIME.split(':')[1]);
-      var time = hour * 60 + minute;
+      var time = ServerTime.time.hour * 60 + ServerTime.time.minute;
       var a = _getHoursAndMinutesEnd();
       if (a![0] * 60 + a[1] > time || time > a[2] * 60 + a[3]) {
         showScaffoldMessage(context, Localizer.get('photo_time_er'));
@@ -183,11 +170,10 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             child: getText(
                 _data.isEmpty ? Localizer.get('company_name') : _data['name'])),
         Expanded(
-          child: getText(SERVER_TIME,
-              align: TextAlign.center, fontWeight: FontWeight.bold),
+          child: ServerTime.getServerTimeWidget(adder: true),
         ),
         IntrinsicWidth(
-          child: getText(CURRENT_YEARMONTH,
+          child: getText(ServerTime.yearMonth,
               bgColor: todayColor,
               fontColor: Colors.white,
               align: TextAlign.center,
@@ -303,7 +289,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             SizedBox(
               width: 48.h + 12.w,
               child: Text(
-                "${_today}",
+                "$_today",
                 style: TextStyle(
                   color: todayColor,
                   fontWeight: FontWeight.bold,
@@ -375,7 +361,10 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                 textM(Localizer.get('no_ass'))
               ]),
               SizedBox(height: 4.h),
-              Row(children: [getRect(onTimeColor), textM(Localizer.get('on_'))]),
+              Row(children: [
+                getRect(onTimeColor),
+                textM(Localizer.get('on_'))
+              ]),
               SizedBox(height: 4.h),
               Row(
                 children: [
@@ -413,7 +402,10 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             children: [
               Row(children: [getRect(lateColor), textM(Localizer.get('late'))]),
               SizedBox(height: 4.h),
-              Row(children: [getRect(truancyColor), textM(Localizer.get('tr'))]),
+              Row(children: [
+                getRect(truancyColor),
+                textM(Localizer.get('tr'))
+              ]),
               SizedBox(height: 4.h),
               Row(children: [
                 getRect(validReasonColor),
@@ -458,7 +450,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               ),
               SizedBox(height: 4.h),
               getTwoTextOneLine(
-                '${Localizer.get('itog')} ${CURRENT_YEARMONTH.split("/")[0]}:',
+                '${Localizer.get('itog')} ${ServerTime.yearMonth.split("/")[0]}:',
                 _data['penalty_count'].toString(),
                 bgColor: lateColor,
               ),
@@ -523,67 +515,49 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   List<int>? _getHoursAndMinutesStart() {
     // Returns time duration for start of day
 
-    String? startTime = _days[_today - 1]['start_time'];
+    String? time = _days[_today - 1]['start_time'];
 
-    if (startTime == null) {
+    if (time == null) {
       return null;
     }
+    DateTime dateTime = DateTime.parse(time);
+    int beforeMinutes = _data['before_minute'];
+    int postponementMinutes = _data['postponement_minute'];
+    DateTime preTime = dateTime.subtract(Duration(minutes: beforeMinutes));
+    DateTime afterTime = dateTime.add(Duration(minutes: postponementMinutes));
 
-    var _hour = int.parse(startTime.split(':')[0]);
-    var _minute = int.parse(startTime.split(':')[1]);
-
-    var _d_hour = int.parse((_data['postponement_minute'] ~/ 60).toString());
-    var _hour2 = _hour + _d_hour;
-    var _minute2 = _minute + _data['postponement_minute'] - 60 * _d_hour;
-    var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
-    _hour2 += _d_hour2;
-    _minute2 -= 60 * _d_hour2;
-
-    _d_hour = int.parse((_data['before_minute'] ~/ 60).toString());
-    _hour -= _d_hour;
-    _minute -= int.parse((_data['before_minute'] - 60 * _d_hour).toString());
-
-    if (_minute < 0) {
-      _minute += 60;
-      _hour -= 1;
-    }
-
-    return [_hour, _minute, _hour2, _minute2.toInt()];
+    return [preTime.hour, preTime.minute, afterTime.hour, afterTime.minute];
   }
 
   List<int>? _getHoursAndMinutesEnd() {
-    String? startTime = _days[_today - 1]['end_time'];
-    if (startTime == null) {
+    String? time = _days[_today - 1]['end_time'];
+    if (time == null) {
       return null;
     }
-    var _hour = int.parse(startTime.split(':')[0]);
-    var _minute = int.parse(startTime.split(':')[1]);
-    var _d_hour = int.parse((_data['after_minute'] ~/ 60).toString());
-    var _hour2 = _d_hour + _hour;
-    var _minute2 =
-        int.parse((_data['after_minute'] - 60 * _d_hour).toString()) + _minute;
-    var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
-    _hour2 += _d_hour2;
-    _minute2 -= 60 * _d_hour2;
-    return [_hour, _minute, _hour2, _minute2];
+
+    DateTime dateTime = DateTime.parse(time);
+    int afterMinutes = _data['after_minute'];
+    DateTime afterTime = dateTime.add(Duration(minutes: afterMinutes));
+
+    return [dateTime.hour, dateTime.minute, afterTime.hour, afterTime.minute];
   }
 
   String getPhotoTime(String key) {
     if (_days.isEmpty) {
       return "__/__";
     }
+
     var time = _days[_today - 1][key];
     if (time == null) {
       return "__/__";
     }
-    final splitted = time.split(":");
-    int hour = int.parse(splitted[0]);
-    String minute = splitted[1];
-    return "$hour:$minute";
+
+    DateTime dateTime = DateTime.parse(time);
+    DateFormat formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
   }
 
   void leftArrow() {
-    updateDateTime();
     if (_today - 1 > 0) {
       setState(() {
         _today -= 1;
@@ -592,12 +566,16 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   }
 
   void rightArrow() {
-    updateDateTime();
     if (_today + 1 <= _currMonthMaxDay) {
       setState(() {
         _today++;
       });
     }
+  }
+
+  String getSystemTime() {
+    var now = DateTime.now();
+    return DateFormat("H:m:s").format(now);
   }
 
   Widget getPenalty({start = true}) {

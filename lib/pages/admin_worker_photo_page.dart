@@ -1,12 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
-import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
@@ -48,15 +43,6 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
   @override
   void initState() {
     super.initState();
-    updateDateTime();
-  }
-
-  void updateDateTime() async {
-    var dateTime = await getServerDateTime();
-    setState(() {
-      SERVER_TIME = dateTime["time"];
-      CURRENT_YEARMONTH = "${Localizer.get(dateTime["month"])} / ${dateTime["year"]}";
-    });
   }
 
 
@@ -114,14 +100,9 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                getText(SERVER_TIME,
-                    align: TextAlign.center, fontWeight: FontWeight.bold),
+
                 SizedBox(height: 4.h),
-                getText(CURRENT_YEARMONTH,
-                    bgColor: todayColor,
-                    fontColor: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    align: TextAlign.center),
+                ServerTime.getServerTimeWidget(),
                 getText(widget.date.toString(),
                     bgColor: todayColor,
                     fontColor: Colors.white,
@@ -237,12 +218,12 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
   }
 
   Widget getPhotoTime() {
-    var label;
+    String label;
     var key = _isStart ? 'worker_status_start' : 'worker_status_end';
     if (_isStart) {
-      label = getCurrentDayTime('start_photo_time') ?? '__/__';
+      label = getCurrentDayTime('start_photo_time');
     } else {
-      label = getCurrentDayTime('end_photo_time') ?? '__/__';
+      label = getCurrentDayTime('end_photo_time');
     }
 
     return getTwoTextOneLine(Localizer.get('photo_from_place'), label,
@@ -251,15 +232,12 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
 
   String getCurrentDayTime(String key) {
     // key = start_time or end_time
-    String? ans = _day[key];
-    if (ans == null) {
+    var time = _day[key];
+    if (time == null) {
       return "__/__";
     }
-    if (ans.startsWith("0")) {
-      ans = ans.substring(1, 5);
-    } else {
-      ans = ans.substring(0, 5);
-    }
-    return ans;
+    DateTime dateTime = DateTime.parse(time);
+    DateFormat formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
   }
 }

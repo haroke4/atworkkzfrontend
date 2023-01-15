@@ -179,10 +179,9 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                 _changeField("name", Localizer.get('company_name'), text: true),
           ),
         ),
-        getText(SERVER_TIME,
-            align: TextAlign.center, fontWeight: FontWeight.bold),
+        ServerTime.getServerTimeWidget(),
         Expanded(
-            child: getText(CURRENT_YEARMONTH,
+            child: getText(ServerTime.yearMonth,
                 bgColor: todayColor,
                 fontColor: Colors.white,
                 align: TextAlign.center)),

@@ -96,6 +96,7 @@ Widget getInputTimeField(controller) {
         contentPadding: EdgeInsets.all(4.w),
       ),
       style: TextStyle(fontSize: 14.h),
+      keyboardType: TextInputType.number,
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
         TimeInputFormatter(),

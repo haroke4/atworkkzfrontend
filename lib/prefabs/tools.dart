@@ -3,22 +3,35 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
-import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:timer_builder/timer_builder.dart';
 import '../utils/BackendAPI.dart';
+import '../utils/LocalizerUtil.dart';
 import 'colors.dart';
 
-Future<dynamic> getServerDateTime() async {
-  var response = await BackendAPI.getServerDateTime();
-  String time = response['time'];
-  List<String> date = response['date'].split('-');
+class ServerTime {
+  static DateTime time = DateTime(2022);
+  static String yearMonth = '';
 
-  final splitted = time.split(":");
-  int hour = int.parse(splitted[0]);
-  return {
-    "time": "$hour:${splitted[1]}",
-    "month": int.parse(date[1]),
-    "year": int.parse(date[0])
-  };
+  static Future<void> updateDateTime() async {
+    var dt = await BackendAPI.getServerDateTime();
+    ServerTime.yearMonth = "${Localizer.get(dt.month)} / ${dt.year}";
+    ServerTime.time = dt;
+  }
+
+  static Widget getServerTimeWidget({bool adder = false}) {
+    return TimerBuilder.periodic(
+      const Duration(seconds: 1),
+      builder: (context) {
+        if(adder) {
+          ServerTime.time = ServerTime.time.add(const Duration(seconds: 1));
+        }
+        DateFormat formatter = DateFormat('HH:mm');
+        return getText(formatter.format(ServerTime.time),
+            align: TextAlign.center, fontWeight: FontWeight.bold);
+      },
+    );
+  }
 }
 
 Widget __getOnlyText(

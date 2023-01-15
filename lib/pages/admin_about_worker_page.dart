@@ -1,5 +1,6 @@
 import 'dart:convert';
-import 'dart:io';
+import 'package:freelance_order/utils/BackendAPI.dart';
+import 'package:timer_builder/timer_builder.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +17,6 @@ import '../prefabs/tools.dart';
 import '../utils/LocalizerUtil.dart';
 import 'admin_main_page.dart';
 import 'admin_worker_photo_page.dart';
-import 'assign_data_page.dart';
 
 class AdminAboutWorkerPage extends StatefulWidget {
   final name;
@@ -27,15 +27,14 @@ class AdminAboutWorkerPage extends StatefulWidget {
   final prevWorkerData;
   final doingAdjustments;
 
-  const AdminAboutWorkerPage(
-      {super.key,
-      required this.name,
-      required this.workerUsername,
-      required this.today,
-      required this.currMonthMaxDay,
-      required this.data,
-      required this.prevWorkerData,
-      required this.doingAdjustments});
+  const AdminAboutWorkerPage({super.key,
+    required this.name,
+    required this.workerUsername,
+    required this.today,
+    required this.currMonthMaxDay,
+    required this.data,
+    required this.prevWorkerData,
+    required this.doingAdjustments});
 
   @override
   State<AdminAboutWorkerPage> createState() => _AdminAboutWorkerPageState();
@@ -46,41 +45,30 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   int _year = 2022;
   int _month = 1;
 
-  late int latePricePerMinute = widget.data['late_minute_price'];
+  late final int _latePricePerMinute = widget.data['late_minute_price'];
   late int _today = widget.today;
   late final _days = widget.data['days'];
   late var _monthPenalty = widget.data['penalty_count'].toString();
 
   //for adjustment
-  var tempValues = {};
+  final _tempValues = {};
   var _pressedLine = "";
   var _result = '';
   bool _geopoint = false;
   bool _canEditDayStatus = false;
-  TextEditingController startController = TextEditingController();
-  TextEditingController leaveController = TextEditingController();
+  final TextEditingController _startController = TextEditingController();
+  final TextEditingController _endController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    updateDateTime();
     setState(() {
       _doingAdjustments = widget.doingAdjustments;
-      startController.text = getCurrentDayTimeForTemp('start_time');
-      leaveController.text = getCurrentDayTimeForTemp('end_time');
-      tempValues['geoposition'] = _days[_today - 1]['geoposition'];
-      tempValues['day_status'] = _days[_today - 1]['day_status'];
+      _startController.text = getTimeForTempValues('start_time');
+      _endController.text = getTimeForTempValues('end_time');
+      _tempValues['geoposition'] = _days[_today - 1]['geoposition'];
+      _tempValues['day_status'] = _days[_today - 1]['day_status'];
       _pressedLine = _days[_today - 1]['day_status'].toString();
-    });
-  }
-
-  void updateDateTime() async {
-    var dateTime = await getServerDateTime();
-    setState(() {
-      _month = dateTime["month"];
-      _year = dateTime["year"];
-      SERVER_TIME = dateTime["time"];
-      CURRENT_YEARMONTH = "${Localizer.get(_month)} / $_year";
     });
   }
 
@@ -96,7 +84,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         workerUsername: widget.workerUsername, dayId: _days[_today - 1]['id']);
     var json = jsonDecode(response.body);
     if (response.statusCode == 200) {
-      updateDateTime();
+      ServerTime.updateDateTime();
       setState(() {
         _days[_today - 1] = json['message'];
       });
@@ -134,7 +122,6 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     }
     if (response != null) {
       if (response.statusCode == 200) {
-        updateDateTime();
         setState(() {
           _days[_today - 1] = jsonDecode(response.body)['message'];
         });
@@ -147,30 +134,28 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   }
 
   void leftArrow() {
-    updateDateTime();
     if (_today - 1 > 0) {
       _today--;
-      updateTempValues();
+      update_tempValues();
     }
   }
 
   void rightArrow() {
-    updateDateTime();
     if (_today + 1 <= widget.currMonthMaxDay) {
       _today++;
-      updateTempValues();
+      update_tempValues();
     }
   }
 
-  void updateTempValues() {
+  void update_tempValues() {
     setState(() {
       _geopoint = false;
       _canEditDayStatus = widget.today < _today ||
           (widget.today == 1 && _days[_today]['day_status'] == null);
-      startController.text = getCurrentDayTimeForTemp('start_time');
-      leaveController.text = getCurrentDayTimeForTemp('end_time');
-      tempValues['geoposition'] = _days[_today - 1]['geoposition'];
-      tempValues['day_status'] = _days[_today - 1]['day_status'];
+      _startController.text = getTimeForTempValues('start_time');
+      _endController.text = getTimeForTempValues('end_time');
+      _tempValues['geoposition'] = _days[_today - 1]['geoposition'];
+      _tempValues['day_status'] = _days[_today - 1]['day_status'];
       _pressedLine = _days[_today - 1]['day_status'].toString();
     });
   }
@@ -182,23 +167,36 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_today != 1) {
       defaultGeopos = _days[_today - 2]['geoposition'];
     }
+
+    var startTime;
+    var endTime;
+    if (_startController.text == '__/__' || _startController.text.length != 5) {
+      startTime = null;
+    } else {
+      startTime = '${_days[_today - 1]['date']} ${_startController.text}';
+    }
+    if (_endController.text == '__/__' || _endController.text.length != 5) {
+      endTime = null;
+    } else {
+      endTime = '${_days[_today - 1]['date']} ${_endController.text}';
+    }
+
     var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
         dayId: _days[_today - 1]['id'],
-        startTime: startController.text,
-        endTime: leaveController.text,
-        geoposition: tempValues['geoposition'] ?? defaultGeopos,
-        dayStatus: tempValues['day_status'],
+        startTime: startTime,
+        endTime: endTime,
+        geoposition: _tempValues['geoposition'] ?? defaultGeopos,
+        dayStatus: _tempValues['day_status'],
         updateWorkerPenalty: widget.today >= _today);
 
     var scaffoldMessage = "";
     if (response.statusCode == 200) {
       _result = 'update';
-      updateDateTime();
-      var _json = jsonDecode(response.body)['message'];
+      var json = jsonDecode(response.body)['message'];
       setState(() {
-        _days[_today - 1] = _json;
-        _monthPenalty = _json['penalty_count'].toString();
+        _days[_today - 1] = json;
+        _monthPenalty = json['penalty_count'].toString();
       });
       scaffoldMessage = Localizer.get('success');
     } else {
@@ -238,7 +236,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     }
 
     LocationData p = await location.getLocation();
-    tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
+    _tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
     showScaffoldMessage(context, Localizer.get('loc_success'));
   }
 
@@ -256,7 +254,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       initZoom: 15,
     );
     if (p != null) {
-      tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
+      _tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
       showScaffoldMessage(context, Localizer.get('loc_success'));
     }
   }
@@ -265,12 +263,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_today - 1 > 0) {
       setState(() {
         // _today - 2 because _today - 1 = index in massiv of element so -2 prev
-        startController.text =
-            getCurrentDayTimeForTemp('start_time', day: _today - 2);
-        leaveController.text =
-            getCurrentDayTimeForTemp('end_time', day: _today - 2);
-        tempValues['geoposition'] = _days[_today - 2]['geoposition'];
-        tempValues['day_status'] = _days[_today - 2]['day_status'];
+        _startController.text =
+            getTimeForTempValues('start_time', day: _today - 2);
+        _endController.text =
+            getTimeForTempValues('end_time', day: _today - 2);
+        _tempValues['geoposition'] = _days[_today - 2]['geoposition'];
+        _tempValues['day_status'] = _days[_today - 2]['day_status'];
         _pressedLine = _days[_today - 2]['day_status'].toString();
       });
     } else {
@@ -296,13 +294,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       );
       if (response.statusCode == 200) {
         _result = 'update';
-        updateDateTime();
         setState(() {
           _days[i - 1] = jsonDecode(response.body)['message'];
         });
       } else {
         showScaffoldMessage(context,
-            "${Localizer.get('error_on_date')} ${_days[i - 1]['date']}: ${jsonDecode(response.body)['message']}");
+            "${Localizer.get('error_on_date')} ${_days[i -
+                1]['date']}: ${jsonDecode(response.body)['message']}");
       }
     }
     showScaffoldMessage(context, Localizer.get('success'));
@@ -312,7 +310,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme
+            .of(context)
+            .backgroundColor,
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: update,
@@ -345,12 +345,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           width: width2,
           child: Row(
             children: [
-              getText(SERVER_TIME,
-                  align: TextAlign.center,
-                  fontWeight: FontWeight.bold,
-                  minWidth: 40.w),
+              ServerTime.getServerTimeWidget(),
               Expanded(
-                  child: getText(CURRENT_YEARMONTH,
+                  child: getText(ServerTime.yearMonth,
                       bgColor: todayColor,
                       fontColor: Colors.white,
                       align: TextAlign.center)),
@@ -407,22 +404,23 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   child: getPhoto(
                     imagePath: _days[_today - 1]['start_photo'],
                     onTap: () {
-                      Get.to(() => (AdminWorkerPhotoPage(
+                      Get.to(() =>
+                      (AdminWorkerPhotoPage(
                           name: widget.name,
                           day: _days[_today - 1],
                           companyName: widget.data['company_name'],
                           department: widget.data['department'],
                           monthPenalty: _monthPenalty,
-                          latePricePerMinute: latePricePerMinute,
+                          latePricePerMinute: _latePricePerMinute,
                           isStart: true,
                           date: _today,
-                          time: getCurrentDayTime('start_time'))));
+                          time: getTime('start_time'))));
                     },
                   ),
                 ),
                 SizedBox(height: 4.h),
                 getTextWithTime(Localizer.get('appearance'),
-                    getCurrentDayTime('start_time')),
+                    getTime('start_time')),
                 SizedBox(height: 4.h),
                 getTwoTextOneLine(
                   Localizer.get('photo_from_place'),
@@ -577,14 +575,14 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             children: [
               Container(
                 color:
-                    _pressedLine == 'valid_reason' ? Colors.black26 : bgColor,
+                _pressedLine == 'valid_reason' ? Colors.black26 : bgColor,
                 padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
                 child: Row(children: [
                   Text(Localizer.get('valid_reason')),
                   getRect(
                     validReasonColor,
                     onTap: () {
-                      tempValues['day_status'] = 'valid_reason';
+                      _tempValues['day_status'] = 'valid_reason';
                       setState(() {
                         _pressedLine = 'valid_reason';
                       });
@@ -601,7 +599,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   getRect(
                     begOffColor,
                     onTap: () {
-                      tempValues['day_status'] = 'beg_off';
+                      _tempValues['day_status'] = 'beg_off';
                       setState(() {
                         _pressedLine = 'beg_off';
                       });
@@ -626,7 +624,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                       if (!_canEditDayStatus) {
                         return;
                       }
-                      tempValues['day_status'] = 'working_day';
+                      _tempValues['day_status'] = 'working_day';
                       setState(() {
                         _pressedLine = 'working_day';
                       });
@@ -656,7 +654,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                       if (!_canEditDayStatus) {
                         return;
                       }
-                      tempValues['day_status'] = 'non_working_day';
+                      _tempValues['day_status'] = 'non_working_day';
                       setState(() {
                         _pressedLine = 'non_working_day';
                       });
@@ -668,7 +666,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                       Localizer.get('non_working_day'),
                       style: TextStyle(
                         color:
-                            _canEditDayStatus ? Colors.black : Colors.black54,
+                        _canEditDayStatus ? Colors.black : Colors.black54,
                       ),
                     ),
                   ),
@@ -697,12 +695,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               getTwoTextSeperated(
                   getPenalty(), " ${day['penalty_count_start']} ",
                   secondTextBgColor:
-                      getColorByStatus(day['worker_status_start'])),
+                  getColorByStatus(day['worker_status_start'])),
               const Expanded(child: SizedBox()),
               getTwoTextSeperated(
                   getPenalty(start: false), " ${day['penalty_count_end']} ",
                   secondTextBgColor:
-                      getColorByStatus(day['worker_status_end'])),
+                  getColorByStatus(day['worker_status_end'])),
             ],
           ),
           SizedBox(height: 15.h),
@@ -760,7 +758,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                       align: TextAlign.center),
                 ),
                 Expanded(
-                  child: getInputTimeField(startController),
+                  child: getInputTimeField(_startController),
                 )
               ],
             ),
@@ -773,7 +771,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     child: getText(Localizer.get('leave'),
                         align: TextAlign.center)),
                 Expanded(
-                  child: getInputTimeField(leaveController),
+                  child: getInputTimeField(_endController),
                 )
               ],
             ),
@@ -807,10 +805,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                         onPressed: repeatButtonPressed)),
                 Expanded(
                     child: getText(
-                  Localizer.get('copy'),
-                  align: TextAlign.center,
-                  onPressed: copyButtonPressed,
-                ))
+                      Localizer.get('copy'),
+                      align: TextAlign.center,
+                      onPressed: copyButtonPressed,
+                    ))
               ],
             ),
             SizedBox(
@@ -832,22 +830,23 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               child: getPhoto(
                 imagePath: _days[_today - 1]['end_photo'],
                 onTap: () {
-                  Get.to(() => (AdminWorkerPhotoPage(
+                  Get.to(() =>
+                  (AdminWorkerPhotoPage(
                       name: widget.name,
                       day: _days[_today - 1],
                       department: widget.data['department'],
                       companyName: widget.data['company_name'],
                       monthPenalty: widget.data['penalty_count'],
-                      latePricePerMinute: latePricePerMinute,
+                      latePricePerMinute: _latePricePerMinute,
                       isStart: false,
                       date: _today,
-                      time: getCurrentDayTime('end_time'))));
+                      time: getTime('end_time'))));
                 },
               ),
             ),
             SizedBox(height: 4.h),
             getTextWithTime(
-                Localizer.get('leave'), getCurrentDayTime('end_time')),
+                Localizer.get('leave'), getTime('end_time')),
             SizedBox(height: 4.h),
             getTwoTextOneLine(
               Localizer.get('photo_from_place'),
@@ -863,10 +862,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   String getPenalty({start = true}) {
     if (start) {
       var cnt = _days[_today - 1]["late_minute_count"];
-      return "$cnt ${Localizer.get('minute')} * $latePricePerMinute";
+      return "$cnt ${Localizer.get('minute')} * $_latePricePerMinute";
     }
     var cnt = _days[_today - 1]["late_minute_count"];
-    return "$cnt ${Localizer.get('minute')} * $latePricePerMinute";
+    return "$cnt ${Localizer.get('minute')} * $_latePricePerMinute";
   }
 
   String getPhotoTime(String key) {
@@ -874,10 +873,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (time == null) {
       return "__/__";
     }
-    final splitted = time.split(":");
-    int hour = int.parse(splitted[0]);
-    String minute = splitted[1];
-    return "$hour:$minute";
+    DateTime dateTime = DateTime.parse(time);
+    DateFormat formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
   }
 
   String getValidatedDay(int curr) {
@@ -909,71 +907,43 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     return getRect(getColorByStatus(_days[day - 1]['day_status']));
   }
 
-  String getCurrentDayTime(String key) {
+  String getTime(String key) {
+    // get time for appear time widget
     // key = start_time or end_time
     if (_days.isEmpty) {
       return "__/__";
     }
-    String? ans = _days[_today - 1][key];
-    if (ans == null) {
+    String? time = _days[_today - 1][key];
+    if (time == null) {
       return "__/__";
     }
-    String ans2 = '';
-    var _data = widget.data;
+    DateTime dateTime = DateTime.parse(time);
+    DateFormat formatter = DateFormat('HH:mm');
     if (key == 'start_time') {
-      var _hour = int.parse(ans.split(':')[0]);
-      var _minute = int.parse(ans.split(':')[1]);
-
-      var _d_hour = int.parse((_data['postponement_minute'] ~/ 60).toString());
-      var _hour2 = _hour + _d_hour;
-      var _minute2 = _minute + _data['postponement_minute'] - 60 * _d_hour;
-      var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
-      _hour2 += _d_hour2;
-      _minute2 -= 60 * _d_hour2;
-      ans2 = "${_hour2}:${_minute2 < 10 ? 0 : ""}$_minute2";
-
-      _d_hour = int.parse((_data['before_minute'] ~/ 60).toString());
-      _hour -= _d_hour;
-      _minute -= int.parse((_data['before_minute'] - 60 * _d_hour).toString());
-
-      if (_minute < 0) {
-        _minute += 60;
-        _hour -= 1;
-      }
-      ans = "$_hour:${_minute < 10 ? 0 : ''}$_minute";
-    } else {
-      var _hour = int.parse(ans.split(':')[0]);
-      var _minute = int.parse(ans.split(':')[1]);
-      var _d_hour = int.parse((_data['after_minute'] ~/ 60).toString());
-      var _hour2 = _d_hour + _hour;
-      var _minute2 =
-          int.parse((_data['after_minute'] - 60 * _d_hour).toString()) +
-              _minute;
-      var _d_hour2 = int.parse((_minute2 ~/ 60).toString());
-      _hour2 += _d_hour2;
-      _minute2 -= 60 * _d_hour2;
-
-      ans2 = "$_hour2:${_minute2 < 10 ? 0 : ""}$_minute2";
-      ans = "$_hour:${_minute < 10 ? 0 : ''}$_minute";
+      int beforeMinutes = widget.data['before_minute'];
+      int postponementMinutes = widget.data['postponement_minute'];
+      DateTime preTime = dateTime.subtract(Duration(minutes: beforeMinutes));
+      DateTime afterTime = dateTime.add(Duration(minutes: postponementMinutes));
+      return '${formatter.format(preTime)}/${formatter.format(afterTime)}';
     }
-
-    return '$ans/$ans2';
+    int afterMinutes = widget.data['after_minute'];
+    DateTime afterTime = dateTime.add(Duration(minutes: afterMinutes));
+    return '${formatter.format(dateTime)}/${formatter.format(afterTime)}';
   }
 
-  String getCurrentDayTimeForTemp(String key, {int? day}) {
+  String getTimeForTempValues(String key, {int? day}) {
+    // Time for tempValues (editing fields)
     // key = start_time or end_time
     day ??= _today - 1;
 
-    String? ans = _days[day][key];
-    if (ans == null) {
+    String? time = _days[day][key];
+    if (time == null) {
       return "__/__";
     }
-    if (ans.startsWith("0")) {
-      ans = ans.substring(1, 5);
-    } else {
-      ans = ans.substring(0, 5);
-    }
-    return ans;
+
+    DateTime dateTime = DateTime.parse(time);
+    DateFormat formatter = DateFormat('HH:mm');
+    return formatter.format(dateTime);
   }
 
   Widget getConfirmationButton(bool data, String arg) {
@@ -1011,9 +981,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           },
           child: const Center(
               child: Icon(
-            Icons.circle,
-            size: 10,
-          )),
+                Icons.circle,
+                size: 10,
+              )),
         ),
       ),
     );

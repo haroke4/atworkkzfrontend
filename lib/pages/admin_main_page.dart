@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,8 +17,6 @@ import 'admin_add_worker_page.dart';
 import 'enter_code_page.dart';
 import 'admin_about_worker_page.dart';
 
-var CURRENT_YEARMONTH = "";
-var SERVER_TIME = "__/__";
 var THIS_MONTH_ACTIVE = false;
 
 class AdminsMainPage extends StatefulWidget {
@@ -43,14 +42,14 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   @override
   void initState() {
     super.initState();
-    asyncInitState();
+    _update();
     initializeDateFormatting();
   }
 
-  Future<void> asyncInitState() async {
+  Future<void> _update() async {
     var response = await AdminBackendAPI.getWorkers();
     if (response.statusCode == 200) {
-      updateDateTime();
+      await ServerTime.updateDateTime();
       setState(() {
         _data = jsonDecode(utf8.decode(response.bodyBytes))['message'];
 
@@ -75,16 +74,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     }
     return;
   }
-
-  void updateDateTime() async {
-    var dateTime = await getServerDateTime();
-    setState(() {
-      _month = dateTime["month"];
-      _year = dateTime["year"];
-      SERVER_TIME = dateTime["time"];
-      CURRENT_YEARMONTH = "${Localizer.get(_month)} / $_year";
-    });
-  }
+  
 
   void _onWorkerNamePressed(
       String displayName, String username, var data, var prevWorkerData,
@@ -135,7 +125,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         _loading = true;
       });
       showScaffoldMessage(context, Localizer.get('loading'));
-      await asyncInitState();
+      await _update();
     }
   }
 
@@ -179,7 +169,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           child: SafeArea(
             child: RefreshIndicator(
               color: brownColor,
-              onRefresh: asyncInitState,
+              onRefresh: _update,
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Container(
@@ -211,12 +201,9 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             child: getText(
               _data.isEmpty ? Localizer.get('company_name') : _data['name'],
             )),
-        getText(SERVER_TIME,
-            align: TextAlign.center,
-            fontWeight: FontWeight.bold,
-            minWidth: 40.w),
+        ServerTime.getServerTimeWidget(adder: true),
         Expanded(
-            child: getText(CURRENT_YEARMONTH,
+            child: getText(ServerTime.yearMonth,
                 bgColor: todayColor,
                 fontColor: Colors.white,
                 align: TextAlign.center)),

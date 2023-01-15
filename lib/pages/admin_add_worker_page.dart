@@ -76,7 +76,10 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
           displayName: _displayUsername, username: _usernameWorker);
     }
     if (response.statusCode == 200) {
-      showScaffoldMessage(context, Localizer.get('ok_worker_replace'), time: 3);
+      if (widget.username != '') {
+        showScaffoldMessage(context, Localizer.get('ok_worker_replace'),
+            time: 3);
+      }
       Get.back(result: "update");
     } else {
       showScaffoldMessage(context, Localizer.get('already_exists'), time: 2);
@@ -104,9 +107,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 Text(
                   Localizer.get('pick_worker'),
                   style: TextStyle(
-                    color: Theme
-                        .of(context)
-                        .primaryColorDark,
+                    color: Theme.of(context).primaryColorDark,
                     fontSize: 40.h,
                     fontWeight: FontWeight.bold,
                   ),
@@ -115,9 +116,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                 Text(
                   Localizer.get('name_con_book'),
                   style: TextStyle(
-                    color: Theme
-                        .of(context)
-                        .primaryColorDark,
+                    color: Theme.of(context).primaryColorDark,
                     fontSize: 25.h,
                     fontWeight: FontWeight.bold,
                     overflow: TextOverflow.visible,
