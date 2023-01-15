@@ -1,11 +1,9 @@
 import 'dart:convert';
-import 'package:freelance_order/utils/BackendAPI.dart';
-import 'package:timer_builder/timer_builder.dart';
+import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
@@ -15,7 +13,6 @@ import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../utils/LocalizerUtil.dart';
-import 'admin_main_page.dart';
 import 'admin_worker_photo_page.dart';
 
 class AdminAboutWorkerPage extends StatefulWidget {
@@ -244,7 +241,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (!_geopoint) {
       return;
     }
-    GeoPoint? p = await showSimplePickerLocation(
+    GeoPoint? p = await LocationPicker(
       context: context,
       isDismissible: true,
       title: Localizer.get('pick_geo'),
