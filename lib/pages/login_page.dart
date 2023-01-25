@@ -116,6 +116,7 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       // тени
       decoration: const BoxDecoration(
+        color: Colors.white,
         boxShadow: [
           BoxShadow(
               color: Colors.black26,
@@ -125,29 +126,26 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
 
-      child: Material(
-        color: Colors.white,
-        child: InkWell(
-          splashColor: Colors.black26,
-          onTap: _onPressed,
-          child: Padding(
-            padding: EdgeInsets.all(6.w),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                image,
-                const SizedBox(
-                  height: 6,
+      child: InkWell(
+        splashColor: Colors.black26,
+        onTap: _onPressed,
+        child: Padding(
+          padding: EdgeInsets.all(6.w),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              image,
+              const SizedBox(
+                height: 6,
+              ),
+              Text(
+                text,
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Theme.of(context).primaryColorDark,
                 ),
-                Text(
-                  text,
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Theme.of(context).primaryColorDark,
-                  ),
-                )
-              ],
-            ),
+              )
+            ],
           ),
         ),
       ),

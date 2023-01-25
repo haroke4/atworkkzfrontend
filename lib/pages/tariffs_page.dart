@@ -2,16 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/prefabs/admin_tools.dart';
-import 'package:freelance_order/prefabs/tools.dart';
-import 'package:get/get.dart';
-import 'package:pin_input_text_field/pin_input_text_field.dart';
 import '../utils/LocalizerUtil.dart';
-import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
-import '../prefabs/appbar_prefab.dart';
 
 class TariffsPage extends StatefulWidget {
   const TariffsPage({super.key});
@@ -33,7 +26,7 @@ class _TariffsPageState extends State<TariffsPage> {
         physics: const BouncingScrollPhysics(),
         child: SafeArea(
           child: Container(
-            margin: EdgeInsets.fromLTRB(40.w, 5.h, 40.w, 2.h),
+            margin: EdgeInsets.fromLTRB(20.w, 5.h, 20.w, 2.h),
             child: Column(
               children: [
                 Text(

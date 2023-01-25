@@ -6,13 +6,11 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/worker_main_page.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/BackendAPI.dart';
-import 'package:freelance_order/utils/WorkersBackendAPI.dart';
 import 'package:get/get.dart';
 import '../utils/LocalizerUtil.dart';
 import 'admin_main_page.dart';
 import 'enter_sms_page.dart';
 import '../prefabs/colors.dart';
-import '../prefabs/appbar_prefab.dart';
 
 class EnterPhonePage extends StatefulWidget {
   final bool loginAsWorker;
@@ -88,7 +86,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 40.h),
+              SizedBox(height: 20.h),
               Text(
                 Localizer.get("fill"),
                 style: TextStyle(

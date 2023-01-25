@@ -23,7 +23,7 @@ class ServerTime {
     return TimerBuilder.periodic(
       const Duration(seconds: 1),
       builder: (context) {
-        if(adder) {
+        if (adder) {
           ServerTime.time = ServerTime.time.add(const Duration(seconds: 1));
         }
         DateFormat formatter = DateFormat('HH:mm');
@@ -296,6 +296,7 @@ Widget getArrowButton(Icon icon, String heroTag, onPressed) {
 }
 
 Widget getRect(
+  context,
   Color color, {
   String text = "",
   String secText = "",
@@ -305,17 +306,18 @@ Widget getRect(
   double? height,
   Function? onTap,
 }) {
-  width = width ?? 26.h;
+  double screenWidth = MediaQuery.of(context).size.width;
+  width = width ?? screenWidth * 0.0013 * 26.h;
   height = height ?? width;
   Widget secTWidget = Padding(
-    padding: EdgeInsets.only(top: height / 1.5),
+    padding: EdgeInsets.only(top: height / 1.7),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           secText,
-          style: const TextStyle(fontSize: 7),
+          style: TextStyle(fontSize: screenWidth * 0.011),
         )
       ],
     ),
@@ -339,7 +341,8 @@ Widget getRect(
                       children: [
                         Text(
                           text,
-                          style: TextStyle(color: fontColor, fontSize: 12),
+                          style: TextStyle(
+                              color: fontColor, fontSize: screenWidth * 0.0145),
                         ),
                         secText == "" ? const SizedBox(height: 0) : secTWidget,
                       ],

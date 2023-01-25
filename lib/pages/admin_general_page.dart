@@ -1,17 +1,11 @@
-import 'dart:collection';
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/pages/tariffs_page.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
-import 'package:image_picker/image_picker.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/scaffold_messages.dart';
@@ -27,13 +21,8 @@ class AdminGeneralPage extends StatefulWidget {
 }
 
 class _AdminGeneralPageState extends State<AdminGeneralPage> {
-  late Widget _saveButtonLabel = getSaveText();
-
-  // Scrolling workers
-
   late var _data;
   late final _registering;
-  final _loading = true;
 
   @override
   void initState() {
@@ -62,10 +51,6 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
   void _onSavePressed() async {
     if (_registering) {
       setState(() {
-        _saveButtonLabel = SpinKitThreeBounce(
-          color: Colors.black,
-          size: 20.h,
-        );
       });
       var response = await AdminBackendAPI.createCompany(
         name: _data['name'],
@@ -90,7 +75,6 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         showScaffoldMessage(context, Localizer.get('some_error_field'));
       }
       setState(() {
-        _saveButtonLabel = getSaveText();
       });
     } else {
       showScaffoldMessage(context, Localizer.get('sending_data'));
@@ -192,7 +176,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         ),
         getText(Localizer.get('general'),
             fontColor: Colors.white, bgColor: brownColor),
-        getText("Atwork.kz", align: TextAlign.center),
+        getText("zhumysta.kz", align: TextAlign.center),
       ],
     );
   }

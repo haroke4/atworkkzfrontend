@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:intl/intl.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:get/get.dart';
@@ -179,7 +178,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               align: TextAlign.center,
               minWidth: 70.w),
         ),
-        Expanded(child: getText("Atwork.kz", align: TextAlign.center)),
+        Expanded(child: getText("zhumysta.kz", align: TextAlign.center)),
       ],
     );
   }
@@ -281,11 +280,11 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       children: [
         Row(
           children: [
-            getRect(Colors.white, text: getValidatedDay(_today - 5)),
-            getRect(Colors.white, text: getValidatedDay(_today - 4)),
-            getRect(Colors.white, text: getValidatedDay(_today - 3)),
-            getRect(Colors.white, text: getValidatedDay(_today - 2)),
-            getRect(Colors.white, text: getValidatedDay(_today - 1)),
+            getRect(context,Colors.white, text: getValidatedDay(_today - 5)),
+            getRect(context,Colors.white, text: getValidatedDay(_today - 4)),
+            getRect(context,Colors.white, text: getValidatedDay(_today - 3)),
+            getRect(context,Colors.white, text: getValidatedDay(_today - 2)),
+            getRect(context,Colors.white, text: getValidatedDay(_today - 1)),
             SizedBox(
               width: 48.h + 12.w,
               child: Text(
@@ -298,11 +297,11 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                 textAlign: TextAlign.center,
               ),
             ),
-            getRect(Colors.white, text: getValidatedDay(_today + 1)),
-            getRect(Colors.white, text: getValidatedDay(_today + 2)),
-            getRect(Colors.white, text: getValidatedDay(_today + 3)),
-            getRect(Colors.white, text: getValidatedDay(_today + 4)),
-            getRect(Colors.white, text: getValidatedDay(_today + 5)),
+            getRect(context,Colors.white, text: getValidatedDay(_today + 1)),
+            getRect(context,Colors.white, text: getValidatedDay(_today + 2)),
+            getRect(context,Colors.white, text: getValidatedDay(_today + 3)),
+            getRect(context,Colors.white, text: getValidatedDay(_today + 4)),
+            getRect(context,Colors.white, text: getValidatedDay(_today + 5)),
           ],
         ),
         SizedBox(height: 3.h),
@@ -342,27 +341,27 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(children: [
-                getRect(todayColor),
+                getRect(context,todayColor),
                 textM(Localizer.get('today_appear_leave'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(workingDayColor),
+                getRect(context,workingDayColor),
                 textM(Localizer.get('working_day'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(nonWorkingDayColor),
+                getRect(context,nonWorkingDayColor),
                 textM(Localizer.get('non_working_day'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(noAssignmentColor),
+                getRect(context,noAssignmentColor),
                 textM(Localizer.get('no_ass'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(onTimeColor),
+                getRect(context,onTimeColor),
                 textM(Localizer.get('on_'))
               ]),
               SizedBox(height: 4.h),
@@ -400,25 +399,25 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(children: [getRect(lateColor), textM(Localizer.get('late'))]),
+              Row(children: [getRect(context,lateColor), textM(Localizer.get('late'))]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(truancyColor),
+                getRect(context,truancyColor),
                 textM(Localizer.get('tr'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(validReasonColor),
+                getRect(context,validReasonColor),
                 textM(Localizer.get('valid_reason'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(begOffColor),
+                getRect(context,begOffColor),
                 textM(Localizer.get('beg_off_text'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(confirmationColor, confirmation: true),
+                getRect(context,confirmationColor, confirmation: true),
                 textM(Localizer.get('con'))
               ]),
               SizedBox(height: 4.h),
@@ -472,22 +471,22 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   Widget getRectByDay(int day, {ws = true, start = true, showConfirm = false}) {
     // ws - is for worker status
     if (getValidatedDay(day) == '' || _days.isEmpty) {
-      return getRect(noAssignmentColor);
+      return getRect(context,noAssignmentColor);
     } else if (_days[day - 1] == null) {
-      return getRect(noAssignmentColor);
+      return getRect(context,noAssignmentColor);
     }
     if (ws && start) {
-      return getRect(
+      return getRect(context,
         getColorByStatus(_days[day - 1]['worker_status_start']),
         confirmation: showConfirm && !_days[day - 1]['confirmed_start'],
       );
     } else if (ws && !start) {
-      return getRect(
+      return getRect(context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
         confirmation: showConfirm && !_days[day - 1]['confirmed_end'],
       );
     }
-    return getRect(getColorByStatus(_days[day - 1]['day_status']));
+    return getRect(context,getColorByStatus(_days[day - 1]['day_status']));
   }
 
   String getCurrentDayTime(String key) {

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:freelance_order/utils/BackendAPI.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,7 +9,6 @@ import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
-import '../prefabs/admin_tools.dart';
 import 'package:intl/intl.dart';
 import '../utils/LocalizerUtil.dart';
 import 'admin_add_worker_page.dart';
@@ -197,7 +195,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return Row(
       children: [
         SizedBox(
-            width: 95.w,
+            width: 92.w,
             child: getText(
               _data.isEmpty ? Localizer.get('company_name') : _data['name'],
             )),
@@ -228,32 +226,32 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return Row(
       children: [
         SizedBox(
-          width: 95.w,
+          width: 92.w,
           child: getText(
             _data.isEmpty ? Localizer.get('department') : _data['department'],
           ),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today - 5),
           secText: getNameOfWeek(_today - 5),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today - 4),
           secText: getNameOfWeek(_today - 4),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today - 3),
           secText: getNameOfWeek(_today - 3),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today - 2),
           secText: getNameOfWeek(_today - 2),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today - 1),
           secText: getNameOfWeek(_today - 1),
@@ -270,27 +268,27 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
             textAlign: TextAlign.center,
           ),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today + 1),
           secText: getNameOfWeek(_today + 1),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today + 2),
           secText: getNameOfWeek(_today + 2),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today + 3),
           secText: getNameOfWeek(_today + 3),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today + 4),
           secText: getNameOfWeek(_today + 4),
         ),
-        getRect(
+        getRect(context,
           Colors.white,
           text: getValidatedDay(_today + 5),
           secText: getNameOfWeek(_today + 5),
@@ -318,7 +316,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     workers = List.from(workers);
     var _length = workers.length;
 
-    for (int i = 0; i <= _data['company_max_workers'] - _length; i++) {
+    for (int i = 0; i < _data['company_max_workers'] - _length; i++) {
       workers.add({"display_name": "", "username": ""});
     }
     for (int i = 0; i < workers.length; i++) {
@@ -362,7 +360,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return Row(
       children: [
         SizedBox(
-          width: 95.w,
+          width: 92.w,
           child: getText(name,
               onPressed: () => _onWorkerNamePressed(name, username, data, prv),
               onLongPress: () => _onWorkerNamePressed(name, username, data, prv,
@@ -396,11 +394,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         SizedBox(
           width: 7.w,
         ),
-        getRect(workingDayColor,
+        getRect(context,workingDayColor,
             text: working_day_count, fontColor: Colors.white),
-        getRect(truancyColor, text: truancy_day_count, fontColor: Colors.white),
+        getRect(context,truancyColor, text: truancy_day_count, fontColor: Colors.white),
         Expanded(
-          child: getRect(prizeColor, text: prize.toString()),
+          child: getRect(context,prizeColor, text: prize.toString()),
         )
       ],
     );
@@ -442,18 +440,18 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     // ws - is for worker status
 
     if (days == null || getValidatedDay(day) == '' || days.isEmpty) {
-      return getRect(noAssignmentColor);
+      return getRect(context,noAssignmentColor);
     } else if (days[day - 1] == null) {
-      return getRect(noAssignmentColor);
+      return getRect(context,noAssignmentColor);
     }
     if (ws && start) {
-      return getRect(getColorByStatus(days[day - 1]['worker_status_start']),
+      return getRect(context,getColorByStatus(days[day - 1]['worker_status_start']),
           confirmation: showConfirm && !days[day - 1]['confirmed_start']);
     } else if (ws && !start) {
-      return getRect(getColorByStatus(days[day - 1]['worker_status_end']),
+      return getRect(context,getColorByStatus(days[day - 1]['worker_status_end']),
           confirmation: showConfirm && !days[day - 1]['confirmed_end']);
     }
-    return getRect(getColorByStatus(days[day - 1]['day_status']), onTap: onTap);
+    return getRect(context,getColorByStatus(days[day - 1]['day_status']), onTap: onTap);
   }
 
   String getNameOfWeek(day) {

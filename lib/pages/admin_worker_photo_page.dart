@@ -7,7 +7,6 @@ import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
 import '../utils/BackendAPI.dart';
 import '../utils/LocalizerUtil.dart';
-import 'admin_main_page.dart';
 
 class AdminWorkerPhotoPage extends StatefulWidget {
   final name;
@@ -131,7 +130,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              getText("Atwork.kz", align: TextAlign.center),
+              getText("zhumysta.kz", align: TextAlign.center),
             ],
           ),
           Expanded(

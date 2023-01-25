@@ -2,24 +2,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/prefabs/admin_tools.dart';
 import 'package:get/get.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import '../prefabs/scaffold_messages.dart';
 import '../utils/AdminBackendAPI.dart';
 import '../utils/LocalizerUtil.dart';
-import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
-import '../prefabs/appbar_prefab.dart';
 
 class EnterCodePage extends StatefulWidget {
   final nextPage;
   var code;
-  EnterCodePage({super.key, required this.nextPage, this.code=""});
+
+  EnterCodePage({super.key, required this.nextPage, this.code = ""});
 
   @override
   State<EnterCodePage> createState() => _EnterCodePageState();
@@ -44,24 +40,19 @@ class _EnterCodePageState extends State<EnterCodePage> {
         });
       }
     } else {
-
-      if(widget.code != ""){
-
-        if (_smsController.text == widget.code){
+      if (widget.code != "") {
+        if (_smsController.text == widget.code) {
           showScaffoldMessage(context, Localizer.get('success'));
           Get.off(widget.nextPage, arguments: Get.arguments);
-        }
-        else {
+        } else {
           showScaffoldMessage(context, Localizer.get('incorrect_code'));
           _smsController.text = "";
         }
-      }
-      else {
+      } else {
         if (await AdminBackendAPI.checkPinCode(_smsController.text)) {
           showScaffoldMessage(context, Localizer.get('success'));
           Get.off(widget.nextPage, arguments: Get.arguments);
-        }
-        else {
+        } else {
           showScaffoldMessage(context, Localizer.get('incorrect_code'));
           _smsController.text = "";
         }
@@ -98,64 +89,65 @@ class _EnterCodePageState extends State<EnterCodePage> {
     return Scaffold(
       backgroundColor: brownColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 40.h),
-              Text(
-                Localizer.get('type_code'),
-                style: TextStyle(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Expanded(child: SizedBox()),
+            Text(
+              Localizer.get('type_code'),
+              style: TextStyle(
+                color: Theme.of(context).primaryColorDark,
+                fontSize: 30.h,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Expanded(child: SizedBox()),
+            Padding(
+              padding: EdgeInsets.fromLTRB(110.w, 5.w, 110.w, 5.w),
+              child: PinInputTextField(
+                controller: _smsController,
+                pinLength: 4,
+                keyboardType: TextInputType.number,
+                cursor: Cursor(
+                  width: 3,
+                  height: 20.h,
                   color: Theme.of(context).primaryColorDark,
-                  fontSize: 20.h,
-                  fontWeight: FontWeight.bold,
+                  enabled: true,
                 ),
-              ),
-              SizedBox(height: 20.h),
-              Padding(
-                padding: EdgeInsets.fromLTRB(110.w, 5.w, 110.w, 5.w),
-                child: PinInputTextField(
-                  controller: _smsController,
-                  pinLength: 4,
-                  keyboardType: TextInputType.number,
-                  cursor: Cursor(
-                    width: 3,
-                    height: 20.h,
-                    color: Theme.of(context).primaryColorDark,
-                    enabled: true,
-                  ),
-                  decoration: const UnderlineDecoration(
-                    colorBuilder:
-                        FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
-                  ),
-                  onChanged: (value) {
-                    _checkCode(fromOnChanged: true);
-                  },
+                decoration: const UnderlineDecoration(
+                  colorBuilder:
+                      FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
                 ),
+                onChanged: (value) {
+                  _checkCode(fromOnChanged: true);
+                },
               ),
-              SizedBox(height: 3.h),
-              _errorMessage != ''
-                  ? Text(
-                      _errorMessage,
-                      style: TextStyle(color: Theme.of(context).errorColor),
-                    )
-                  : const SizedBox(),
-              SizedBox(height: 10.h),
-              Row(
-                children: [
-                  SizedBox(width: 10.w),
-                  getFingerprintButton(),
-                  const Expanded(child: SizedBox()),
-                  getNumbersWidget(),
-                  const Expanded(child: SizedBox()),
-                  getGoBackButton(padding: 2.w, height: 44.h),
-                  SizedBox(width: 10.w),
-                ],
-              ),
-            ],
-          ),
+            ),
+            SizedBox(height: 3.h),
+            _errorMessage != ''
+                ? Text(
+                    _errorMessage,
+                    style: TextStyle(color: Theme.of(context).errorColor),
+                  )
+                : const SizedBox(),
+            SizedBox(height: 10.h),
+            Row(
+              children: [
+                SizedBox(width: 10.w),
+                getFingerprintButton(),
+                const Expanded(child: SizedBox()),
+                getNumbersWidget(),
+                const Expanded(child: SizedBox()),
+                getGoBackButton(padding: 2.w, height: 44.h),
+                SizedBox(width: 10.w),
+              ],
+            ),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+          ],
         ),
       ),
     );
@@ -215,7 +207,6 @@ class _EnterCodePageState extends State<EnterCodePage> {
       ],
     );
   }
-
 }
 
 class CircleButton extends StatelessWidget {

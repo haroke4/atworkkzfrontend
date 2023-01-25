@@ -3,9 +3,7 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/pages/admin_general_page.dart';
-import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:freelance_order/utils/WorkersBackendAPI.dart';
@@ -13,9 +11,7 @@ import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../prefabs/scaffold_messages.dart';
-import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
-import '../prefabs/appbar_prefab.dart';
 
 class EnterSMSPage extends StatefulWidget {
   final nextPage;
@@ -114,54 +110,56 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
     return Scaffold(
       backgroundColor: brownColor,
       body: SafeArea(
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              SizedBox(height: 40.h),
-              Text(
-                Localizer.get('enter_sent_sms_come'),
-                style: TextStyle(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            const Expanded(child: SizedBox()),
+            Text(
+              Localizer.get('enter_sent_sms_come'),
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Theme.of(context).primaryColorDark,
+                fontSize: 40.h,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const Expanded(child: SizedBox()),
+            Padding(
+              padding: EdgeInsets.fromLTRB(110.w, 0.w, 110.w, 0),
+              child: PinInputTextField(
+                controller: _smsController,
+                pinLength: 4,
+                keyboardType: TextInputType.number,
+                cursor: Cursor(
+                  width: 3,
+                  height: 20.h,
                   color: Theme.of(context).primaryColorDark,
-                  fontSize: 40.h,
-                  fontWeight: FontWeight.bold,
+                  enabled: true,
                 ),
-              ),
-              SizedBox(height: 20.h),
-              Padding(
-                padding: EdgeInsets.fromLTRB(110.w, 5.w, 110.w, 5.w),
-                child: PinInputTextField(
-                  controller: _smsController,
-                  pinLength: 4,
-                  keyboardType: TextInputType.number,
-                  cursor: Cursor(
-                    width: 3,
-                    height: 20.h,
-                    color: Theme.of(context).primaryColorDark,
-                    enabled: true,
-                  ),
-                  decoration: const UnderlineDecoration(
-                    colorBuilder:
-                        FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
-                  ),
-                  onChanged: (value) {
-                    sendAndCheckSMS(fromOnChanged: true);
-                  },
+                decoration: const UnderlineDecoration(
+                  colorBuilder:
+                      FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
                 ),
+                onChanged: (value) {
+                  sendAndCheckSMS(fromOnChanged: true);
+                },
               ),
-              SizedBox(height: 3.h),
-              _errorMessage != ''
-                  ? Text(
-                      _errorMessage,
-                      style: TextStyle(color: Theme.of(context).errorColor),
-                    )
-                  : const SizedBox(),
-              SizedBox(height: 10.h),
-              getNumbersWidget(),
-            ],
-          ),
+            ),
+            SizedBox(height: 3.h),
+            _errorMessage != ''
+                ? Text(
+                    _errorMessage,
+                    style: TextStyle(color: Theme.of(context).errorColor),
+                  )
+                : const SizedBox(),
+            SizedBox(height: 10.h),
+            getNumbersWidget(),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+          ],
         ),
       ),
     );

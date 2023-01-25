@@ -24,14 +24,15 @@ class AdminAboutWorkerPage extends StatefulWidget {
   final prevWorkerData;
   final doingAdjustments;
 
-  const AdminAboutWorkerPage({super.key,
-    required this.name,
-    required this.workerUsername,
-    required this.today,
-    required this.currMonthMaxDay,
-    required this.data,
-    required this.prevWorkerData,
-    required this.doingAdjustments});
+  const AdminAboutWorkerPage(
+      {super.key,
+      required this.name,
+      required this.workerUsername,
+      required this.today,
+      required this.currMonthMaxDay,
+      required this.data,
+      required this.prevWorkerData,
+      required this.doingAdjustments});
 
   @override
   State<AdminAboutWorkerPage> createState() => _AdminAboutWorkerPageState();
@@ -262,8 +263,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         // _today - 2 because _today - 1 = index in massiv of element so -2 prev
         _startController.text =
             getTimeForTempValues('start_time', day: _today - 2);
-        _endController.text =
-            getTimeForTempValues('end_time', day: _today - 2);
+        _endController.text = getTimeForTempValues('end_time', day: _today - 2);
         _tempValues['geoposition'] = _days[_today - 2]['geoposition'];
         _tempValues['day_status'] = _days[_today - 2]['day_status'];
         _pressedLine = _days[_today - 2]['day_status'].toString();
@@ -296,8 +296,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         });
       } else {
         showScaffoldMessage(context,
-            "${Localizer.get('error_on_date')} ${_days[i -
-                1]['date']}: ${jsonDecode(response.body)['message']}");
+            "${Localizer.get('error_on_date')} ${_days[i - 1]['date']}: ${jsonDecode(response.body)['message']}");
       }
     }
     showScaffoldMessage(context, Localizer.get('success'));
@@ -307,9 +306,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme
-            .of(context)
-            .backgroundColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: update,
@@ -323,7 +320,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     SizedBox(height: 4.h),
                     getSecondLineWidgets(90.w, constraints.maxWidth - 90.w * 2),
                     SizedBox(height: 4.h),
-                    getThirdLineWidgets(90.w, constraints.maxHeight - 133.h),
+                    getThirdLineWidgets(90.w),
                   ],
                 ),
               ),
@@ -358,7 +355,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           ),
         ),
         const Expanded(child: SizedBox()),
-        getText("Atwork.kz", align: TextAlign.center),
+        getText("zhumysta.kz", align: TextAlign.center),
       ],
     );
   }
@@ -386,9 +383,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     );
   }
 
-  Widget getThirdLineWidgets(width, height) {
-    return SizedBox(
-      height: height,
+  Widget getThirdLineWidgets(width) {
+    return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -401,8 +397,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   child: getPhoto(
                     imagePath: _days[_today - 1]['start_photo'],
                     onTap: () {
-                      Get.to(() =>
-                      (AdminWorkerPhotoPage(
+                      Get.to(() => (AdminWorkerPhotoPage(
                           name: widget.name,
                           day: _days[_today - 1],
                           companyName: widget.data['company_name'],
@@ -416,8 +411,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   ),
                 ),
                 SizedBox(height: 4.h),
-                getTextWithTime(Localizer.get('appearance'),
-                    getTime('start_time')),
+                getTextWithTime(
+                    Localizer.get('appearance'), getTime('start_time')),
                 SizedBox(height: 4.h),
                 getTwoTextOneLine(
                   Localizer.get('photo_from_place'),
@@ -431,18 +426,21 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           Expanded(
             child: Column(
               children: [
-                Row(
-                  children: [
-                    getArrowButton(
-                        const Icon(Icons.arrow_back), "back", leftArrow),
-                    const Expanded(child: SizedBox()),
-                    getArrowButton(
-                        const Icon(Icons.arrow_forward), "forw", rightArrow),
-                  ],
+                SizedBox(
+                  height: 35.h,
+                  child: Row(
+                    children: [
+                      getArrowButton(
+                          const Icon(Icons.arrow_back), "back", leftArrow),
+                      const Expanded(child: SizedBox()),
+                      getArrowButton(
+                          const Icon(Icons.arrow_forward), "forw", rightArrow),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 10.h),
                 getMiddleInfoWidgets(),
-                Expanded(child: SizedBox()),
+                const Expanded(child: SizedBox()),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -451,7 +449,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     getGoBackButton(result: _result),
                   ],
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 25.h),
               ],
             ),
           ),
@@ -468,26 +466,31 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today - 5),
               secText: getNameOfWeek(_today - 5),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today - 4),
               secText: getNameOfWeek(_today - 4),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today - 3),
               secText: getNameOfWeek(_today - 3),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today - 2),
               secText: getNameOfWeek(_today - 2),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today - 1),
               secText: getNameOfWeek(_today - 1),
@@ -505,26 +508,31 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today + 1),
               secText: getNameOfWeek(_today + 1),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today + 2),
               secText: getNameOfWeek(_today + 2),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today + 3),
               secText: getNameOfWeek(_today + 3),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today + 4),
               secText: getNameOfWeek(_today + 4),
             ),
             getRect(
+              context,
               Colors.white,
               text: getValidatedDay(_today + 5),
               secText: getNameOfWeek(_today + 5),
@@ -567,117 +575,38 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_doingAdjustments) {
       return Row(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Container(
-                color:
-                _pressedLine == 'valid_reason' ? Colors.black26 : bgColor,
-                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-                child: Row(children: [
-                  Text(Localizer.get('valid_reason')),
-                  getRect(
-                    validReasonColor,
-                    onTap: () {
-                      _tempValues['day_status'] = 'valid_reason';
-                      setState(() {
-                        _pressedLine = 'valid_reason';
-                      });
-                    },
-                  ),
-                ]),
-              ),
-              SizedBox(height: 20.h),
-              Container(
-                color: _pressedLine == 'beg_off' ? Colors.black26 : bgColor,
-                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-                child: Row(children: [
-                  Text(Localizer.get("beg_off_text")),
-                  getRect(
-                    begOffColor,
-                    onTap: () {
-                      _tempValues['day_status'] = 'beg_off';
-                      setState(() {
-                        _pressedLine = 'beg_off';
-                      });
-                    },
-                  ),
-                ]),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                getSingleMiddleInfoWidget('valid_reason', r: false),
+                SizedBox(height: 20.h),
+                getSingleMiddleInfoWidget('beg_off_text', r: false)
+              ],
+            ),
           ),
           SizedBox(width: 5.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                color: _pressedLine == 'working_day' ? Colors.black26 : bgColor,
-                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-                child: Row(children: [
-                  getRect(
-                    workingDayColor,
-                    onTap: () {
-                      if (!_canEditDayStatus) {
-                        return;
-                      }
-                      _tempValues['day_status'] = 'working_day';
-                      setState(() {
-                        _pressedLine = 'working_day';
-                      });
-                    },
-                  ),
-                  Text(
-                    Localizer.get('working_day'),
-                    style: TextStyle(
-                      color: _canEditDayStatus ? Colors.black : Colors.black54,
-                    ),
-                    maxLines: 1,
-                    softWrap: false,
-                    overflow: TextOverflow.ellipsis,
-                  )
-                ]),
-              ),
-              SizedBox(height: 20.h),
-              Container(
-                color: _pressedLine == 'non_working_day'
-                    ? Colors.black26
-                    : bgColor,
-                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  getRect(
-                    nonWorkingDayColor,
-                    onTap: () {
-                      if (!_canEditDayStatus) {
-                        return;
-                      }
-                      _tempValues['day_status'] = 'non_working_day';
-                      setState(() {
-                        _pressedLine = 'non_working_day';
-                      });
-                    },
-                  ),
-                  SizedBox(
-                    width: 50.w,
-                    child: Text(
-                      Localizer.get('non_working_day'),
-                      style: TextStyle(
-                        color:
-                        _canEditDayStatus ? Colors.black : Colors.black54,
-                      ),
-                    ),
-                  ),
-                ]),
-              ),
-              SizedBox(height: 20.h),
-              Container(
-                padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
-                child: Row(children: [
-                  getGeopointButton(),
-                  Text(Localizer.get("geopoint"))
-                ]),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                getSingleMiddleInfoWidget('working_day',
+                    canEditDayStatus: _canEditDayStatus),
+                SizedBox(height: 20.h),
+                getSingleMiddleInfoWidget('non_working_day',
+                    canEditDayStatus: _canEditDayStatus),
+                SizedBox(height: 20.h),
+                Container(
+                  padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+                  child: Row(children: [
+                    getGeopointButton(),
+                    Text(Localizer.get("geopoint"))
+                  ]),
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -692,12 +621,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               getTwoTextSeperated(
                   getPenalty(), " ${day['penalty_count_start']} ",
                   secondTextBgColor:
-                  getColorByStatus(day['worker_status_start'])),
+                      getColorByStatus(day['worker_status_start'])),
               const Expanded(child: SizedBox()),
               getTwoTextSeperated(
                   getPenalty(start: false), " ${day['penalty_count_end']} ",
                   secondTextBgColor:
-                  getColorByStatus(day['worker_status_end'])),
+                      getColorByStatus(day['worker_status_end'])),
             ],
           ),
           SizedBox(height: 15.h),
@@ -724,17 +653,74 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           SizedBox(height: 15.h),
           Row(
             children: [
-              Expanded(
-                child: getConfirmationButton(
-                    day['confirmed_start'], 'confirmed_start'),
-              ),
-              Expanded(
-                child: getConfirmationButton(
-                    day['confirmed_end'], 'confirmed_end'),
-              )
+              const Expanded(child: SizedBox()),
+              getConfirmationButton(
+                  day['confirmed_start'], 'confirmed_start'),
+              const Expanded(child: SizedBox()),
+              getConfirmationButton(
+                  day['confirmed_end'], 'confirmed_end'),
+              const Expanded(child: SizedBox()),
             ],
           ),
           SizedBox(height: 4.h),
+        ],
+      ),
+    );
+  }
+
+  Widget getSingleMiddleInfoWidget(key, {canEditDayStatus = true, r = true}) {
+    // r = reversed
+    var colorByKey = {
+      "non_working_day": nonWorkingDayColor,
+      "working_day": workingDayColor,
+      "valid_reason": validReasonColor,
+      "beg_off_text": begOffColor,
+    };
+    return Container(
+      color: _pressedLine == key ? Colors.black26 : bgColor,
+      padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          r == true
+              ? getRect(
+                  context,
+                  colorByKey[key]!,
+                  onTap: () {
+                    if (!canEditDayStatus) {
+                      return;
+                    }
+                    _tempValues['day_status'] = key;
+                    setState(() {
+                      _pressedLine = key;
+                    });
+                  },
+                )
+              : const SizedBox(width: 0),
+          Expanded(
+            child: Text(
+              Localizer.get(key),
+              textAlign: r == true ? TextAlign.start : TextAlign.end,
+              style: TextStyle(
+                color: canEditDayStatus ? Colors.black : Colors.black54,
+              ),
+            ),
+          ),
+          r != true
+              ? getRect(
+                  context,
+                  colorByKey[key]!,
+                  onTap: () {
+                    if (!canEditDayStatus) {
+                      return;
+                    }
+                    _tempValues['day_status'] = key;
+                    setState(() {
+                      _pressedLine = key;
+                    });
+                  },
+                )
+              : const SizedBox(),
         ],
       ),
     );
@@ -747,7 +733,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            SizedBox(height: 45.h),
+            const Expanded(child: SizedBox()),
             Row(
               children: [
                 Expanded(
@@ -802,10 +788,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                         onPressed: repeatButtonPressed)),
                 Expanded(
                     child: getText(
-                      Localizer.get('copy'),
-                      align: TextAlign.center,
-                      onPressed: copyButtonPressed,
-                    ))
+                  Localizer.get('copy'),
+                  align: TextAlign.center,
+                  onPressed: copyButtonPressed,
+                ))
               ],
             ),
             SizedBox(
@@ -813,7 +799,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             ),
             const Expanded(child: SizedBox()),
             getSaveButton(save),
-            SizedBox(height: 10.h),
+            SizedBox(height: 25.h),
           ],
         ),
       );
@@ -827,8 +813,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               child: getPhoto(
                 imagePath: _days[_today - 1]['end_photo'],
                 onTap: () {
-                  Get.to(() =>
-                  (AdminWorkerPhotoPage(
+                  Get.to(() => (AdminWorkerPhotoPage(
                       name: widget.name,
                       day: _days[_today - 1],
                       department: widget.data['department'],
@@ -842,8 +827,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ),
             ),
             SizedBox(height: 4.h),
-            getTextWithTime(
-                Localizer.get('leave'), getTime('end_time')),
+            getTextWithTime(Localizer.get('leave'), getTime('end_time')),
             SizedBox(height: 4.h),
             getTwoTextOneLine(
               Localizer.get('photo_from_place'),
@@ -887,21 +871,23 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     // ws - is for worker status
 
     if (getValidatedDay(day) == '' || _days.isEmpty) {
-      return getRect(noAssignmentColor);
+      return getRect(context, noAssignmentColor);
     } else if (_days[day - 1] == null) {
       // day starts from 1 but indexes from 0
-      return getRect(noAssignmentColor);
+      return getRect(context, noAssignmentColor);
     }
     if (ws && start) {
-      return getRect(getColorByStatus(_days[day - 1]['worker_status_start']),
+      return getRect(
+          context, getColorByStatus(_days[day - 1]['worker_status_start']),
           confirmation: !_days[day - 1]['confirmed_start'] && day == _today);
     } else if (ws && !start) {
       return getRect(
+        context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
         confirmation: !_days[day - 1]['confirmed_end'] && day == _today,
       );
     }
-    return getRect(getColorByStatus(_days[day - 1]['day_status']));
+    return getRect(context, getColorByStatus(_days[day - 1]['day_status']));
   }
 
   String getTime(String key) {
@@ -978,9 +964,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           },
           child: const Center(
               child: Icon(
-                Icons.circle,
-                size: 10,
-              )),
+            Icons.circle,
+            size: 10,
+          )),
         ),
       ),
     );
