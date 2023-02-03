@@ -130,7 +130,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              getText("zhumysta.kz", align: TextAlign.center),
+              getZhumystaKzText(),
             ],
           ),
           Expanded(

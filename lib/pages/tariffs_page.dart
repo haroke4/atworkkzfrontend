@@ -1,21 +1,38 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/prefabs/admin_tools.dart';
+import 'package:freelance_order/prefabs/scaffold_messages.dart';
+import 'package:freelance_order/utils/AdminBackendAPI.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../utils/LocalizerUtil.dart';
 import '../prefabs/colors.dart';
 
 class TariffsPage extends StatefulWidget {
-  const TariffsPage({super.key});
+  final tariffsData;
+
+  const TariffsPage({super.key, required this.tariffsData});
 
   @override
   State<TariffsPage> createState() => _TariffsPageState();
 }
 
 class _TariffsPageState extends State<TariffsPage> {
-  void buy(int price){
-    print("Price: $price");
+  void selectTariff(String tariff) async{
+    showScaffoldMessage(context, Localizer.get('processing'));
+    var response = await AdminBackendAPI.extendPlan(tariff);
+    if(response.statusCode == 200){
+      final jsonResponse = jsonDecode(response.body);
+      final url = jsonResponse['message'];
+      var aboba = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      await Future.delayed(Duration(milliseconds: 100));
+      while (WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
+        await Future.delayed(Duration(milliseconds: 100));
+      }
+    }
   }
 
   @override
@@ -69,33 +86,33 @@ class _TariffsPageState extends State<TariffsPage> {
       TableRow(
         children: [
           text("8", big: true),
-          button(10000),
-          button(15000),
-          button(25000),
+          button('8worker_3month'),
+          button('8worker_6month'),
+          button('8worker_12month'),
         ],
       ),
       TableRow(
         children: [
           text("16", big: true),
-          button(15000),
-          button(20000),
-          button(35000),
+          button('16worker_3month'),
+          button('16worker_6month'),
+          button('16worker_12month'),
         ],
       ),
       TableRow(
         children: [
           text("32", big: true),
-          button(20000),
-          button(30000),
-          button(50000),
+          button('32worker_3month'),
+          button('32worker_6month'),
+          button('32worker_12month'),
         ],
       ),
       TableRow(
         children: [
           text("80", big: true),
-          button(40000),
-          button(70000),
-          button(120000),
+          button('80worker_3month'),
+          button('80worker_6month'),
+          button('80worker_12month'),
         ],
       ),
     ];
@@ -115,11 +132,18 @@ class _TariffsPageState extends State<TariffsPage> {
     );
   }
 
-  Widget button(int price) {
-    //reverse _text
+  Widget button(String tariffName) {
+    int price = widget.tariffsData
+        .where((item) => item['name'] == tariffName)
+        .toList()[0]['price'];
+
+    //Modifying text
     String _text = price.toString();
     _text = _text.split('').reversed.join();
-    _text =  _text.replaceAllMapped(RegExp(r".{3}"), (match) => "${match.group(0)} ",);
+    _text = _text.replaceAllMapped(
+      RegExp(r".{3}"),
+      (match) => "${match.group(0)} ",
+    );
     //reverse it again here
     _text = _text.split('').reversed.join();
     _text += " ₸";
@@ -132,7 +156,7 @@ class _TariffsPageState extends State<TariffsPage> {
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(15)),
           onTap: () {
-            buy(price);
+            selectTariff(tariffName);
           },
           splashColor: Colors.black26,
           child: Padding(

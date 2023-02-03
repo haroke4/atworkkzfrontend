@@ -9,6 +9,7 @@ import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:location/location.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
@@ -355,7 +356,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           ),
         ),
         const Expanded(child: SizedBox()),
-        getText("zhumysta.kz", align: TextAlign.center),
+        getZhumystaKzText(),
       ],
     );
   }

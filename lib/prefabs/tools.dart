@@ -5,6 +5,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:intl/intl.dart';
 import 'package:timer_builder/timer_builder.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../utils/BackendAPI.dart';
 import '../utils/LocalizerUtil.dart';
 import 'colors.dart';
@@ -357,4 +358,10 @@ Widget getRect(
             ),
     ),
   );
+}
+
+Widget getZhumystaKzText() {
+  return getText("Zhumysta.kz", align: TextAlign.center, onPressed: () {
+    launchUrl(Uri.parse("https://Zhumysta.kz"));
+  });
 }

@@ -178,7 +178,7 @@ class AdminBackendAPI {
     return response;
   }
 
-  static Future<dynamic> extendPlan() async {
-    return await _post('/extend_plan', {});
+  static Future<dynamic> extendPlan(String tariffName) async {
+    return await _post('/extend_plan', {"tariff_name": tariffName});
   }
 }

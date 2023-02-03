@@ -178,7 +178,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               align: TextAlign.center,
               minWidth: 70.w),
         ),
-        Expanded(child: getText("zhumysta.kz", align: TextAlign.center)),
+        Expanded(child: getZhumystaKzText()),
       ],
     );
   }

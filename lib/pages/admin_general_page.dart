@@ -50,8 +50,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
 
   void _onSavePressed() async {
     if (_registering) {
-      setState(() {
-      });
+      setState(() {});
       var response = await AdminBackendAPI.createCompany(
         name: _data['name'],
         department: _data['department'],
@@ -74,8 +73,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
       } else {
         showScaffoldMessage(context, Localizer.get('some_error_field'));
       }
-      setState(() {
-      });
+      setState(() {});
     } else {
       showScaffoldMessage(context, Localizer.get('sending_data'));
       var response = await AdminBackendAPI.editCompany(
@@ -172,11 +170,12 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         getText(
           Localizer.get('plans'),
           align: TextAlign.center,
-          onPressed: () => (Get.to(() => const TariffsPage())),
+          onPressed: () =>
+              (Get.to(() => TariffsPage(tariffsData: _data['tariffs']))),
         ),
         getText(Localizer.get('general'),
             fontColor: Colors.white, bgColor: brownColor),
-        getText("zhumysta.kz", align: TextAlign.center),
+        getZhumystaKzText(),
       ],
     );
   }
