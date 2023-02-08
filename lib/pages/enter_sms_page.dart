@@ -35,14 +35,14 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
   late var _nextPage = widget.nextPage;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     initSharedPrefs();
   }
 
-  void initSharedPrefs() async{
+  void initSharedPrefs() async {
     sharedPrefs = await SharedPreferences.getInstance();
-}
+  }
 
   void sendAndCheckSMS({fromOnChanged = false}) async {
     if (_smsController.text.length < 4) {
@@ -79,7 +79,8 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
           duration: const Duration(seconds: 1),
         ));
 
-        if (!isWorker) { // if admin does not set up company
+        if (!isWorker) {
+          // if admin does not set up company
           var response = await AdminBackendAPI.getWorkers();
           if (response.statusCode != 200) {
             _nextPage = AdminGeneralPage();
@@ -120,7 +121,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Theme.of(context).primaryColorDark,
-                fontSize: 40.h,
+                fontSize: 65.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -132,21 +133,22 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
                 pinLength: 4,
                 keyboardType: TextInputType.number,
                 cursor: Cursor(
-                  width: 3,
-                  height: 20.h,
+                  width: 1,
+                  height: 40.h,
                   color: Theme.of(context).primaryColorDark,
                   enabled: true,
                 ),
-                decoration: const UnderlineDecoration(
-                  colorBuilder:
+                decoration: UnderlineDecoration(
+                  colorBuilder: const
                       FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
+                  textStyle: TextStyle(fontSize: 35.sp, color: Colors.black),
                 ),
                 onChanged: (value) {
                   sendAndCheckSMS(fromOnChanged: true);
                 },
               ),
             ),
-            SizedBox(height: 3.h),
+            SizedBox(height: 15.h),
             _errorMessage != ''
                 ? Text(
                     _errorMessage,
@@ -193,7 +195,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: firstLine,
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: 20.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -202,7 +204,6 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
       ],
     );
   }
-
 }
 
 class CircleButton extends StatelessWidget {
@@ -228,7 +229,7 @@ class CircleButton extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 25.h,
+                fontSize: 35.sp,
               ),
             ),
           )),

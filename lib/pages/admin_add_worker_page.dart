@@ -102,7 +102,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                   Localizer.get('pick_worker'),
                   style: TextStyle(
                     color: Theme.of(context).primaryColorDark,
-                    fontSize: 40.h,
+                    fontSize: 72.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -111,39 +111,34 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
                   Localizer.get('name_con_book'),
                   style: TextStyle(
                     color: Theme.of(context).primaryColorDark,
-                    fontSize: 25.h,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 45.sp,
                     overflow: TextOverflow.visible,
                   ),
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 40.h),
                 getText(
                   _workerInfo == "" ? " " * 50 : _workerInfo,
-                  fontSize: 25.h,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 40.sp,
                   onPressed: _addContactPressed,
                 ),
-                SizedBox(height: 20.h),
+                SizedBox(height: 40.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     if (_workerInfo != '') ...[
                       getText(
                         Localizer.get('yes'),
-                        fontSize: 20.h,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 38.sp,
                         onPressed: _yesPressed,
                       ),
                       getText(
                         Localizer.get('no'),
-                        fontSize: 20.h,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 38.sp,
                         onPressed: _noPressed,
                       )
                     ],
                     getText(Localizer.get('back'),
-                        fontSize: 20.h,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 38.sp,
                         onPressed: () => Get.back()),
                   ],
                 ),

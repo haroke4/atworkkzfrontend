@@ -11,13 +11,14 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'pages/login_page.dart';
 
-void main() {
+void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.landscapeRight,
     DeviceOrientation.landscapeLeft,
   ]);
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  await ScreenUtil.ensureScreenSize();
   runApp(const MyApp());
 }
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(360, 690),
       minTextAdapt: true,
-      splitScreenMode: true,
+      splitScreenMode: false,
       builder: (context, child) {
         return GetMaterialApp(
           debugShowCheckedModeBanner: false,
@@ -52,7 +53,7 @@ class MyApp extends StatelessWidget {
               backgroundColor: Color.fromRGBO(21, 21, 21, 1.0),
             ),
           ),
-          home: const SplashScreen(nextScreen: LoginPage()),
+          home: const SplashScreen(),
         );
       },
     );
@@ -60,9 +61,7 @@ class MyApp extends StatelessWidget {
 }
 
 class SplashScreen extends StatefulWidget {
-  final nextScreen;
-
-  const SplashScreen({super.key, required this.nextScreen});
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -80,7 +79,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (nextScreen != null) {
@@ -147,7 +146,7 @@ class _SplashScreenState extends State<SplashScreen>
       body: Center(
         child: RotationTransition(
           turns: Tween(begin: 0.0, end: 1.0).animate(_controller),
-          child: Image.asset("assets/icon.png", height: 200.h),
+          child: Image.asset("assets/icon.png", height: 350.h),
         ),
       ),
     );

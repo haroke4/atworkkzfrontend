@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -124,7 +123,7 @@ class _MyMapViewState extends State<MyMapView> {
                       },
                     ),
                     SizedBox(height: 10.h),
-                    getGoBackButton(padding: 1.w)
+                    getGoBackButton(padding: 1.w, height: 60.h)
                   ],
                 )
               ],
@@ -143,7 +142,7 @@ class _MyMapViewState extends State<MyMapView> {
         ),
         SizedBox(
           width: 200.w,
-          height: 300.h,
+          height: 550.h,
           child: OSMFlutter(
             controller: controller,
             trackMyPosition: false,

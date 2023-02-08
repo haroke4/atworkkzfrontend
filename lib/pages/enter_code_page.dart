@@ -98,7 +98,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
               Localizer.get('type_code'),
               style: TextStyle(
                 color: Theme.of(context).primaryColorDark,
-                fontSize: 30.h,
+                fontSize: 60.sp,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -110,15 +110,15 @@ class _EnterCodePageState extends State<EnterCodePage> {
                 pinLength: 4,
                 keyboardType: TextInputType.number,
                 cursor: Cursor(
-                  width: 3,
+                  width: 1,
                   height: 20.h,
                   color: Theme.of(context).primaryColorDark,
                   enabled: true,
                 ),
-                decoration: const UnderlineDecoration(
-                  colorBuilder:
-                      FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
-                ),
+                decoration: UnderlineDecoration(
+                    colorBuilder:
+                        const FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
+                    textStyle: TextStyle(fontSize: 35.sp, color: Colors.black)),
                 onChanged: (value) {
                   _checkCode(fromOnChanged: true);
                 },
@@ -139,7 +139,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
                 const Expanded(child: SizedBox()),
                 getNumbersWidget(),
                 const Expanded(child: SizedBox()),
-                getGoBackButton(padding: 2.w, height: 44.h),
+                getGoBackButton(padding: 2.w, height: 80.h),
                 SizedBox(width: 10.w),
               ],
             ),
@@ -198,7 +198,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: firstLine,
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: 20.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -232,7 +232,7 @@ class CircleButton extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 25.h,
+                fontSize: 35.sp,
               ),
             ),
           )),

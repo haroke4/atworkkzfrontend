@@ -40,16 +40,18 @@ Widget __getOnlyText(
   return Container(
     constraints: BoxConstraints(minWidth: minWidth),
     padding: EdgeInsets.all(4.w),
-    child: Text(text,
-        style: TextStyle(
-          color: fontColor,
-          fontSize: fontSize,
-          fontWeight: weight,
-        ),
-        textAlign: align,
-        maxLines: 1,
-        softWrap: false,
-        overflow: overflow),
+    child: Text(
+      text,
+      style: TextStyle(
+        color: fontColor,
+        fontSize: fontSize,
+        fontWeight: weight,
+      ),
+      textAlign: align,
+      maxLines: 1,
+      softWrap: false,
+      overflow: overflow,
+    ),
   );
 }
 
@@ -61,11 +63,12 @@ Widget getText(
   TextAlign align = TextAlign.left,
   FontWeight fontWeight = FontWeight.normal,
   double minWidth = 0,
+  bool rounded = false,
   double? fontSize,
   VoidCallback? onPressed,
   VoidCallback? onLongPress,
 }) {
-  fontSize = fontSize ?? 12.h;
+  fontSize = fontSize ?? 20.sp;
   var textW;
   if (onPressed != null) {
     textW = InkWell(
@@ -73,77 +76,20 @@ Widget getText(
       onTap: onPressed,
       onLongPress: onLongPress,
       child: __getOnlyText(
-        text,
-        fontColor,
-        overflow,
-        align,
-        fontWeight,
-        fontSize,
-        minWidth,
-      ),
+          text, fontColor, overflow, align, fontWeight, fontSize, minWidth),
     );
   } else {
     textW = __getOnlyText(
-      text,
-      fontColor,
-      overflow,
-      align,
-      fontWeight,
-      fontSize,
-      minWidth,
-    );
+        text, fontColor, overflow, align, fontWeight, fontSize, minWidth);
   }
 
   return Container(
     margin: EdgeInsets.only(left: 2.w, right: 2.w),
     child: Material(
+      borderRadius: BorderRadius.circular(rounded ? 5 : 0),
       color: bgColor,
       child: textW,
     ),
-  );
-}
-
-Widget getTextSmaller(String text,
-    {Color bgColor = Colors.white,
-    Color fontColor = Colors.black,
-    TextOverflow overflow = TextOverflow.fade,
-    Function? onPressed,
-    Function? onLongPress}) {
-  return Container(
-    margin: EdgeInsets.only(left: 2.w, right: 2.w),
-    padding: EdgeInsets.all(3.w),
-    decoration: BoxDecoration(
-      color: bgColor,
-    ),
-    child: onPressed == null
-        ? Text(
-            text,
-            style: TextStyle(
-              color: fontColor,
-              fontSize: 14.h,
-            ),
-            maxLines: 1,
-            softWrap: false,
-            overflow: overflow,
-          )
-        : InkWell(
-            onTap: () {
-              onPressed();
-            },
-            onLongPress: () {
-              onLongPress!();
-            },
-            child: Text(
-              text,
-              style: TextStyle(
-                color: fontColor,
-                fontSize: 14.h,
-              ),
-              maxLines: 1,
-              softWrap: false,
-              overflow: overflow,
-            ),
-          ),
   );
 }
 
@@ -163,12 +109,9 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
               splashColor: Colors.black26,
               child: Column(
                 children: [
-                  SizedBox(height: 20.h),
                   Image.network(
                     headers: headers,
                     AdminBackendAPI.getImageUrl(imagePath),
-                    height: 120.h,
-                    fit: BoxFit.cover,
                     loadingBuilder: (BuildContext context, Widget child,
                         ImageChunkEvent? loadingProgress) {
                       if (loadingProgress == null) return child;
@@ -178,7 +121,6 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
                       );
                     },
                   ),
-                  Text(text),
                 ],
               ),
             ),
@@ -195,9 +137,12 @@ Widget getPhoto({text = "", Function? onTap, String? imagePath}) {
                 Image.asset(
                   'assets/icon.png',
                   fit: BoxFit.cover,
-                  height: 105.h,
+                  height: 200.h,
                 ),
-                Text(text),
+                Text(
+                  text,
+                  style: TextStyle(fontSize: 20.sp),
+                ),
               ],
             ),
           );
@@ -221,7 +166,7 @@ Widget getTextWithTime(String text, String timeText) {
         ),
         child: Text(
           text,
-          style: TextStyle(fontSize: 13.h),
+          style: TextStyle(fontSize: 20.sp),
           overflow: TextOverflow.ellipsis,
         ),
       ),
@@ -233,26 +178,30 @@ Widget getTextWithTime(String text, String timeText) {
         color: brownColor,
         border: Border.all(color: brownColor, width: 2),
       ),
-      child:
-          Text(timeText, style: TextStyle(color: Colors.white, fontSize: 13.h)),
+      child: Text(
+        timeText,
+        style: TextStyle(color: Colors.white, fontSize: 20.sp),
+      ),
     ),
   ]);
 }
 
 Widget getTwoTextOneLine(firstText, secondText,
-    {bgColor = Colors.white, expanded = true}) {
+    {bgColor = Colors.white, expanded = true, double? margin}) {
+  margin = margin ?? 3.w;
+  var firstTextWidget = Text(firstText, style: TextStyle(fontSize: 20.sp));
   return Container(
-    margin: EdgeInsets.only(left: 3.w, right: 3.w),
+    margin: EdgeInsets.only(left: margin, right: margin),
     padding: EdgeInsets.all(4.w),
     decoration: BoxDecoration(
       color: bgColor,
     ),
     child: Row(
       children: [
-        expanded ? Expanded(child: Text(firstText)) : Text(firstText),
+        expanded ? Expanded(child: firstTextWidget) : firstTextWidget,
         Text(
           secondText,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20.sp),
         )
       ],
     ),
@@ -302,23 +251,25 @@ Widget getRect(
   String text = "",
   String secText = "",
   bool confirmation = false,
+  bool wBorder = false,
+  bool rounded = true,
   Color fontColor = Colors.black,
   double? width,
   double? height,
   Function? onTap,
 }) {
-  double screenWidth = MediaQuery.of(context).size.width;
-  width = width ?? screenWidth * 0.0013 * 26.h;
+  var border = wBorder ? Border.all(color: Colors.black, width: 0.5) : Border();
+  width = width ?? 52.h;
   height = height ?? width;
   Widget secTWidget = Padding(
-    padding: EdgeInsets.only(top: height / 1.7),
+    padding: EdgeInsets.only(top: height / 1.8),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.end,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         Text(
           secText,
-          style: TextStyle(fontSize: screenWidth * 0.011),
+          style: TextStyle(fontSize: 14.sp),
         )
       ],
     ),
@@ -326,24 +277,29 @@ Widget getRect(
   return Container(
     width: width,
     height: height,
-    margin: EdgeInsets.only(left: 1.w, right: 1.w),
-    child: Material(
-      borderRadius: BorderRadius.circular(5),
-      color: color,
+    margin: EdgeInsets.only(left: 0.8.w, right: 0.8.w),
+    child: Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(rounded ? 5 : 0),
+        border: border,
+        color: color,
+      ),
       child: onTap == null
           ? Center(
               child: (text == "" && confirmation)
                   ? Image.asset(
                       "assets/confirmation.png",
-                      height: 13.h,
+                      height: 20.sp,
                     )
                   : Stack(
                       alignment: Alignment.center,
                       children: [
                         Text(
                           text,
-                          style: TextStyle(
-                              color: fontColor, fontSize: screenWidth * 0.0145),
+                          softWrap: false,
+                          maxLines: 1,
+                          overflow: TextOverflow.fade,
+                          style: TextStyle(color: fontColor, fontSize: 22.sp),
                         ),
                         secText == "" ? const SizedBox(height: 0) : secTWidget,
                       ],
@@ -362,6 +318,17 @@ Widget getRect(
 
 Widget getZhumystaKzText() {
   return getText("Zhumysta.kz", align: TextAlign.center, onPressed: () {
-    launchUrl(Uri.parse("https://Zhumysta.kz"));
+    launchUrl(
+      Uri.parse("https://Zhumysta.kz"),
+      mode: LaunchMode.externalApplication,
+    );
   });
+}
+
+String getNameOfWeek(day) {
+  return Localizer.get(DateFormat('EE').format(DateTime(
+    ServerTime.time.year,
+    ServerTime.time.month,
+    day,
+  )));
 }

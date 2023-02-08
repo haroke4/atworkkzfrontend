@@ -108,7 +108,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
                     fontWeight: FontWeight.bold,
                     fontSize: 22.h,
                     align: TextAlign.center),
-                SizedBox(height: 4.h),
+                SizedBox(height: 12.h),
                 getConfirmationButton(widget.isStart
                     ? _day['confirmed_start']
                     : _day['confirmed_end']),

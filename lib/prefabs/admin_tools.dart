@@ -7,10 +7,9 @@ import '../pages/admin_main_page.dart';
 import '../utils/LocalizerUtil.dart';
 import 'colors.dart';
 
-
 Widget getMainMenuButton({enabled = true}) {
   return SizedBox(
-    height: 32.h,
+    height: 50.h,
     child: InkWell(
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
@@ -33,7 +32,7 @@ Widget getGoBackButton(
   return Material(
     color: color ?? bgColor,
     child: SizedBox(
-      height: height ?? 32.h,
+      height: height ?? 50.h,
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
@@ -56,7 +55,7 @@ Widget getGoBackButton(
   );
 }
 
-Widget getSaveButton(Function onTap){
+Widget getSaveButton(Function onTap) {
   return Container(
     constraints: BoxConstraints(minWidth: 20.w),
     margin: EdgeInsets.only(left: 2.w, right: 2.w),
@@ -65,17 +64,22 @@ Widget getSaveButton(Function onTap){
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,
-        onTap: (){ onTap(); },
+        onTap: () {
+          onTap();
+        },
         child: Container(
           padding: EdgeInsets.all(4.w),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/save.png', height: 25.h,),
+              Image.asset(
+                'assets/save.png',
+                height: 42.h,
+              ),
               Text(Localizer.get('save'),
                   style: TextStyle(
                     color: Colors.black,
-                    fontSize: 14.h,
+                    fontSize: 22.sp,
                   ),
                   textAlign: TextAlign.center),
             ],
@@ -97,7 +101,9 @@ Widget getInputTimeField(controller) {
         isDense: true,
         contentPadding: EdgeInsets.all(4.w),
       ),
-      style: TextStyle(fontSize: 14.h),
+      cursorWidth: 1,
+      cursorColor: Colors.black,
+      style: TextStyle(fontSize: 20.sp),
       keyboardType: TextInputType.number,
       inputFormatters: [
         FilteringTextInputFormatter.digitsOnly,
@@ -114,12 +120,19 @@ class TimeInputFormatter extends TextInputFormatter {
       TextEditingValue oldValue, TextEditingValue newValue) {
     String ans = '';
     int counter = 0;
-
     for (var element in newValue.text.runes) {
       if (counter == 2) {
+        if (int.parse(ans.substring(0, 2)) > 24) {
+          ans = '24';
+        }
         ans += ':';
       }
       ans += String.fromCharCode(element);
+      if (counter == 3) {
+        if (int.parse(ans.substring(3, 5)) > 60) {
+          ans = '${ans.substring(0, 3)}60';
+        }
+      }
       counter += 1;
     }
 
@@ -132,11 +145,11 @@ class TimeInputFormatter extends TextInputFormatter {
 
 Future<GeoPoint?> LocationPicker({
   required BuildContext context,
+  required String textConfirmPicker,
+  required String textCancelPicker,
+  required String title,
   Widget? titleWidget,
-  String? title,
   TextStyle? titleStyle,
-  String? textConfirmPicker,
-  String? textCancelPicker,
   EdgeInsets contentPadding = EdgeInsets.zero,
   double radius = 0.0,
   GeoPoint? initPosition,
@@ -147,7 +160,7 @@ Future<GeoPoint?> LocationPicker({
   bool isDismissible = false,
   bool initCurrentUserPosition = true,
 }) async {
-  assert(title == null || titleWidget == null);
+  assert(titleWidget == null);
   assert((initCurrentUserPosition && initPosition == null) ||
       !initCurrentUserPosition && initPosition != null);
   final MapController controller = MapController(
@@ -163,15 +176,10 @@ Future<GeoPoint?> LocationPicker({
           return isDismissible;
         },
         child: SizedBox(
-          height: MediaQuery.of(context).size.height / 1.3,
-          width: MediaQuery.of(context).size.width / 1.3,
+          height: MediaQuery.of(context).size.height / 1.1,
+          width: MediaQuery.of(context).size.width / 1.2,
           child: AlertDialog(
-            title: title != null
-                ? Text(
-              title,
-              style: titleStyle,
-            )
-                : titleWidget,
+            title: Text(title, style: TextStyle(fontSize: 30.sp)),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.all(
                 Radius.circular(radius),
@@ -179,8 +187,8 @@ Future<GeoPoint?> LocationPicker({
             ),
             contentPadding: contentPadding,
             content: SizedBox(
-              height: MediaQuery.of(context).size.width / 1.3,
-              width: MediaQuery.of(context).size.width / 1.3,
+              height: MediaQuery.of(context).size.width / 1.1,
+              width: MediaQuery.of(context).size.width / 1.2,
               child: OSMFlutter(
                 controller: controller,
                 isPicker: true,
@@ -190,12 +198,15 @@ Future<GeoPoint?> LocationPicker({
                 maxZoomLevel: maxZoomLevel,
               ),
             ),
+            actionsPadding: EdgeInsets.only(right: 10.w),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: Text(
-                  textCancelPicker ??
-                      MaterialLocalizations.of(context).cancelButtonLabel,
+                  textCancelPicker,
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                  ),
                 ),
               ),
               ElevatedButton(
@@ -206,8 +217,10 @@ Future<GeoPoint?> LocationPicker({
                   Navigator.pop(ctx, p);
                 },
                 child: Text(
-                  textConfirmPicker ??
-                      MaterialLocalizations.of(context).okButtonLabel,
+                  textConfirmPicker,
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                  ),
                 ),
               ),
             ],

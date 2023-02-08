@@ -27,7 +27,7 @@ class _TariffsPageState extends State<TariffsPage> {
     if(response.statusCode == 200){
       final jsonResponse = jsonDecode(response.body);
       final url = jsonResponse['message'];
-      var aboba = await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+      await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
       await Future.delayed(Duration(milliseconds: 100));
       while (WidgetsBinding.instance.lifecycleState != AppLifecycleState.resumed) {
         await Future.delayed(Duration(milliseconds: 100));
@@ -50,11 +50,11 @@ class _TariffsPageState extends State<TariffsPage> {
                   Localizer.get('choose_plan'),
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 28.h,
+                    fontSize: 55.sp,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 16.h),
                 Table(
                   border: TableBorder.all(
                     color: Colors.black,
@@ -63,8 +63,8 @@ class _TariffsPageState extends State<TariffsPage> {
                   ),
                   children: [..._getTableElements()],
                 ),
-                SizedBox(height: 5.h),
-                getGoBackButton(padding: 2.w)
+                SizedBox(height: 10.h),
+                getGoBackButton(padding: 2.w, height: 70.h)
               ],
             ),
           ),
@@ -125,7 +125,7 @@ class _TariffsPageState extends State<TariffsPage> {
         _text,
         textAlign: TextAlign.center,
         style: TextStyle(
-          fontSize: big ? 24.h : 18.h,
+          fontSize: big ? 42.sp : 36.sp,
           fontWeight: big ? FontWeight.bold : FontWeight.normal,
         ),
       ),
@@ -152,9 +152,9 @@ class _TariffsPageState extends State<TariffsPage> {
       margin: EdgeInsets.all(8.h),
       child: Material(
         color: Colors.white,
-        borderRadius: const BorderRadius.all(Radius.circular(15)),
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: InkWell(
-          borderRadius: const BorderRadius.all(Radius.circular(15)),
+          borderRadius: const BorderRadius.all(Radius.circular(10)),
           onTap: () {
             selectTariff(tariffName);
           },

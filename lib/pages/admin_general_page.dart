@@ -124,7 +124,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   getFirstLineWidgets(95.w),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: 10.h),
                   Row(
                     children: [
                       SizedBox(
@@ -189,18 +189,14 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
           children: [
             Image.asset(
               "assets/icon.png",
-              height: 150.h,
+              height: 240.h,
             ),
             SizedBox(
-              height: 30.h,
+              height: 60.h,
             ),
-            Row(
-              children: [
-                getSaveButton(_onSavePressed),
-                SizedBox(
-                  width: 5.w,
-                ),
-              ],
+            getSaveButton(_onSavePressed),
+            SizedBox(
+              width: 5.w,
             )
           ],
         ),
@@ -219,13 +215,13 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 getText(Localizer.get('truancy_price')),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(Localizer.get('prize')),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(Localizer.get('beg_off')),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(Localizer.get('bef_min')),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(Localizer.get('email')),
               ],
             ),
@@ -239,25 +235,25 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                   onPressed: () => _changeField(
                       "truancy_price", Localizer.get('truancy_price')),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(
                   _data["prize"].toString(),
                   onPressed: () =>
                       _changeField("prize", Localizer.get('prize')),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(
                   _data["beg_off_price"].toString(),
                   onPressed: () =>
                       _changeField("beg_off_price", Localizer.get('beg_off')),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 getText(
                   _data["before_minute"].toString(),
                   onPressed: () =>
                       _changeField("before_minute", Localizer.get('bef_min')),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 6.h),
                 Container(
                   constraints: BoxConstraints(maxWidth: 80.w),
                   child: getText(
@@ -287,11 +283,11 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     getText(Localizer.get('postp_min')),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     getText(Localizer.get('truancy_min')),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     getText(Localizer.get('min_price')),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     getText(Localizer.get('aft_min')),
                   ],
                 ),
@@ -305,13 +301,13 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                       onPressed: () => _changeField(
                           "postponement_minute", Localizer.get('postp_min')),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     getText(
                       _data["truancy_minute"].toString(),
                       onPressed: () => _changeField(
                           "truancy_minute", Localizer.get('truancy_min')),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     getText(
                       _data["late_minute_price"].toString(),
                       onPressed: () => _changeField(
@@ -319,7 +315,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                         Localizer.get('min_price'),
                       ),
                     ),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 6.h),
                     getText(
                       _data["after_minute"].toString(),
                       minWidth: 25.w,
@@ -333,7 +329,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               )
             ],
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 6.h),
           getText(
             Localizer.get('change_code'),
             onPressed: () => (Get.to(() => const ChangePasswordPage())),
@@ -342,17 +338,4 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
       ),
     );
   }
-}
-
-Widget getSaveText() {
-  return Padding(
-    padding: EdgeInsets.fromLTRB(2.w, 4.h, 2.w, 4.h),
-    child: Text(
-      Localizer.get('save'),
-      style: TextStyle(
-        color: Colors.black,
-        fontSize: 14.h,
-      ),
-    ),
-  );
 }

@@ -9,7 +9,6 @@ import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:location/location.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../prefabs/admin_tools.dart';
 import '../prefabs/colors.dart';
 import '../prefabs/tools.dart';
@@ -318,9 +317,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 child: Column(
                   children: [
                     getFirstLineWidgets(90.w, constraints.maxWidth - 90.w * 2),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 8.h),
                     getSecondLineWidgets(90.w, constraints.maxWidth - 90.w * 2),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 8.h),
                     getThirdLineWidgets(90.w),
                   ],
                 ),
@@ -370,7 +369,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               getText(widget.data['department']),
-              SizedBox(height: 4.h),
+              SizedBox(height: 8.h),
               getText(widget.name,
                   bgColor: brownColor, fontColor: Colors.white),
             ],
@@ -411,10 +410,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     },
                   ),
                 ),
-                SizedBox(height: 4.h),
+                SizedBox(height: 8.h),
                 getTextWithTime(
                     Localizer.get('appearance'), getTime('start_time')),
-                SizedBox(height: 4.h),
+                SizedBox(height: 8.h),
                 getTwoTextOneLine(
                   Localizer.get('photo_from_place'),
                   getPhotoTime('start_photo_time'),
@@ -428,18 +427,24 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             child: Column(
               children: [
                 SizedBox(
-                  height: 35.h,
+                  height: 80.sp,
                   child: Row(
                     children: [
                       getArrowButton(
-                          const Icon(Icons.arrow_back), "back", leftArrow),
+                        const Icon(Icons.arrow_back),
+                        "back",
+                        leftArrow,
+                      ),
                       const Expanded(child: SizedBox()),
                       getArrowButton(
-                          const Icon(Icons.arrow_forward), "forw", rightArrow),
+                        const Icon(Icons.arrow_forward),
+                        "forw",
+                        rightArrow,
+                      ),
                     ],
                   ),
                 ),
-                SizedBox(height: 10.h),
+                SizedBox(height: 20.h),
                 getMiddleInfoWidgets(),
                 const Expanded(child: SizedBox()),
                 Row(
@@ -450,8 +455,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     getGoBackButton(result: _result),
                   ],
                 ),
-                SizedBox(height: 25.h),
+                SizedBox(height: 40.h,)
               ],
+
             ),
           ),
           getRightInfoWidgets(width),
@@ -497,13 +503,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               secText: getNameOfWeek(_today - 1),
             ),
             SizedBox(
-              width: 48.h + 12.w,
+              width: 104.h + 4.w,
               child: Text(
                 "${_today}",
                 style: TextStyle(
                   color: todayColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 23.h,
+                  fontSize: 30.sp,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -541,7 +547,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           ],
         ),
         SizedBox(
-          height: 4.h,
+          height: 8.h,
         ),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -552,7 +558,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             getRectByDay(_today - 2),
             getRectByDay(_today - 1),
             SizedBox(
-              width: 48.h + 12.w,
+              width: 104.h + 4.w,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -603,7 +609,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                   padding: EdgeInsets.only(top: 3.h, bottom: 3.h),
                   child: Row(children: [
                     getGeopointButton(),
-                    Text(Localizer.get("geopoint"))
+                    Text(
+                      Localizer.get("geopoint"),
+                      style: TextStyle(fontSize: 20.sp),
+                    )
                   ]),
                 ),
               ],
@@ -640,13 +649,19 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ),
               child: Row(
                 children: [
-                  Text(Localizer.get('sum_month')),
+                  Text(
+                    Localizer.get('sum_month'),
+                    style: TextStyle(fontSize: 20.sp),
+                  ),
                   SizedBox(width: 5.w),
                   Text(
                     _monthPenalty,
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.white),
-                  )
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      fontSize: 20.sp,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -655,15 +670,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           Row(
             children: [
               const Expanded(child: SizedBox()),
-              getConfirmationButton(
-                  day['confirmed_start'], 'confirmed_start'),
+              getConfirmationButton(day['confirmed_start'], 'confirmed_start'),
               const Expanded(child: SizedBox()),
-              getConfirmationButton(
-                  day['confirmed_end'], 'confirmed_end'),
+              getConfirmationButton(day['confirmed_end'], 'confirmed_end'),
               const Expanded(child: SizedBox()),
             ],
           ),
-          SizedBox(height: 4.h),
+          SizedBox(height: 8.h),
         ],
       ),
     );
@@ -703,8 +716,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               Localizer.get(key),
               textAlign: r == true ? TextAlign.start : TextAlign.end,
               style: TextStyle(
-                color: canEditDayStatus ? Colors.black : Colors.black54,
-              ),
+                  color: canEditDayStatus ? Colors.black : Colors.black54,
+                  fontSize: 20.sp),
             ),
           ),
           r != true
@@ -747,7 +760,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ],
             ),
             SizedBox(
-              height: 4.h,
+              height: 8.h,
             ),
             Row(
               children: [
@@ -760,7 +773,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ],
             ),
             SizedBox(
-              height: 4.h,
+              height: 8.h,
             ),
             Row(
               children: [
@@ -779,7 +792,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ],
             ),
             SizedBox(
-              height: 4.h,
+              height: 8.h,
             ),
             Row(
               children: [
@@ -796,11 +809,11 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               ],
             ),
             SizedBox(
-              height: 4.h,
+              height: 8.h,
             ),
             const Expanded(child: SizedBox()),
             getSaveButton(save),
-            SizedBox(height: 25.h),
+            SizedBox(height: 40.h,)
           ],
         ),
       );
@@ -827,9 +840,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 },
               ),
             ),
-            SizedBox(height: 4.h),
+            SizedBox(height: 8.h),
             getTextWithTime(Localizer.get('leave'), getTime('end_time')),
-            SizedBox(height: 4.h),
+            SizedBox(height: 8.h),
             getTwoTextOneLine(
               Localizer.get('photo_from_place'),
               getPhotoTime('end_photo_time'),
@@ -950,8 +963,8 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
 
   Widget getGeopointButton() {
     return Container(
-      width: 22.h,
-      height: 22.h,
+      width: 48.h,
+      height: 48.h,
       margin: EdgeInsets.only(left: 1.5.w, right: 1.5.w),
       child: Material(
         color: Colors.white,

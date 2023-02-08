@@ -66,44 +66,44 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: brownColor,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: 40.h),
           Text(
             Localizer.get('login_as'),
             style: TextStyle(
               color: Theme.of(context).primaryColorDark,
-              fontSize: 40.h,
+              fontSize: 80.sp,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 40.h),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               getLoginAsButtons(
                   Image.asset(
                     "assets/admin.png",
-                    height: 140.h,
+                    height: 220.h,
                   ),
                   Localizer.get('admin'),
                   loginAsAdministrator),
               SizedBox(
-                width: 50.w,
+                width: 70.w,
               ),
               getLoginAsButtons(
                   Image.asset(
                     "assets/worker.png",
-                    height: 140.h,
+                    height: 220.h,
                   ),
                   Localizer.get('worker'),
                   loginAsUser),
             ],
           ),
-          SizedBox(height: 20.h),
+          SizedBox(height: 35.h),
           getText("Қаз / Рус / Eng",
               align: TextAlign.center,
-              fontSize: 14,
+              fontSize: 28.sp,
               onPressed: () => setState(() {
                 Localizer.changeLanguage();
               })),
@@ -130,18 +130,16 @@ class _LoginPageState extends State<LoginPage> {
         splashColor: Colors.black26,
         onTap: _onPressed,
         child: Padding(
-          padding: EdgeInsets.all(6.w),
+          padding: EdgeInsets.fromLTRB(10.w, 30.h, 10.w, 30.h),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               image,
-              const SizedBox(
-                height: 6,
-              ),
+
               Text(
                 text,
                 style: TextStyle(
-                  fontSize: 20,
+                  fontSize: 45.sp,
                   color: Theme.of(context).primaryColorDark,
                 ),
               )

@@ -2,8 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/prefabs/admin_tools.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:freelance_order/prefabs/tools.dart';
@@ -11,9 +9,7 @@ import 'package:freelance_order/utils/AdminBackendAPI.dart';
 import 'package:get/get.dart';
 import 'package:pin_input_text_field/pin_input_text_field.dart';
 import '../utils/LocalizerUtil.dart';
-import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
-import '../prefabs/appbar_prefab.dart';
 
 class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({super.key});
@@ -76,7 +72,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     : Localizer.get('enter_currp'),
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
-                  fontSize: 35.h,
+                  fontSize: 60.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -92,9 +88,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                     color: Theme.of(context).primaryColorDark,
                     enabled: true,
                   ),
-                  decoration: const UnderlineDecoration(
-                    colorBuilder:
+                  decoration: UnderlineDecoration(
+                    colorBuilder: const
                         FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
+                    textStyle: TextStyle(fontSize: 35.sp, color: Colors.black),
                   ),
                   onChanged: (value) {
                     if (_textController.text.length == 4) {
@@ -103,23 +100,23 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                   },
                 ),
               ),
-              SizedBox(height: 3.h),
+              SizedBox(height: 5.h),
               _errorMessage != ''
                   ? Text(
                       _errorMessage,
-                      style: TextStyle(color: Theme.of(context).errorColor),
+                      style: TextStyle(color: Theme.of(context).errorColor, fontSize: 25.sp),
                     )
                   : const SizedBox(),
-              SizedBox(height: 10.h),
+              SizedBox(height: 18.h),
               getNumbersWidget(),
-              SizedBox(height: 15.h),
+              SizedBox(height: 30.h),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   getGoBackButton(
-                      padding: 2.w, height: 36.h, color: Colors.white),
+                      padding: 2.w, height: 68.h, color: Colors.white),
                   SizedBox(width: 5.w),
-                  getText(_buttonLabel, onPressed: _onNextPressed),
+                  getText(_buttonLabel, onPressed: _onNextPressed, fontSize: 26.sp),
                 ],
               ),
             ],
@@ -157,7 +154,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: firstLine,
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: 22.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -192,7 +189,7 @@ class CircleButton extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 25.h,
+                fontSize: 35.sp,
               ),
             ),
           )),

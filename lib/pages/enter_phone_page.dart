@@ -25,7 +25,10 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
   final _formKey = GlobalKey<FormState>();
   final _adminPhoneController = TextEditingController();
   final _workerPhoneController = TextEditingController();
-  Widget _buttonLabel = Text(Localizer.get('send_code'));
+  Widget _buttonLabel = Text(
+    Localizer.get('send_code'),
+    style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
+  );
 
   void sendTelNumbers() async {
     // Send data to backend and wait for SMS
@@ -33,15 +36,13 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       setState(() {
         _buttonLabel = SpinKitThreeBounce(
           color: Colors.black,
-          size: 20.h,
+          size: 40.sp,
         );
       });
 
-      // ScaffoldMessenger.of(context).showSnackBar(
-      //   const SnackBar(content: Text('Processing Data')),
-      // );
       var adminUsername = "7${_adminPhoneController.text.replaceAll(" ", "")}";
-      var workerUsername = "7${_workerPhoneController.text.replaceAll(" ", "")}";
+      var workerUsername =
+          "7${_workerPhoneController.text.replaceAll(" ", "")}";
       var response;
       if (widget.loginAsWorker) {
         response = await BackendAPI.sendSms(workerUsername);
@@ -54,7 +55,10 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       }
       if (response.statusCode == 200) {
         setState(() {
-          _buttonLabel = Text(Localizer.get('send_code'));
+          _buttonLabel = Text(
+            Localizer.get('send_code'),
+            style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
+          );
         });
         Get.to(
           () => EnterSMSPage(
@@ -66,10 +70,12 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           ),
         );
       } else {
-
         showScaffoldMessage(context, Localizer.get('invalid_phone'));
         setState(() {
-          _buttonLabel = Text(Localizer.get('send_code'));
+          _buttonLabel = Text(
+            Localizer.get('send_code'),
+            style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
+          );
         });
       }
     }
@@ -86,16 +92,16 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20.h),
+              SizedBox(height: 30.h),
               Text(
                 Localizer.get("fill"),
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
-                  fontSize: 40.h,
+                  fontSize: 70.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 20.h),
+              SizedBox(height: 25.h),
               Form(
                 key: _formKey,
                 child: Column(
@@ -104,7 +110,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
                   children: [
                     getTelNumberInputField(
                         Localizer.get('phone_admin'), _adminPhoneController),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 7.h),
                     // Если юзер нажал на кнопку "войти как работник" тогда показываем
                     widget.loginAsWorker
                         ? getTelNumberInputField(Localizer.get('phone_worker'),
@@ -138,7 +144,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       String label, TextEditingController controller) {
     return Container(
       margin: EdgeInsets.only(left: 50.w, right: 50.w),
-      padding: const EdgeInsets.only(left: 20, top: 5, right: 20, bottom: 5),
+      padding: EdgeInsets.only(left: 10.w, top: 10.h, right: 10.w, bottom: 10.h),
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
@@ -161,11 +167,20 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
             FocusScope.of(context).nextFocus();
           }
         },
+        style: TextStyle(
+          fontSize: 25.sp,
+        ),
         decoration: InputDecoration(
           labelText: label,
-          prefixText: '+7 '
+          prefixText: '+7 ',
+          hintStyle: TextStyle(fontSize: 25.sp),
+          labelStyle: TextStyle(fontSize: 25.sp, color: Colors.black54),
+          errorStyle: TextStyle(fontSize: 17.sp),
+          contentPadding: EdgeInsets.fromLTRB(2.w, 10.h, 2.w, 10.h),
+
         ),
-        cursorColor: Theme.of(context).primaryColorLight,
+        cursorWidth: 1,
+        cursorColor: Theme.of(context).primaryColorDark,
         keyboardType: TextInputType.number,
         inputFormatters: [
           FilteringTextInputFormatter.digitsOnly,

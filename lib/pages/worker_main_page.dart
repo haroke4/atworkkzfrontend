@@ -147,9 +147,9 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                 child: Column(
                   children: [
                     getFirstLineWidgets(constraints.maxWidth * 0.25 - 4.w),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 8.h),
                     getSecondLineWidgets(constraints.maxWidth * 0.25 - 4.w),
-                    SizedBox(height: 4.h),
+                    SizedBox(height: 8.h),
                     getThirdLineWidgets(constraints.maxWidth * 0.25 - 4.w),
                   ],
                 ),
@@ -172,11 +172,14 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           child: ServerTime.getServerTimeWidget(adder: true),
         ),
         IntrinsicWidth(
-          child: getText(ServerTime.yearMonth,
-              bgColor: todayColor,
-              fontColor: Colors.white,
-              align: TextAlign.center,
-              minWidth: 70.w),
+          child: getText(
+            ServerTime.yearMonth,
+            bgColor: todayColor,
+            fontColor: Colors.white,
+            align: TextAlign.center,
+            fontWeight: FontWeight.bold,
+            minWidth: 70.w,
+          ),
         ),
         Expanded(child: getZhumystaKzText()),
       ],
@@ -194,7 +197,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               getText(_data.isEmpty
                   ? Localizer.get('department')
                   : _data['department']),
-              SizedBox(height: 4.h),
+              SizedBox(height: 8.h),
               getText(
                   _data.isEmpty ? Localizer.get('name') : _data['worker_name'],
                   bgColor: brownColor,
@@ -230,10 +233,10 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                   return getPhoto(imagePath: _days[_today - 1]['start_photo']);
                 }
               }(),
-              SizedBox(height: 4.h),
+              SizedBox(height: 6.h),
               getTextWithTime(
                   Localizer.get('appearance'), getCurrentDayTime("start_time")),
-              SizedBox(height: 4.h),
+              SizedBox(height: 6.h),
               getTwoTextOneLine(
                 Localizer.get('photo_from_place'),
                 getPhotoTime("start_photo_time"),
@@ -280,31 +283,31 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       children: [
         Row(
           children: [
-            getRect(context,Colors.white, text: getValidatedDay(_today - 5)),
-            getRect(context,Colors.white, text: getValidatedDay(_today - 4)),
-            getRect(context,Colors.white, text: getValidatedDay(_today - 3)),
-            getRect(context,Colors.white, text: getValidatedDay(_today - 2)),
-            getRect(context,Colors.white, text: getValidatedDay(_today - 1)),
+            getUpperRect(_today - 5),
+            getUpperRect(_today - 4),
+            getUpperRect(_today - 3),
+            getUpperRect(_today - 2),
+            getUpperRect(_today - 1),
             SizedBox(
-              width: 48.h + 12.w,
+              width: 104.h + 4.w,
               child: Text(
                 "$_today",
                 style: TextStyle(
                   color: todayColor,
                   fontWeight: FontWeight.bold,
-                  fontSize: 23.h,
+                  fontSize: 30.sp,
                 ),
                 textAlign: TextAlign.center,
               ),
             ),
-            getRect(context,Colors.white, text: getValidatedDay(_today + 1)),
-            getRect(context,Colors.white, text: getValidatedDay(_today + 2)),
-            getRect(context,Colors.white, text: getValidatedDay(_today + 3)),
-            getRect(context,Colors.white, text: getValidatedDay(_today + 4)),
-            getRect(context,Colors.white, text: getValidatedDay(_today + 5)),
+            getUpperRect(_today + 1),
+            getUpperRect(_today + 2),
+            getUpperRect(_today + 3),
+            getUpperRect(_today + 4),
+            getUpperRect(_today + 5),
           ],
         ),
-        SizedBox(height: 3.h),
+        SizedBox(height: 6.h),
         Row(
           children: [
             getRectByDay(_today - 5),
@@ -313,12 +316,17 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             getRectByDay(_today - 2),
             getRectByDay(_today - 1),
             SizedBox(
-              width: 48.h + 12.w,
+              width: 104.h + 4.w,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getRectByDay(_today, showConfirm: true),
-                  getRectByDay(_today, start: false, showConfirm: true),
+                  getRectByDay(_today, showConfirm: true, rounded: false),
+                  getRectByDay(
+                    _today,
+                    start: false,
+                    showConfirm: true,
+                    rounded: false,
+                  ),
                 ],
               ),
             ),
@@ -341,27 +349,27 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Row(children: [
-                getRect(context,todayColor),
+                getRect(context, todayColor, width: 50.h),
                 textM(Localizer.get('today_appear_leave'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,workingDayColor),
+                getRect(context, workingDayColor, width: 50.h),
                 textM(Localizer.get('working_day'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,nonWorkingDayColor),
+                getRect(context, nonWorkingDayColor, width: 50.h),
                 textM(Localizer.get('non_working_day'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,noAssignmentColor),
+                getRect(context, noAssignmentColor, width: 50.h),
                 textM(Localizer.get('no_ass'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,onTimeColor),
+                getRect(context, onTimeColor, width: 50.h),
                 textM(Localizer.get('on_'))
               ]),
               SizedBox(height: 4.h),
@@ -371,20 +379,27 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller(Localizer.get('prize_w')),
+                        getText(Localizer.get('prize_w')),
                         SizedBox(height: 4.h),
-                        getTextSmaller(Localizer.get('beg_off_text')),
+                        getText(Localizer.get('beg_off_text')),
                       ],
                     ),
                   ),
-                  SizedBox(height: 4.h),
                   IntrinsicWidth(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller(_data['prize'].toString()),
+                        getText(
+                          _data['prize'].toString(),
+                          overflow: TextOverflow.visible,
+                          rounded: true,
+                        ),
                         SizedBox(height: 4.h),
-                        getTextSmaller(_data['beg_off_price'].toString()),
+                        getText(
+                          _data['beg_off_price'].toString(),
+                          overflow: TextOverflow.visible,
+                          rounded: true,
+                        ),
                       ],
                     ),
                   ),
@@ -399,25 +414,33 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(children: [getRect(context,lateColor), textM(Localizer.get('late'))]),
+              Row(children: [
+                getRect(context, lateColor),
+                textM(Localizer.get('late'))
+              ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,truancyColor),
+                getRect(context, truancyColor, width: 50.h),
                 textM(Localizer.get('tr'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,validReasonColor),
+                getRect(context, validReasonColor, width: 50.h),
                 textM(Localizer.get('valid_reason'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,begOffColor),
+                getRect(context, begOffColor, width: 50.h),
                 textM(Localizer.get('beg_off_text'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
-                getRect(context,confirmationColor, confirmation: true),
+                getRect(
+                  context,
+                  confirmationColor,
+                  confirmation: true,
+                  width: 50.h,
+                ),
                 textM(Localizer.get('con'))
               ]),
               SizedBox(height: 4.h),
@@ -427,21 +450,27 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller(Localizer.get('min_p')),
+                        getText(Localizer.get('min_p')),
                         SizedBox(height: 4.h),
-                        getTextSmaller(Localizer.get('tru_min')),
+                        getText(Localizer.get('tru_min')),
                       ],
                     ),
                   ),
-                  SizedBox(height: 4.h),
                   IntrinsicWidth(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        getTextSmaller(_data['late_minute_price'].toString()),
+                        getText(
+                          _data['late_minute_price'].toString(),
+                          overflow: TextOverflow.visible,
+                          rounded: true,
+                        ),
                         SizedBox(height: 4.h),
-                        getTextSmaller(
-                            "${_data['truancy_minute']}/${_data['truancy_price']}"),
+                        getText(
+                          "${_data['truancy_minute']}/${_data['truancy_price']}",
+                          overflow: TextOverflow.visible,
+                          rounded: true,
+                        ),
                       ],
                     ),
                   ),
@@ -449,10 +478,10 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               ),
               SizedBox(height: 4.h),
               getTwoTextOneLine(
-                '${Localizer.get('itog')} ${ServerTime.yearMonth.split("/")[0]}:',
-                _data['penalty_count'].toString(),
-                bgColor: lateColor,
-              ),
+                  '${Localizer.get('itog')} ${ServerTime.yearMonth.split("/")[0]}:',
+                  _data['penalty_count'].toString(),
+                  bgColor: lateColor,
+                  margin: 2.w),
             ],
           ),
         ),
@@ -468,25 +497,41 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
     }
   }
 
-  Widget getRectByDay(int day, {ws = true, start = true, showConfirm = false}) {
+  Widget getRectByDay(
+    int day, {
+    ws = true,
+    start = true,
+    showConfirm = false,
+    rounded = true,
+  }) {
     // ws - is for worker status
-    if (getValidatedDay(day) == '' || _days.isEmpty) {
-      return getRect(context,noAssignmentColor);
-    } else if (_days[day - 1] == null) {
-      return getRect(context,noAssignmentColor);
+    if (getValidatedDay(day) == '' || _days.isEmpty || _days[day - 1] == null) {
+      return getRect(
+        context,
+        noAssignmentColor,
+        rounded: rounded,
+      );
     }
     if (ws && start) {
-      return getRect(context,
+      return getRect(
+        context,
         getColorByStatus(_days[day - 1]['worker_status_start']),
         confirmation: showConfirm && !_days[day - 1]['confirmed_start'],
+        rounded: rounded,
       );
     } else if (ws && !start) {
-      return getRect(context,
+      return getRect(
+        context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
         confirmation: showConfirm && !_days[day - 1]['confirmed_end'],
+        rounded: rounded,
       );
     }
-    return getRect(context,getColorByStatus(_days[day - 1]['day_status']));
+    return getRect(
+      context,
+      getColorByStatus(_days[day - 1]['day_status']),
+      rounded: rounded,
+    );
   }
 
   String getCurrentDayTime(String key) {
@@ -600,7 +645,21 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         overflow: TextOverflow.fade,
         maxLines: 1,
         softWrap: false,
+        style: TextStyle(
+          fontSize: 20.sp,
+        ),
       ),
+    );
+  }
+
+  Widget getUpperRect(int day) {
+    return getRect(
+      context,
+      bgColor,
+      wBorder: true,
+      text: getValidatedDay(day),
+      secText: getNameOfWeek(day),
+      rounded: false,
     );
   }
 }

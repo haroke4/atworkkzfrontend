@@ -2,14 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/prefabs/admin_tools.dart';
 import 'package:get/get.dart';
-import 'package:pin_input_text_field/pin_input_text_field.dart';
-import 'worker_main_page.dart';
 import '../prefabs/colors.dart';
-import '../prefabs/appbar_prefab.dart';
 
 class AssignDataPage extends StatefulWidget {
   final String text;
@@ -55,20 +50,21 @@ class _AssignDataPageState extends State<AssignDataPage> {
                 widget.text,
                 style: TextStyle(
                   color: Theme.of(context).primaryColorDark,
-                  fontSize: 35.h,
+                  fontSize: 57.sp,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(110.w, 5.w, 110.w, 5.w),
+                padding: EdgeInsets.fromLTRB(110.w, 10.h, 110.w, 10.w),
                 child: TextField(
                   controller: _textController,
-                  style: TextStyle(fontSize: 20.h, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                   cursorColor: Colors.black,
                   cursorWidth: 1.w,
                   autofocus: widget.inputtingText,
                   decoration: InputDecoration(
+                    contentPadding: EdgeInsets.only(bottom: -18.h),
                     enabledBorder: UnderlineInputBorder(
                         borderSide: BorderSide(color: Colors.red, width: 5.h)),
                     focusedBorder: UnderlineInputBorder(
@@ -91,9 +87,9 @@ class _AssignDataPageState extends State<AssignDataPage> {
                 SizedBox(height: 10.h),
                 getNumbersWidget(),
               ],
-              SizedBox(height: 15.h),
+              SizedBox(height: 30.h),
               getGoBackButton(
-                  padding: 2.w, height: 36.h, onTap: _onGoBackPressed),
+                  padding: 2.w, height: 70.h, onTap: _onGoBackPressed),
             ],
           ),
         ),
@@ -129,7 +125,7 @@ class _AssignDataPageState extends State<AssignDataPage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: firstLine,
         ),
-        SizedBox(height: 10.h),
+        SizedBox(height: 22.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -164,7 +160,7 @@ class CircleButton extends StatelessWidget {
             child: Text(
               text,
               style: TextStyle(
-                fontSize: 25.h,
+                fontSize: 35.sp,
               ),
             ),
           )),
