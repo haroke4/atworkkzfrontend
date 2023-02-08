@@ -21,6 +21,7 @@ class TariffsPage extends StatefulWidget {
 }
 
 class _TariffsPageState extends State<TariffsPage> {
+
   void selectTariff(String tariff) async{
     showScaffoldMessage(context, Localizer.get('processing'));
     var response = await AdminBackendAPI.extendPlan(tariff);
@@ -33,6 +34,12 @@ class _TariffsPageState extends State<TariffsPage> {
         await Future.delayed(Duration(milliseconds: 100));
       }
     }
+  }
+
+  @override
+  void initState(){
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   }
 
   @override

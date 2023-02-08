@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_main_page.dart';
 import 'package:freelance_order/pages/tariffs_page.dart';
@@ -46,6 +47,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
       _data['after_minute'] = Localizer.get('enter');
     }
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   }
 
   void _onSavePressed() async {

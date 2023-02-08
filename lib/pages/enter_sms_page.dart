@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/pages/admin_general_page.dart';
 import 'package:freelance_order/utils/AdminBackendAPI.dart';
@@ -37,6 +38,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     initSharedPrefs();
   }
 
@@ -139,8 +141,8 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
                   enabled: true,
                 ),
                 decoration: UnderlineDecoration(
-                  colorBuilder: const
-                      FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
+                  colorBuilder:
+                      const FixedColorBuilder(Color.fromRGBO(201, 60, 42, 1)),
                   textStyle: TextStyle(fontSize: 35.sp, color: Colors.black),
                 ),
                 onChanged: (value) {

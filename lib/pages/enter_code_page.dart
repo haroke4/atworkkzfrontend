@@ -28,6 +28,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
 
   @override
   void initState() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     super.initState();
     _onFingerprintPressed();
   }

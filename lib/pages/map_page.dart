@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_osm_plugin/flutter_osm_plugin.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -43,6 +44,7 @@ class _MyMapViewState extends State<MyMapView> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     List<String> geoPos = widget.day['geoposition'].split(" ");
     var lat = double.parse(geoPos[0]);
     var lon = double.parse(geoPos[1]);

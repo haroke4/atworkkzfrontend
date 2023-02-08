@@ -11,21 +11,22 @@ class AssignDataPage extends StatefulWidget {
   final bool inputtingText;
 
   const AssignDataPage(
-      {super.key,
-      required this.text,
-      this.inputtingText = false});
+      {super.key, required this.text, this.inputtingText = false});
 
   @override
   State<AssignDataPage> createState() => _AssignDataPageState();
 }
 
 class _AssignDataPageState extends State<AssignDataPage> {
-  String _errorMessage = '';
   final _textController = TextEditingController();
 
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  }
 
   void _onNumberButtonPressed(String value) {
-
     _textController.text += value;
   }
 
@@ -58,7 +59,8 @@ class _AssignDataPageState extends State<AssignDataPage> {
                 padding: EdgeInsets.fromLTRB(110.w, 10.h, 110.w, 10.w),
                 child: TextField(
                   controller: _textController,
-                  style: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
+                  style:
+                      TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                   cursorColor: Colors.black,
                   cursorWidth: 1.w,
@@ -77,12 +79,6 @@ class _AssignDataPageState extends State<AssignDataPage> {
                 ),
               ),
               SizedBox(height: 3.h),
-              _errorMessage != ''
-                  ? Text(
-                      _errorMessage,
-                      style: TextStyle(color: Theme.of(context).errorColor),
-                    )
-                  : const SizedBox(),
               if (!widget.inputtingText) ...[
                 SizedBox(height: 10.h),
                 getNumbersWidget(),
@@ -134,7 +130,6 @@ class _AssignDataPageState extends State<AssignDataPage> {
       ],
     );
   }
-
 }
 
 class CircleButton extends StatelessWidget {

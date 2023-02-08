@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:freelance_order/utils/LocalizerUtil.dart';
 import 'package:get/get.dart';
@@ -20,6 +21,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState(){
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     asyncInitState();
   }
 

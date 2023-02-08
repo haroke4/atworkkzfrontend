@@ -24,6 +24,12 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   bool _enteringNewPassword = false;
   final _textController = TextEditingController();
 
+  @override
+  void initState(){
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  }
+
   void _onNextPressed() async {
     //Check if password valid
     if (_enteringNewPassword) {

@@ -30,6 +30,12 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
     style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
   );
 
+  @override
+  void initState(){
+    super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+  }
+
   void sendTelNumbers() async {
     // Send data to backend and wait for SMS
     if (_formKey.currentState!.validate()) {

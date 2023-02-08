@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:freelance_order/prefabs/scaffold_messages.dart';
 import 'package:get/get.dart';
@@ -33,6 +34,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     initializeDateFormatting();
     _update();
   }

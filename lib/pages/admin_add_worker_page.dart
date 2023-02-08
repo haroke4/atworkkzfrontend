@@ -28,7 +28,7 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
   @override
   void initState() {
     super.initState();
-
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     _workerInfo = widget.displayName != null
         ? "${widget.displayName}"
         : ""; // split it into 2 parameter

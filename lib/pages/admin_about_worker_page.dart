@@ -60,6 +60,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     setState(() {
       _doingAdjustments = widget.doingAdjustments;
       _startController.text = getTimeForTempValues('start_time');
