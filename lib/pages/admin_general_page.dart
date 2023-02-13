@@ -175,6 +175,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
           onPressed: () {
             if (!_registering){
               Get.to(() => TariffsPage(tariffsData: _data['tariffs']));
+              return;
             }
             showScaffoldMessage(context, Localizer.get('cant_see_tariffs'));
           },
