@@ -58,9 +58,9 @@ class Localizer {
       'kz': 'Қателік',
     },
     'enter_sent_sms_come': {
-      'en': 'Enter the code sent to you',
-      'ru': 'Введите присланный вам код',
-      'kz': 'Сізге жіберілген кодты енгізіңіз'
+      'en': 'Enter the last 4 digits of the incoming call',
+      'ru': 'Введите последние 4 цифры поступившего звонка',
+      'kz': 'Келген қоңыраудың соңғы 4 санын енгізіңіз'
     },
     'company_name': {
       'en': 'Company name',
