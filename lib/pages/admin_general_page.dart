@@ -70,7 +70,6 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
       if (response.statusCode == 201) {
         showScaffoldMessage(context, Localizer.get('company_created'));
         Get.offAll(const AdminsMainPage());
-        showScaffoldMessage(context, Localizer.get('ATTENTION'), time: 15);
         return null;
       } else {
         showScaffoldMessage(context, Localizer.get('some_error_field'));
