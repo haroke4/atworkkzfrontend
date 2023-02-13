@@ -172,8 +172,12 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         getText(
           Localizer.get('plans'),
           align: TextAlign.center,
-          onPressed: () =>
-              (Get.to(() => TariffsPage(tariffsData: _data['tariffs']))),
+          onPressed: () {
+            if (!_registering){
+              Get.to(() => TariffsPage(tariffsData: _data['tariffs']));
+            }
+            showScaffoldMessage(context, Localizer.get('cant_see_tariffs'));
+          },
         ),
         getText(Localizer.get('general'),
             fontColor: Colors.white, bgColor: brownColor),
@@ -228,45 +232,47 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               ],
             ),
           ),
-          Container(
-            constraints: BoxConstraints(maxWidth: 78.w),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                getText(
-                  _data["truancy_price"].toString(),
-                  onPressed: () => _changeField(
-                      "truancy_price", Localizer.get('truancy_price')),
-                ),
-                SizedBox(height: 6.h),
-                getText(
-                  _data["prize"].toString(),
-                  onPressed: () =>
-                      _changeField("prize", Localizer.get('prize')),
-                ),
-                SizedBox(height: 6.h),
-                getText(
-                  _data["beg_off_price"].toString(),
-                  onPressed: () =>
-                      _changeField("beg_off_price", Localizer.get('beg_off')),
-                ),
-                SizedBox(height: 6.h),
-                getText(
-                  _data["before_minute"].toString(),
-                  onPressed: () =>
-                      _changeField("before_minute", Localizer.get('bef_min')),
-                ),
-                SizedBox(height: 6.h),
-                Container(
-                  constraints: BoxConstraints(maxWidth: 80.w),
-                  child: getText(
-                    _data["mail"],
+          IntrinsicWidth(
+            child: Container(
+              constraints: BoxConstraints(maxWidth: 78.w),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  getText(
+                    _data["truancy_price"].toString(),
                     onPressed: () => _changeField(
-                        "mail", Localizer.get('email'),
-                        text: true),
+                        "truancy_price", Localizer.get('truancy_price')),
                   ),
-                ),
-              ],
+                  SizedBox(height: 6.h),
+                  getText(
+                    _data["prize"].toString(),
+                    onPressed: () =>
+                        _changeField("prize", Localizer.get('prize')),
+                  ),
+                  SizedBox(height: 6.h),
+                  getText(
+                    _data["beg_off_price"].toString(),
+                    onPressed: () =>
+                        _changeField("beg_off_price", Localizer.get('beg_off')),
+                  ),
+                  SizedBox(height: 6.h),
+                  getText(
+                    _data["before_minute"].toString(),
+                    onPressed: () =>
+                        _changeField("before_minute", Localizer.get('bef_min')),
+                  ),
+                  SizedBox(height: 6.h),
+                  Container(
+                    constraints: BoxConstraints(maxWidth: 80.w),
+                    child: getText(
+                      _data["mail"],
+                      onPressed: () => _changeField(
+                          "mail", Localizer.get('email'),
+                          text: true),
+                    ),
+                  ),
+                ],
+              ),
             ),
           )
         ],
