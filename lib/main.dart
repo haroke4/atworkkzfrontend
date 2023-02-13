@@ -83,7 +83,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         if (nextScreen != null) {
-          Get.off(nextScreen);
+          Get.off(nextScreen, arguments: {"from_main": true});
         } else {
           _controller.forward(from: 0.0);
         }

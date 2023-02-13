@@ -228,7 +228,8 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
               ],
             ),
           ),
-          IntrinsicWidth(
+          Container(
+            constraints: BoxConstraints(maxWidth: 78.w),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -295,38 +296,41 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
                 ),
               ),
               IntrinsicWidth(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    getText(
-                      _data["postponement_minute"].toString(),
-                      onPressed: () => _changeField(
-                          "postponement_minute", Localizer.get('postp_min')),
-                    ),
-                    SizedBox(height: 6.h),
-                    getText(
-                      _data["truancy_minute"].toString(),
-                      onPressed: () => _changeField(
-                          "truancy_minute", Localizer.get('truancy_min')),
-                    ),
-                    SizedBox(height: 6.h),
-                    getText(
-                      _data["late_minute_price"].toString(),
-                      onPressed: () => _changeField(
-                        "late_minute_price",
-                        Localizer.get('min_price'),
+                child: Container(
+                  constraints: BoxConstraints(maxWidth: 70.w),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      getText(
+                        _data["postponement_minute"].toString(),
+                        onPressed: () => _changeField(
+                            "postponement_minute", Localizer.get('postp_min')),
                       ),
-                    ),
-                    SizedBox(height: 6.h),
-                    getText(
-                      _data["after_minute"].toString(),
-                      minWidth: 25.w,
-                      onPressed: () => _changeField(
-                        "after_minute",
-                        Localizer.get('aft_min'),
+                      SizedBox(height: 6.h),
+                      getText(
+                        _data["truancy_minute"].toString(),
+                        onPressed: () => _changeField(
+                            "truancy_minute", Localizer.get('truancy_min')),
                       ),
-                    ),
-                  ],
+                      SizedBox(height: 6.h),
+                      getText(
+                        _data["late_minute_price"].toString(),
+                        onPressed: () => _changeField(
+                          "late_minute_price",
+                          Localizer.get('min_price'),
+                        ),
+                      ),
+                      SizedBox(height: 6.h),
+                      getText(
+                        _data["after_minute"].toString(),
+                        minWidth: 25.w,
+                        onPressed: () => _changeField(
+                          "after_minute",
+                          Localizer.get('aft_min'),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               )
             ],

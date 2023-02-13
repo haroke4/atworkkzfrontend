@@ -70,13 +70,22 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       });
       showScaffoldMessage(context, Localizer.get('loaded'));
     } else {
-      showScaffoldMessage(context, Localizer.get('error_restart_app'));
+      try {
+        print(Get.arguments);
+        if (Get.arguments["from_main"] == true){
+          Get.offAll(() => const AdminGeneralPage());
+          return;
+        }
+        throw Exception();
+      } on Exception catch (_) {
+        showScaffoldMessage(context, Localizer.get('error_restart_app'));
+      }
     }
     return;
   }
 
-  void _onWorkerNamePressed(
-      String displayName, String username, var data, var prevWorkerData,
+  void _onWorkerNamePressed(String displayName, String username, var data,
+      var prevWorkerData,
       {longPress = false}) async {
     String? ans;
 
@@ -85,10 +94,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         ans = await Get.to(() => const AdminAddWorkerPage());
       } else {
         ans = await Get.to(
-          () => AdminAddWorkerPage(
-            displayName: displayName,
-            username: username,
-          ),
+              () =>
+              AdminAddWorkerPage(
+                displayName: displayName,
+                username: username,
+              ),
         );
       }
     } else {
@@ -107,15 +117,16 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       data['late_minute_price'] = _data['late_minute_price'];
 
       ans = await Get.to(
-        () => AdminAboutWorkerPage(
-          name: displayName,
-          workerUsername: username,
-          today: _today,
-          currMonthMaxDay: _currMonthMaxDay,
-          data: data,
-          prevWorkerData: prevWorkerData,
-          doingAdjustments: _doingAdjustments,
-        ),
+            () =>
+            AdminAboutWorkerPage(
+              name: displayName,
+              workerUsername: username,
+              today: _today,
+              currMonthMaxDay: _currMonthMaxDay,
+              data: data,
+              prevWorkerData: prevWorkerData,
+              doingAdjustments: _doingAdjustments,
+            ),
       );
     }
 
@@ -162,7 +173,9 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme.of(context).backgroundColor,
+        backgroundColor: Theme
+            .of(context)
+            .backgroundColor,
         body: AbsorbPointer(
           absorbing: _loading,
           child: SafeArea(
@@ -218,11 +231,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         ),
         getText(Localizer.get('general'), align: TextAlign.center,
             onPressed: () {
-          Get.to(
-            () => (EnterCodePage(nextPage: const AdminGeneralPage())),
-            arguments: [_data],
-          );
-        }),
+              Get.to(
+                    () => (EnterCodePage(nextPage: const AdminGeneralPage())),
+                arguments: [_data],
+              );
+            }),
       ],
     );
   }
@@ -381,8 +394,9 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           width: 92.w,
           child: getText(name,
               onPressed: () => _onWorkerNamePressed(name, username, data, prv),
-              onLongPress: () => _onWorkerNamePressed(name, username, data, prv,
-                  longPress: true)),
+              onLongPress: () =>
+                  _onWorkerNamePressed(name, username, data, prv,
+                      longPress: true)),
         ),
         SizedBox(
           width: 2.w,
@@ -451,14 +465,13 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     }
   }
 
-  Widget getRectByDay(
-    int day,
-    days, {
-    ws = true,
-    start = true,
-    showConfirm = false,
-    Function? onTap,
-  }) {
+  Widget getRectByDay(int day,
+      days, {
+        ws = true,
+        start = true,
+        showConfirm = false,
+        Function? onTap,
+      }) {
     // ws - is for worker status
 
     if (days == null || getValidatedDay(day) == '' || days.isEmpty) {
