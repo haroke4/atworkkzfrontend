@@ -269,7 +269,7 @@ Widget getRect(
       children: [
         Text(
           secText,
-          style: TextStyle(fontSize: 14.sp),
+          style: TextStyle(fontSize: 12.sp),
         )
       ],
     ),
@@ -317,9 +317,9 @@ Widget getRect(
 }
 
 Widget getZhumystaKzText() {
-  return getText("Zhumysta.kz", align: TextAlign.center, onPressed: () {
+  return getText("zhumista.kz ", align: TextAlign.center, onPressed: () {
     launchUrl(
-      Uri.parse("https://Zhumysta.kz"),
+      Uri.parse("https://zhumista.kz "),
       mode: LaunchMode.externalApplication,
     );
   });

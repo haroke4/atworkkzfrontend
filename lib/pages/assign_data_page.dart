@@ -85,7 +85,7 @@ class _AssignDataPageState extends State<AssignDataPage> {
               ],
               SizedBox(height: 30.h),
               getGoBackButton(
-                  padding: 2.w, height: 70.h, onTap: _onGoBackPressed),
+                  color: Colors.transparent, height: 100.sp, onTap: _onGoBackPressed),
             ],
           ),
         ),

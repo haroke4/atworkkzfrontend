@@ -140,7 +140,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
                 const Expanded(child: SizedBox()),
                 getNumbersWidget(),
                 const Expanded(child: SizedBox()),
-                getGoBackButton(padding: 2.w, height: 80.h),
+                getGoBackButton(padding: 2.w, height: 150.sp, color: const Color.fromRGBO(1, 1, 1, 0)),
                 SizedBox(width: 10.w),
               ],
             ),
@@ -164,7 +164,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
           padding: EdgeInsets.all(2.h),
           child: Icon(
             Icons.fingerprint,
-            size: 20.w,
+            size: 120.sp,
           ),
         ),
       ),

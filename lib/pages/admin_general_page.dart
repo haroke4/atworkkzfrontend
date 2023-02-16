@@ -91,8 +91,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
         afterMinute: _data['after_minute'].toString(),
       );
       if (response.statusCode == 200) {
-        showScaffoldMessage(context, Localizer.get('success_update'));
-        Get.back(result: 'update');
+        Get.offAll(() => const AdminsMainPage());
       } else {
         showScaffoldMessage(context, response.body, time: 5);
       }

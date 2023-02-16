@@ -76,10 +76,7 @@ class _EnterSMSPageState extends State<EnterSMSPage> {
         );
       }
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(Localizer.get('loading')),
-          duration: const Duration(seconds: 1),
-        ));
+        showScaffoldMessage(context, Localizer.get('loading'));
 
         if (!isWorker) {
           // if admin does not set up company

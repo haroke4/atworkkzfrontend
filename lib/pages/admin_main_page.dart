@@ -33,8 +33,6 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   bool _loading = true;
 
   int _today = 0;
-  int _month = 1;
-  int _year = 2022;
   int _currMonthMaxDay = 0;
   double rectSize = 12.h + 6.w;
 
@@ -72,7 +70,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     } else {
       try {
         print(Get.arguments);
-        if (Get.arguments["from_main"] == true){
+        if (Get.arguments["from_main"] == true) {
           Get.offAll(() => const AdminGeneralPage());
           return;
         }
@@ -84,8 +82,8 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     return;
   }
 
-  void _onWorkerNamePressed(String displayName, String username, var data,
-      var prevWorkerData,
+  void _onWorkerNamePressed(
+      String displayName, String username, var data, var prevWorkerData,
       {longPress = false}) async {
     String? ans;
 
@@ -94,11 +92,10 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         ans = await Get.to(() => const AdminAddWorkerPage());
       } else {
         ans = await Get.to(
-              () =>
-              AdminAddWorkerPage(
-                displayName: displayName,
-                username: username,
-              ),
+          () => AdminAddWorkerPage(
+            displayName: displayName,
+            username: username,
+          ),
         );
       }
     } else {
@@ -117,16 +114,15 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
       data['late_minute_price'] = _data['late_minute_price'];
 
       ans = await Get.to(
-            () =>
-            AdminAboutWorkerPage(
-              name: displayName,
-              workerUsername: username,
-              today: _today,
-              currMonthMaxDay: _currMonthMaxDay,
-              data: data,
-              prevWorkerData: prevWorkerData,
-              doingAdjustments: _doingAdjustments,
-            ),
+        () => AdminAboutWorkerPage(
+          name: displayName,
+          workerUsername: username,
+          today: _today,
+          currMonthMaxDay: _currMonthMaxDay,
+          data: data,
+          prevWorkerData: prevWorkerData,
+          doingAdjustments: _doingAdjustments,
+        ),
       );
     }
 
@@ -173,9 +169,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, BoxConstraints constraints) {
       return Scaffold(
-        backgroundColor: Theme
-            .of(context)
-            .backgroundColor,
+        backgroundColor: Theme.of(context).backgroundColor,
         body: AbsorbPointer(
           absorbing: _loading,
           child: SafeArea(
@@ -231,11 +225,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         ),
         getText(Localizer.get('general'), align: TextAlign.center,
             onPressed: () {
-              Get.to(
-                    () => (EnterCodePage(nextPage: const AdminGeneralPage())),
-                arguments: [_data],
-              );
-            }),
+          Get.to(
+            () => (EnterCodePage(nextPage: const AdminGeneralPage())),
+            arguments: [_data],
+          );
+        }),
       ],
     );
   }
@@ -378,7 +372,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
 
     var truancy_day_count = "0";
     var working_day_count = "0";
-    var prize = _data['prize'];
+    var prize = '';
     var prizeColor = Colors.white;
 
     if (data != null) {
@@ -394,9 +388,8 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           width: 92.w,
           child: getText(name,
               onPressed: () => _onWorkerNamePressed(name, username, data, prv),
-              onLongPress: () =>
-                  _onWorkerNamePressed(name, username, data, prv,
-                      longPress: true)),
+              onLongPress: () => _onWorkerNamePressed(name, username, data, prv,
+                  longPress: true)),
         ),
         SizedBox(
           width: 2.w,
@@ -465,13 +458,14 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     }
   }
 
-  Widget getRectByDay(int day,
-      days, {
-        ws = true,
-        start = true,
-        showConfirm = false,
-        Function? onTap,
-      }) {
+  Widget getRectByDay(
+    int day,
+    days, {
+    ws = true,
+    start = true,
+    showConfirm = false,
+    Function? onTap,
+  }) {
     // ws - is for worker status
 
     if (days == null || getValidatedDay(day) == '' || days.isEmpty) {
@@ -482,17 +476,21 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     if (ws && start) {
       return getRect(
           context, getColorByStatus(days[day - 1]['worker_status_start']),
-          confirmation: showConfirm && !days[day - 1]['confirmed_start']);
+          confirmation: showConfirm && days[day - 1]['confirmed_start']);
     } else if (ws && !start) {
       return getRect(
           context, getColorByStatus(days[day - 1]['worker_status_end']),
-          confirmation: showConfirm && !days[day - 1]['confirmed_end']);
+          confirmation: showConfirm && days[day - 1]['confirmed_end']);
     }
     return getRect(context, getColorByStatus(days[day - 1]['day_status']),
         onTap: onTap);
   }
 
   String getNameOfWeek(day) {
-    return Localizer.get(DateFormat('EE').format(DateTime(_year, _month, day)));
+    return Localizer.get(DateFormat('EE').format(DateTime(
+      ServerTime.time.year,
+      ServerTime.time.month,
+      day,
+    )));
   }
 }

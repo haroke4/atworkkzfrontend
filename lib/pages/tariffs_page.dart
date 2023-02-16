@@ -71,7 +71,7 @@ class _TariffsPageState extends State<TariffsPage> {
                   children: [..._getTableElements()],
                 ),
                 SizedBox(height: 10.h),
-                getGoBackButton(padding: 2.w, height: 70.h)
+                getGoBackButton(color: Colors.transparent)
               ],
             ),
           ),
@@ -85,39 +85,34 @@ class _TariffsPageState extends State<TariffsPage> {
       TableRow(
         children: [
           text(Localizer.get('amount_worker')),
-          text(Localizer.get('3_m')),
           text(Localizer.get('6_m')),
           text(Localizer.get('12_m')),
         ],
       ),
       TableRow(
         children: [
-          text("8", big: true),
-          button('8worker_3month'),
-          button('8worker_6month'),
-          button('8worker_12month'),
+          text("10", big: true),
+          button('10worker_6month'),
+          button('10worker_12month'),
         ],
       ),
       TableRow(
         children: [
-          text("16", big: true),
-          button('16worker_3month'),
-          button('16worker_6month'),
-          button('16worker_12month'),
+          text("10", big: true),
+          button('20worker_6month'),
+          button('20worker_12month'),
         ],
       ),
       TableRow(
         children: [
-          text("32", big: true),
-          button('32worker_3month'),
-          button('32worker_6month'),
-          button('32worker_12month'),
+          text("40", big: true),
+          button('40worker_6month'),
+          button('40worker_12month'),
         ],
       ),
       TableRow(
         children: [
           text("80", big: true),
-          button('80worker_3month'),
           button('80worker_6month'),
           button('80worker_12month'),
         ],

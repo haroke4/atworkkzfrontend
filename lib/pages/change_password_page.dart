@@ -71,7 +71,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 40.h),
+              SizedBox(height: 20.h),
               Text(
                 _enteringNewPassword
                     ? Localizer.get('enter_new_p')
@@ -119,8 +119,7 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getGoBackButton(
-                      padding: 2.w, height: 68.h, color: Colors.white),
+                  getGoBackButton(height: 80.sp, color: Colors.transparent),
                   SizedBox(width: 5.w),
                   getText(_buttonLabel, onPressed: _onNextPressed, fontSize: 26.sp),
                 ],

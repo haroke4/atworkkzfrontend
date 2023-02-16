@@ -456,9 +456,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                     getGoBackButton(result: _result),
                   ],
                 ),
-                SizedBox(height: 40.h,)
+                SizedBox(
+                  height: 40.h,
+                )
               ],
-
             ),
           ),
           getRightInfoWidgets(width),
@@ -553,26 +554,27 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            getRectByDay(_today - 5),
-            getRectByDay(_today - 4),
-            getRectByDay(_today - 3),
-            getRectByDay(_today - 2),
-            getRectByDay(_today - 1),
+            getRectByDay(_today - 5, ws: _today - 5 <= widget.today),
+            getRectByDay(_today - 4, ws: _today - 4 <= widget.today),
+            getRectByDay(_today - 3, ws: _today - 3 <= widget.today),
+            getRectByDay(_today - 2, ws: _today - 2 <= widget.today),
+            getRectByDay(_today - 1, ws: _today - 1 <= widget.today),
             SizedBox(
               width: 104.h + 4.w,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getRectByDay(_today),
-                  getRectByDay(_today, start: false),
+                  getRectByDay(_today, ws: _today <= widget.today),
+                  getRectByDay(_today,
+                      start: false, ws: _today <= widget.today),
                 ],
               ),
             ),
-            getRectByDay(_today + 1, ws: false),
-            getRectByDay(_today + 2, ws: false),
-            getRectByDay(_today + 3, ws: false),
-            getRectByDay(_today + 4, ws: false),
-            getRectByDay(_today + 5, ws: false),
+            getRectByDay(_today + 1, ws: _today + 1 <= widget.today),
+            getRectByDay(_today + 2, ws: _today + 2 <= widget.today),
+            getRectByDay(_today + 3, ws: _today + 3 <= widget.today),
+            getRectByDay(_today + 4, ws: _today + 4 <= widget.today),
+            getRectByDay(_today + 5, ws: _today + 5 <= widget.today),
           ],
         )
       ],
@@ -749,6 +751,10 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
+            const Expanded(child: SizedBox()),
             Row(
               children: [
                 Expanded(
@@ -814,7 +820,9 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
             ),
             const Expanded(child: SizedBox()),
             getSaveButton(save),
-            SizedBox(height: 40.h,)
+            SizedBox(
+              height: 40.h,
+            )
           ],
         ),
       );
@@ -894,12 +902,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (ws && start) {
       return getRect(
           context, getColorByStatus(_days[day - 1]['worker_status_start']),
-          confirmation: !_days[day - 1]['confirmed_start'] && day == _today);
+          confirmation: _days[day - 1]['confirmed_start'] && day == _today);
     } else if (ws && !start) {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
-        confirmation: !_days[day - 1]['confirmed_end'] && day == _today,
+        confirmation: _days[day - 1]['confirmed_end'] && day == _today,
       );
     }
     return getRect(context, getColorByStatus(_days[day - 1]['day_status']));

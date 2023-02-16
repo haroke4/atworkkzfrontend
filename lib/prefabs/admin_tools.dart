@@ -9,7 +9,7 @@ import 'colors.dart';
 
 Widget getMainMenuButton({enabled = true}) {
   return SizedBox(
-    height: 50.h,
+    height: 70.sp,
     child: InkWell(
       splashColor: Colors.transparent,
       highlightColor: Colors.transparent,
@@ -32,7 +32,7 @@ Widget getGoBackButton(
   return Material(
     color: color ?? bgColor,
     child: SizedBox(
-      height: height ?? 50.h,
+      height: height ?? 80.sp,
       child: InkWell(
         splashColor: Colors.transparent,
         highlightColor: Colors.transparent,

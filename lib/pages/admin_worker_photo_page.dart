@@ -184,7 +184,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
   }
 
   Widget getFirstLine() {
-    if (_isStart) {
+    if (!_isStart) {
       return getTwoTextSeperated(
         getPenalty(),
         " ${_day['penalty_count_end']} ",
