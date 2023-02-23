@@ -110,6 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
           nextScreen = EnterCodePage(
             nextPage: const AdminsMainPage(),
             code: code.toString(),
+            closeApp: true,
           );
         });
       }
@@ -122,6 +123,7 @@ class _SplashScreenState extends State<SplashScreen>
           nextScreen = EnterCodePage(
             nextPage: const WorkersMainPage(),
             code: code.toString(),
+            closeApp: true,
           );
         });
       }

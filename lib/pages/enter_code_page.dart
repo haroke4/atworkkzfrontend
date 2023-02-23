@@ -14,8 +14,13 @@ import '../prefabs/colors.dart';
 class EnterCodePage extends StatefulWidget {
   final nextPage;
   var code;
+  bool closeApp;
 
-  EnterCodePage({super.key, required this.nextPage, this.code = ""});
+  EnterCodePage(
+      {super.key,
+      required this.nextPage,
+      this.code = "",
+      this.closeApp = false});
 
   @override
   State<EnterCodePage> createState() => _EnterCodePageState();
@@ -34,6 +39,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
   }
 
   void _checkCode({fromOnChanged = false}) async {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
     if (_smsController.text.length < 4) {
       if (!fromOnChanged) {
         setState(() {
@@ -79,6 +85,8 @@ class _EnterCodePageState extends State<EnterCodePage> {
           options: const AuthenticationOptions(biometricOnly: true),
         );
         if (didAuthenticate) {
+          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
+              overlays: []);
           Get.off(widget.nextPage, arguments: Get.arguments);
         }
       } on PlatformException {}
@@ -136,11 +144,26 @@ class _EnterCodePageState extends State<EnterCodePage> {
             Row(
               children: [
                 SizedBox(width: 10.w),
-                getFingerprintButton(),
+                Column(
+                  children: [
+                    SizedBox(height: 160.sp),
+                    getFingerprintButton(),
+                  ],
+                ),
                 const Expanded(child: SizedBox()),
                 getNumbersWidget(),
                 const Expanded(child: SizedBox()),
-                getGoBackButton(padding: 2.w, height: 150.sp, color: const Color.fromRGBO(1, 1, 1, 0)),
+                Column(
+                  children: [
+                    SizedBox(height: 160.sp),
+                    getGoBackButton(
+                      padding: 2.w,
+                      height: 150.sp,
+                      color: const Color.fromRGBO(1, 1, 1, 0),
+                      onTap: widget.closeApp ? SystemNavigator.pop : null,
+                    ),
+                  ],
+                ),
                 SizedBox(width: 10.w),
               ],
             ),

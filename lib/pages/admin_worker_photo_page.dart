@@ -237,7 +237,7 @@ class _AdminWorkerPhotoPageState extends State<AdminWorkerPhotoPage> {
     if (time == null) {
       return "__/__";
     }
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     DateFormat formatter = DateFormat('HH:mm');
     return formatter.format(dateTime);
   }

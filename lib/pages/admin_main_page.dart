@@ -62,14 +62,13 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         }
         _loading = false;
         _today = _data['today'];
-        var curr_date = DateTime.now();
+        var currDate = DateTime.now();
         _currMonthMaxDay =
-            DateTime(curr_date.year, curr_date.month + 1, 0).day.toInt();
+            DateTime(currDate.year, currDate.month + 1, 0).day.toInt();
       });
       showScaffoldMessage(context, Localizer.get('loaded'));
     } else {
       try {
-        print(Get.arguments);
         if (Get.arguments["from_main"] == true) {
           Get.offAll(() => const AdminGeneralPage());
           return;
@@ -370,14 +369,14 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
   Widget getWorkerLineWidget(String name, String username, var data, var prv) {
     final days = data == null ? null : data['days'];
 
-    var truancy_day_count = "0";
-    var working_day_count = "0";
+    var truancyDayCount = "0";
+    var workingDayCount = "0";
     var prize = '';
     var prizeColor = Colors.white;
 
     if (data != null) {
-      truancy_day_count = data['truancy_day_count'].toString();
-      working_day_count = data['working_day_count'].toString();
+      truancyDayCount = data['truancy_day_count'].toString();
+      workingDayCount = data['working_day_count'].toString();
       prize = (_data['prize'] - data['penalty_count']).toString();
       prizeColor = data['penalty_count'] == 0 ? onTimeColor : lateColor;
     }
@@ -423,9 +422,9 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
           width: 2.w,
         ),
         getRect(context, workingDayColor,
-            text: working_day_count, fontColor: Colors.white),
+            text: workingDayCount, fontColor: Colors.white),
         getRect(context, truancyColor,
-            text: truancy_day_count, fontColor: Colors.white),
+            text: truancyDayCount, fontColor: Colors.white),
         Expanded(
           child: getRect(context, prizeColor, text: prize.toString()),
         )

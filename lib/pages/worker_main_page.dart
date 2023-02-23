@@ -566,7 +566,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
     if (time == null) {
       return null;
     }
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     int beforeMinutes = _data['before_minute'];
     int postponementMinutes = _data['postponement_minute'];
     DateTime preTime = dateTime.subtract(Duration(minutes: beforeMinutes));
@@ -581,7 +581,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       return null;
     }
 
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     int afterMinutes = _data['after_minute'];
     DateTime afterTime = dateTime.add(Duration(minutes: afterMinutes));
 
@@ -598,7 +598,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       return "__/__";
     }
 
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     DateFormat formatter = DateFormat('HH:mm');
     return formatter.format(dateTime);
   }

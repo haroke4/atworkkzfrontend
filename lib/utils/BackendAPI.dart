@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:http/http.dart';
-import '';
 
 const host = "http://45.130.43.56:8000"; // "";
 String token = '';
@@ -41,7 +40,7 @@ class BackendAPI {
     if (response.statusCode != 200){
       return DateTime(2022);
     }
-    return DateTime.parse(jsonDecode(response.body)['message']['datetime']);
+    return DateTime.parse(jsonDecode(response.body)['message']['datetime']).toLocal();
   }
 
   static Future<bool> isTokenValid(String t) async {

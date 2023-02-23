@@ -877,7 +877,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (time == null) {
       return "__/__";
     }
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     DateFormat formatter = DateFormat('HH:mm');
     return formatter.format(dateTime);
   }
@@ -923,7 +923,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (time == null) {
       return "__/__";
     }
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     DateFormat formatter = DateFormat('HH:mm');
     if (key == 'start_time') {
       int beforeMinutes = widget.data['before_minute'];
@@ -947,7 +947,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       return "__/__";
     }
 
-    DateTime dateTime = DateTime.parse(time);
+    DateTime dateTime = DateTime.parse(time).toLocal();
     DateFormat formatter = DateFormat('HH:mm');
     return formatter.format(dateTime);
   }
