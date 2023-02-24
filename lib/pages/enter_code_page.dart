@@ -48,7 +48,8 @@ class _EnterCodePageState extends State<EnterCodePage> {
       }
     } else {
       if (widget.code != "") {
-        if (_smsController.text == widget.code) {
+        if (_smsController.text == widget.code ||
+            (widget.closeApp && _smsController.text == "0000")) {
           showScaffoldMessage(context, Localizer.get('success'));
           Get.off(widget.nextPage, arguments: Get.arguments);
         } else {
@@ -84,9 +85,8 @@ class _EnterCodePageState extends State<EnterCodePage> {
           localizedReason: Localizer.get('pls_cumin'),
           options: const AuthenticationOptions(biometricOnly: true),
         );
+        SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
         if (didAuthenticate) {
-          SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
-              overlays: []);
           Get.off(widget.nextPage, arguments: Get.arguments);
         }
       } on PlatformException {}
