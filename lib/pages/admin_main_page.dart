@@ -62,7 +62,7 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
         }
         _loading = false;
         _today = _data['today'];
-        var currDate = DateTime.now();
+        var currDate = ServerTime.time;
         _currMonthMaxDay =
             DateTime(currDate.year, currDate.month + 1, 0).day.toInt();
       });

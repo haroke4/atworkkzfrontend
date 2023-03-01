@@ -70,9 +70,8 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
           displayName: _displayUsername, username: _usernameWorker);
     }
     if (response.statusCode == 200) {
-      if (widget.username != '') {
-        showScaffoldMessage(context, Localizer.get('ok_worker_replace'),
-            time: 3);
+      if (widget.username != null) {
+        showScaffoldMessage(context, Localizer.get('ok_worker_replace'), time: 3);
       }
       Get.back(result: "update");
     } else {

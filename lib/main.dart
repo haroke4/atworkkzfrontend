@@ -97,7 +97,7 @@ class _SplashScreenState extends State<SplashScreen>
     sharedPrefs = await SharedPreferences.getInstance();
 
     nextScreen = LoginPage();
-    if (sharedPrefs.getString("account_type") == null) { //
+    if (null == null) { //
       setState(() {
         nextScreen = LoginPage();
       });

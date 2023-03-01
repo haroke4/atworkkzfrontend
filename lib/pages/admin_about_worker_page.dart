@@ -172,14 +172,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_startController.text == '__/__' || _startController.text.length != 5) {
       startTime = null;
     } else {
-      startTime = '${_days[_today - 1]['date']} ${_startController.text}';
+      startTime = parseLTTU('${_days[_today - 1]['date']} ${_startController.text}');
     }
     if (_endController.text == '__/__' || _endController.text.length != 5) {
       endTime = null;
     } else {
-      endTime = '${_days[_today - 1]['date']} ${_endController.text}';
+      endTime = parseLTTU('${_days[_today - 1]['date']} ${_endController.text}');
     }
-
     var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
         dayId: _days[_today - 1]['id'],
@@ -207,6 +206,13 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       }
     }
     showScaffoldMessage(context, scaffoldMessage);
+  }
+
+  String parseLTTU(String p){
+    // Parse local time string then convert it to utc time string
+    var t = DateTime.parse(p);
+    var ans = DateTime(t.year, t.month, t.day ,t.hour, t.minute);
+    return ans.toUtc().toString();
   }
 
   Future<dynamic> hereGeoposition() async {

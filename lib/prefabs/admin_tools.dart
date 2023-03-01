@@ -122,15 +122,15 @@ class TimeInputFormatter extends TextInputFormatter {
     int counter = 0;
     for (var element in newValue.text.runes) {
       if (counter == 2) {
-        if (int.parse(ans.substring(0, 2)) > 24) {
-          ans = '24';
+        if (int.parse(ans.substring(0, 2)) > 23) {
+          ans = '23';
         }
         ans += ':';
       }
       ans += String.fromCharCode(element);
       if (counter == 3) {
-        if (int.parse(ans.substring(3, 5)) > 60) {
-          ans = '${ans.substring(0, 3)}60';
+        if (int.parse(ans.substring(3, 5)) > 59) {
+          ans = '${ans.substring(0, 3)}59';
         }
       }
       counter += 1;
