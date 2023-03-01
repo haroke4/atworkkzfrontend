@@ -518,14 +518,14 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_start']),
-        confirmation: showConfirm && !_days[day - 1]['confirmed_start'],
+        confirmation: showConfirm && _days[day - 1]['confirmed_start'],
         rounded: rounded,
       );
     } else if (ws && !start) {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
-        confirmation: showConfirm && !_days[day - 1]['confirmed_end'],
+        confirmation: showConfirm && _days[day - 1]['confirmed_end'],
         rounded: rounded,
       );
     }
