@@ -43,8 +43,8 @@ class _AdminAddWorkerPageState extends State<AdminAddWorkerPage> {
       }
       setState(() {
         _displayUsername = contact.displayName;
-        _usernameWorker = contact.phones[0].number.replaceAll(" ", "");
-        _usernameWorker = _usernameWorker.replaceAll("+", "");
+        _usernameWorker = contact.phones[0].number;
+        _usernameWorker = _usernameWorker.replaceAll(RegExp(r'[^0-9]'),'');
         if (!_usernameWorker.startsWith("7")) {
           _usernameWorker = '7${_usernameWorker.substring(
             1,

@@ -25,6 +25,7 @@ class WorkersMainPage extends StatefulWidget {
 }
 
 class _WorkersMainPageState extends State<WorkersMainPage> {
+  int _actualToday = 1;
   int _today = 1;
   int _initToday = 0;
   var _data = {};
@@ -53,10 +54,11 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         _days = _data['days'];
         THIS_MONTH_ACTIVE = _data['this_month_active'];
         _today = _data['today'];
+        _actualToday = _today;
         _initToday = _today;
-        var curr_date = DateTime.now();
+        var currDate = DateTime.now();
         _currMonthMaxDay =
-            DateTime(curr_date.year, curr_date.month + 1, 0).day.toInt();
+            DateTime(currDate.year, currDate.month + 1, 0).day.toInt();
       });
       showScaffoldMessage(context, Localizer.get('success'));
       if (!THIS_MONTH_ACTIVE) {
@@ -312,31 +314,37 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         SizedBox(height: 6.h),
         Row(
           children: [
-            getRectByDay(_today - 5),
-            getRectByDay(_today - 4),
-            getRectByDay(_today - 3),
-            getRectByDay(_today - 2),
-            getRectByDay(_today - 1),
+            getRectByDay(_today - 5, ws: _today - 5 <= _actualToday),
+            getRectByDay(_today - 4, ws: _today - 4 <= _actualToday),
+            getRectByDay(_today - 3, ws: _today - 3 <= _actualToday),
+            getRectByDay(_today - 2, ws: _today - 2 <= _actualToday),
+            getRectByDay(_today - 1, ws: _today - 1 <= _actualToday),
             SizedBox(
               width: 104.h + 4.w,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  getRectByDay(_today, showConfirm: true, rounded: false),
+                  getRectByDay(
+                    _today,
+                    showConfirm: true,
+                    rounded: false,
+                    ws: _today <= _actualToday,
+                  ),
                   getRectByDay(
                     _today,
                     start: false,
                     showConfirm: true,
                     rounded: false,
+                    ws: _today <= _actualToday,
                   ),
                 ],
               ),
             ),
-            getRectByDay(_today + 1, ws: false),
-            getRectByDay(_today + 2, ws: false),
-            getRectByDay(_today + 3, ws: false),
-            getRectByDay(_today + 4, ws: false),
-            getRectByDay(_today + 5, ws: false),
+            getRectByDay(_today + 1, ws: _today + 1 <= _actualToday),
+            getRectByDay(_today + 2, ws: _today + 2 <= _actualToday),
+            getRectByDay(_today + 3, ws: _today + 3 <= _actualToday),
+            getRectByDay(_today + 4, ws: _today + 4 <= _actualToday),
+            getRectByDay(_today + 5, ws: _today + 5 <= _actualToday),
           ],
         )
       ],

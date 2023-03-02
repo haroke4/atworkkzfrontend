@@ -48,6 +48,7 @@ class _AdminGeneralPageState extends State<AdminGeneralPage> {
     }
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
+    ServerTime.updateDateTime();
   }
 
   void _onSavePressed() async {

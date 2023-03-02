@@ -908,12 +908,12 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (ws && start) {
       return getRect(
           context, getColorByStatus(_days[day - 1]['worker_status_start']),
-          confirmation: _days[day - 1]['confirmed_start'] && day == _today);
+          confirmation: _days[day - 1]['confirmed_start']);
     } else if (ws && !start) {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
-        confirmation: _days[day - 1]['confirmed_end'] && day == _today,
+        confirmation: _days[day - 1]['confirmed_end'],
       );
     }
     return getRect(context, getColorByStatus(_days[day - 1]['day_status']));

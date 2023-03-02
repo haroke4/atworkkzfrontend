@@ -51,7 +51,13 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           "7${_workerPhoneController.text.replaceAll(" ", "")}";
       var response;
       if (widget.loginAsWorker) {
-        response = await BackendAPI.sendSms(workerUsername);
+        if(workerUsername != adminUsername){
+          response = await BackendAPI.sendSms(workerUsername);
+        }
+        else{
+          showScaffoldMessage(context, Localizer.get('invalid_phone'));
+          return;
+        }
       } else {
         try {
           await BackendAPI.registerAsAdmin(adminUsername);
