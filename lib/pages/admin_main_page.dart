@@ -472,11 +472,11 @@ class _AdminsMainPageState extends State<AdminsMainPage> {
     } else if (days[day - 1] == null) {
       return getRect(context, noAssignmentColor);
     }
-    if (ws && start) {
+    if (ws && start && days[day - 1]['worker_status_start'] != null) {
       return getRect(
           context, getColorByStatus(days[day - 1]['worker_status_start']),
           confirmation: showConfirm && days[day - 1]['confirmed_start']);
-    } else if (ws && !start) {
+    } else if (ws && !start && days[day - 1]['worker_status_end'] != null) {
       return getRect(
           context, getColorByStatus(days[day - 1]['worker_status_end']),
           confirmation: showConfirm && days[day - 1]['confirmed_end']);

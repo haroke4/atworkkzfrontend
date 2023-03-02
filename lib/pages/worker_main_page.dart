@@ -85,15 +85,15 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       showScaffoldMessage(context, Localizer.get('today_not_w_d'));
       return;
     }
+    // Checking time
+    await ServerTime.updateDateTime();
 
     if (start) {
       if (_days[_today - 1]['start_time'] == null) {
         showScaffoldMessage(context, Localizer.get('no_appea_time'));
         return;
       }
-      // Checking time
-      await ServerTime.updateDateTime();
-
+      
       //Checking if user in time duration
       var time = ServerTime.time.hour * 60 + ServerTime.time.minute;
       var a = _getHoursAndMinutesStart();
@@ -391,7 +391,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
                       children: [
                         getText(Localizer.get('prize_w')),
                         SizedBox(height: 4.h),
-                        getText(Localizer.get('beg_off_text')),
+                        getText(Localizer.get('beg_off')),
                       ],
                     ),
                   ),
@@ -441,7 +441,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
               SizedBox(height: 4.h),
               Row(children: [
                 getRect(context, begOffColor, width: 50.h),
-                textM(Localizer.get('beg_off_text'))
+                textM(Localizer.get('beg_off'))
               ]),
               SizedBox(height: 4.h),
               Row(children: [
@@ -522,14 +522,14 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
         rounded: rounded,
       );
     }
-    if (ws && start) {
+    if (ws && start && _days[day - 1]['worker_status_start'] != null) {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_start']),
         confirmation: showConfirm && _days[day - 1]['confirmed_start'],
         rounded: rounded,
       );
-    } else if (ws && !start) {
+    } else if (ws && !start && _days[day - 1]['worker_status_end'] != null) {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_end']),

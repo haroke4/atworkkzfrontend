@@ -229,7 +229,7 @@ class Localizer {
       "ru": "Нерабочий день",
       "kz": "Jūmys emes kün"
     },
-    "beg_off_text": {
+    "beg_off": {
       "en": "Asked off",
       "ru": "Отпросился",
       "kz": "Sūranylyp kettı"

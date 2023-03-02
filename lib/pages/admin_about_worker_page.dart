@@ -49,6 +49,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
   late var _monthPenalty = widget.data['penalty_count'].toString();
 
   //for adjustment
+  var _updateDays = {}; //list of id of days which need sent to server
   final _tempValues = {};
   var _pressedLine = "";
   var _result = '';
@@ -172,12 +173,14 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (_startController.text == '__/__' || _startController.text.length != 5) {
       startTime = null;
     } else {
-      startTime = parseLTTU('${_days[_today - 1]['date']} ${_startController.text}');
+      startTime =
+          parseLTTU('${_days[_today - 1]['date']} ${_startController.text}');
     }
     if (_endController.text == '__/__' || _endController.text.length != 5) {
       endTime = null;
     } else {
-      endTime = parseLTTU('${_days[_today - 1]['date']} ${_endController.text}');
+      endTime =
+          parseLTTU('${_days[_today - 1]['date']} ${_endController.text}');
     }
     var response = await AdminBackendAPI.editDay(
         workerUsername: widget.workerUsername,
@@ -205,13 +208,25 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         scaffoldMessage = '${Localizer.get('error')} $e';
       }
     }
+    _updateDays.forEach((dayId, value) async {
+      await AdminBackendAPI.editDay(
+        workerUsername: widget.workerUsername,
+        dayId: dayId,
+        dayStatus: value['day_status'],
+        geoposition: value['geoposition'],
+      );
+    });
+    if (_updateDays.isNotEmpty){
+      _result = 'update';
+      scaffoldMessage = Localizer.get('success');
+    }
     showScaffoldMessage(context, scaffoldMessage);
   }
 
-  String parseLTTU(String p){
+  String parseLTTU(String p) {
     // Parse local time string then convert it to utc time string
     var t = DateTime.parse(p);
-    var ans = DateTime(t.year, t.month, t.day ,t.hour, t.minute);
+    var ans = DateTime(t.year, t.month, t.day, t.hour, t.minute);
     return ans.toUtc().toString();
   }
 
@@ -560,11 +575,31 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            getRectByDay(_today - 5, ws: _today - 5 <= widget.today),
-            getRectByDay(_today - 4, ws: _today - 4 <= widget.today),
-            getRectByDay(_today - 3, ws: _today - 3 <= widget.today),
-            getRectByDay(_today - 2, ws: _today - 2 <= widget.today),
-            getRectByDay(_today - 1, ws: _today - 1 <= widget.today),
+            getRectByDay(
+              _today - 5,
+              ws: _today - 5 <= widget.today,
+              onTap: () => onRectPressed(_today - 6),
+            ),
+            getRectByDay(
+              _today - 4,
+              ws: _today - 4 <= widget.today,
+              onTap: () => onRectPressed(_today - 5),
+            ),
+            getRectByDay(
+              _today - 3,
+              ws: _today - 3 <= widget.today,
+              onTap: () => onRectPressed(_today - 4),
+            ),
+            getRectByDay(
+              _today - 2,
+              ws: _today - 2 <= widget.today,
+              onTap: () => onRectPressed(_today - 3),
+            ),
+            getRectByDay(
+              _today - 1,
+              ws: _today - 1 <= widget.today,
+              onTap: () => onRectPressed(_today - 2),
+            ),
             SizedBox(
               width: 104.h + 4.w,
               child: Row(
@@ -576,11 +611,31 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
                 ],
               ),
             ),
-            getRectByDay(_today + 1, ws: _today + 1 <= widget.today),
-            getRectByDay(_today + 2, ws: _today + 2 <= widget.today),
-            getRectByDay(_today + 3, ws: _today + 3 <= widget.today),
-            getRectByDay(_today + 4, ws: _today + 4 <= widget.today),
-            getRectByDay(_today + 5, ws: _today + 5 <= widget.today),
+            getRectByDay(
+              _today + 1,
+              ws: _today + 1 <= widget.today,
+              onTap: () => onRectPressed(_today),
+            ),
+            getRectByDay(
+              _today + 2,
+              ws: _today + 2 <= widget.today,
+              onTap: () => onRectPressed(_today + 1),
+            ),
+            getRectByDay(
+              _today + 3,
+              ws: _today + 3 <= widget.today,
+              onTap: () => onRectPressed(_today + 2),
+            ),
+            getRectByDay(
+              _today + 4,
+              ws: _today + 4 <= widget.today,
+              onTap: () => onRectPressed(_today + 3),
+            ),
+            getRectByDay(
+              _today + 5,
+              ws: _today + 5 <= widget.today,
+              onTap: () => onRectPressed(_today + 4),
+            ),
           ],
         )
       ],
@@ -598,7 +653,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
               children: [
                 getSingleMiddleInfoWidget('valid_reason', r: false),
                 SizedBox(height: 20.h),
-                getSingleMiddleInfoWidget('beg_off_text', r: false)
+                getSingleMiddleInfoWidget('beg_off', r: false)
               ],
             ),
           ),
@@ -697,7 +752,7 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
       "non_working_day": nonWorkingDayColor,
       "working_day": workingDayColor,
       "valid_reason": validReasonColor,
-      "beg_off_text": begOffColor,
+      "beg_off": begOffColor,
     };
     return Container(
       color: _pressedLine == key ? Colors.black26 : bgColor,
@@ -896,27 +951,61 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     }
   }
 
-  Widget getRectByDay(int day, {ws = true, start = true}) {
+  Widget getRectByDay(int day, {ws = true, start = true, Function? onTap}) {
     // ws - is for worker status
-
+    onTap = onTap ?? () {};
     if (getValidatedDay(day) == '' || _days.isEmpty) {
-      return getRect(context, noAssignmentColor);
+      return getRect(context, noAssignmentColor, onTap: onTap);
     } else if (_days[day - 1] == null) {
       // day starts from 1 but indexes from 0
-      return getRect(context, noAssignmentColor);
+      return getRect(context, noAssignmentColor, onTap: onTap);
     }
-    if (ws && start) {
+    if (ws && start && _days[day - 1]['worker_status_start'] != null) {
       return getRect(
-          context, getColorByStatus(_days[day - 1]['worker_status_start']),
-          confirmation: _days[day - 1]['confirmed_start']);
-    } else if (ws && !start) {
+        context,
+        getColorByStatus(_days[day - 1]['worker_status_start']),
+        confirmation: _days[day - 1]['confirmed_start'],
+        onTap: onTap,
+      );
+    } else if (ws && !start && _days[day - 1]['worker_status_end'] != null) {
       return getRect(
         context,
         getColorByStatus(_days[day - 1]['worker_status_end']),
         confirmation: _days[day - 1]['confirmed_end'],
+        onTap: onTap,
       );
     }
-    return getRect(context, getColorByStatus(_days[day - 1]['day_status']));
+    return getRect(
+      context,
+      getColorByStatus(_days[day - 1]['day_status']),
+      onTap: onTap,
+    );
+  }
+
+  void onRectPressed(dayIdInList) {
+    if (dayIdInList + 1 <= widget.today) {
+      return;
+    }
+
+    if (!_doingAdjustments) {
+      return;
+    }
+
+    var day = _days[dayIdInList];
+    var geoposition;
+    if (dayIdInList >= 1) {
+      geoposition = _days[dayIdInList - 1]['geoposition'];
+    }
+    setState(() {
+      _days[dayIdInList]['day_status'] = day['day_status'] == 'working_day'
+          ? 'non_working_day'
+          : 'working_day';
+    });
+
+    _updateDays[day['id']] = {
+      'day_status': _days[dayIdInList]['day_status'],
+      'geoposition': geoposition,
+    };
   }
 
   String getTime(String key) {
