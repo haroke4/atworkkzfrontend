@@ -229,11 +229,7 @@ class Localizer {
       "ru": "Нерабочий день",
       "kz": "Jūmys emes kün"
     },
-    "beg_off": {
-      "en": "Asked off",
-      "ru": "Отпросился",
-      "kz": "Sūranylyp kettı"
-    },
+    "beg_off": {"en": "Asked off", "ru": "Отпросился", "kz": "Sūranylyp kettı"},
     "sum_month": {
       "en": "Summary of month",
       "ru": "Сумма месяц",
@@ -460,6 +456,11 @@ class Localizer {
       "ru": 'Введите поля и нажмите кнопку "Сохранить"',
       "kz": 'Örısterdı engızıp "Saqtau" tüimesın basyŋyz'
     },
+    "error_2": {
+      'en': 'Too many requests to this number',
+      'ru': 'Слишком много запросов на этот номер',
+      'kz': 'Bul nómirge tym kóp suranys'
+    }
   };
 
   static String get(dynamic key) {

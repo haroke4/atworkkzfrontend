@@ -230,31 +230,47 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     return ans.toUtc().toString();
   }
 
+  Future<bool> isLocationSystemsAllowed() async{
+    Location location = Location();
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) {
+        return false;
+      }
+    }
+
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  Future<bool> ensureLocationSystemsAllowed() async{
+    if(await isLocationSystemsAllowed()){
+      return true;
+    }
+    showScaffoldMessage(context, Localizer.get('loc_disabled'));
+    return false;
+  }
+
   Future<dynamic> hereGeoposition() async {
     if (!_geopoint) {
       return;
     }
 
+    if (!await ensureLocationSystemsAllowed()){
+      return;
+    }
+
     Location location = Location();
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
-    }
-
     LocationData p = await location.getLocation();
     _tempValues['geoposition'] = "${p.latitude} ${p.longitude}";
     showScaffoldMessage(context, Localizer.get('loc_success'));
@@ -264,6 +280,11 @@ class _AdminAboutWorkerPageState extends State<AdminAboutWorkerPage> {
     if (!_geopoint) {
       return;
     }
+
+    if (!await ensureLocationSystemsAllowed()){
+      return;
+    }
+
     GeoPoint? p = await LocationPicker(
       context: context,
       isDismissible: true,

@@ -31,7 +31,7 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
   );
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: []);
   }
@@ -51,10 +51,9 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           "7${_workerPhoneController.text.replaceAll(" ", "")}";
       var response;
       if (widget.loginAsWorker) {
-        if(workerUsername != adminUsername){
+        if (workerUsername != adminUsername) {
           response = await BackendAPI.sendSms(workerUsername);
-        }
-        else{
+        } else {
           showScaffoldMessage(context, Localizer.get('invalid_phone'));
           return;
         }
@@ -81,6 +80,14 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
             workerUsername: workerUsername,
           ),
         );
+      } else if (response.statusCode == 429) {
+        showScaffoldMessage(context, Localizer.get('error_2'));
+        setState(() {
+          _buttonLabel = Text(
+            Localizer.get('send_code'),
+            style: TextStyle(fontSize: 25.sp, fontWeight: FontWeight.bold),
+          );
+        });
       } else {
         showScaffoldMessage(context, Localizer.get('invalid_phone'));
         setState(() {
@@ -156,7 +163,8 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
       String label, TextEditingController controller) {
     return Container(
       margin: EdgeInsets.only(left: 50.w, right: 50.w),
-      padding: EdgeInsets.only(left: 10.w, top: 10.h, right: 10.w, bottom: 10.h),
+      padding:
+          EdgeInsets.only(left: 10.w, top: 10.h, right: 10.w, bottom: 10.h),
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
@@ -189,7 +197,6 @@ class _EnterPhonePageState extends State<EnterPhonePage> {
           labelStyle: TextStyle(fontSize: 25.sp, color: Colors.black54),
           errorStyle: TextStyle(fontSize: 17.sp),
           contentPadding: EdgeInsets.fromLTRB(2.w, 10.h, 2.w, 10.h),
-
         ),
         cursorWidth: 1,
         cursorColor: Theme.of(context).primaryColorDark,
