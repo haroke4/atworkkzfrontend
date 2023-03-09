@@ -53,6 +53,10 @@
 		<string>This app requires permission to work properly</string>
 		<key>NSContactsUsageDescription</key>
 		<string>This app requires permission to work properly</string>
+		<key>NSCalendarsUsageDescription</key>
+		<string>This app requires permission to work properly</string>
+		<key>NSLocationWhenInUseUsageDescription</key>
+        <string>This app requires permission to work properly</string>
 		<key>NSFaceIDUsageDescription</key>
 		<string>This permission is required to log in</string>
 		<key>com.apple.security.network.client</key>
