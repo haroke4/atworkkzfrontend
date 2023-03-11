@@ -437,9 +437,9 @@ class Localizer {
       "kz": "Bügın jūmys künı emes"
     },
     "photo_time_er": {
-      "en": "Too early or too late to send photo",
-      "ru": "Слишком рано или слишком поздно чтобы отправлять фото",
-      "kz": "Fotosurettı jıberu üşın erte nemese keş"
+      "en": "Too early to send the photo",
+      "ru": "Слишком рано чтобы отправлять фото",
+      "kz": "Fotosurettı jıberu üşın erte"
     },
     "edit_error": {
       "en": "You cannot change the status of the day of today/past dates",

@@ -77,14 +77,16 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       showScaffoldMessage(context, Localizer.get('atten'), time: 2);
       return;
     }
-    if (_days[_today - 1]['geoposition'] == null) {
-      showScaffoldMessage(context, Localizer.get('no_geo_pos'));
-      return;
-    }
     if (_days[_today - 1]['day_status'] != 'working_day') {
       showScaffoldMessage(context, Localizer.get('today_not_w_d'));
       return;
     }
+
+    if (_days[_today - 1]['geoposition'] == null) {
+      showScaffoldMessage(context, Localizer.get('no_geo_pos'));
+      return;
+    }
+
     // Checking time
     await ServerTime.updateDateTime();
 
@@ -97,7 +99,7 @@ class _WorkersMainPageState extends State<WorkersMainPage> {
       //Checking if user in time duration
       var time = ServerTime.time.hour * 60 + ServerTime.time.minute;
       var a = _getHoursAndMinutesStart();
-      if (a![0] * 60 + a[1] > time || time > a[2] * 60 + a[3]) {
+      if (a![0] * 60 + a[1] > time) {
         showScaffoldMessage(context, Localizer.get('photo_time_er'));
         return;
       }
